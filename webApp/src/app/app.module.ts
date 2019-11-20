@@ -9,10 +9,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatVideoModule } from 'mat-video';
 import { VideoDisplayComponent } from './video-display/video-display.component';
 
-import {MatMenuModule} from '@angular/material/menu';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatIconModule} from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 import { StatsDisplayComponent } from './stats-display/stats-display.component';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { StatsDisplayComponent } from './stats-display/stats-display.component';
     MatVideoModule,
     MatMenuModule,
     MatToolbarModule,
-    MatIconModule
+    MatIconModule,
+    MatCardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

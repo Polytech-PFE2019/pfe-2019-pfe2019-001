@@ -42,6 +42,7 @@
     background-color: #1976d2;
     color: white;
     font-weight: 600;
+    margin-bottom: 20px;
   }
 
   .toolbar img {
@@ -266,11 +267,11 @@
 
 <!-- Toolbar -->
 <div class="toolbar" role="banner">
-  <img
+  <a routerLink="/"><img
     width="40"
     alt="Angular Logo"
     src="../assets/bird.png"
-  />
+  /></a>
   <nav>
     <a routerLink="/"><h1>Bird Control</h1></a>
   </nav>
@@ -282,6 +283,20 @@
   </nav>
     <div class="spacer"></div>
 </div>
+
+<mat-card id="card" class="example-card" *ngIf="isHome">
+  <img id="logo" mat-card-image src="../assets/polytech.png" alt="logo Polytech">
+  <mat-card-content>
+    <p>
+      PFE de polytech Nice-Sophia 2019
+
+La croissance du marché des objets connectés met clairement en évidence l’intérêt,
+aussi bien du grand public que des industriels, pour les objets de tous les jours améliorés avec des technologies du numérique qui transforment leur usage.
+<br><br>S’inscrivant pleinement dans les domaines de l’IoT,
+ce projet a pour but de développer une cabane à oiseaux connectée qui pourra à terme servir de “centre de contrôle” pour d’éventuels objets additionnels.
+    </p>
+  </mat-card-content>
+</mat-card>
 
 
 
