@@ -1,11 +1,1 @@
-<h2>Video de la cabane en live !!</h2>
-<div id = "video"><mat-video src="../../assets/hello.mp4"></mat-video></div>
-<script type="text/javascript" src="https://rawgit.com/131/h264-live-player/master/vendor/dist/http-live-player.js"></script>
-<script>
-    var canvas = document.createElement("canvas");
-    document.body.appendChild(canvas);
-
-    var wsavc = new WSAvcPlayer(canvas, "webgl");
-
-    wsavc.connect(YOUR_WEBSOCKET_URL);
-</script> 
+<iframe id="video" src="http://192.168.43.223:8080"></iframe>

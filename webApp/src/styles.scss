@@ -2,8 +2,11 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
 #video{
-  margin: 0 auto;
-  width:600px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width:970px;
+  height:560px;
 }
 
 #stats{
