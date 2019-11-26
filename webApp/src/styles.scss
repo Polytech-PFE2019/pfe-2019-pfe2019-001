@@ -7,6 +7,7 @@
   flex-direction: column;
   width:970px;
   height:560px;
+  overflow:hidden;
 }
 
 #stats{
@@ -28,4 +29,11 @@
   flex-direction: column;
   margin: 0 auto;
   width:600px;
+}
+
+#loading{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto;
 }

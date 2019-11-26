@@ -30,7 +30,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": ["src/app/http-live-player.js"]
+            "scripts": []
           },
           "configurations": {
             "production": {
