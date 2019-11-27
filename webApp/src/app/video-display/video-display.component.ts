@@ -19,17 +19,21 @@ export class VideoDisplayComponent implements OnInit {
       const imageElm = document.getElementById('image');
       imageElm.setAttribute("src",`data:image/jpeg;base64,${image}`);
       document.getElementById("loading").style.display = 'none';
+      document.getElementById("stop").style.display = 'inline';
+      document.getElementById("start").style.display = 'inline';
     });
 
     this.socket.on("connect_error", function(exeception){
       document.getElementById('image').setAttribute("src", "https://image.freepik.com/vecteurs-libre/modele-erreur-404-oiseau-dans-style-dessine-main_23-2147734776.jpg");
       document.getElementById("loading").style.display = 'none';
+      document.getElementById("stop").style.display = 'none';
+      document.getElementById("start").style.display = 'none';
+      document.getElementById("pause").style.color = 'red';
+      document.getElementById("pause").innerHTML = "Erreur";
     })
   }
 
   ngOnInit() {
-
-
     /*var jsmpeg = require('jsmpeg');
         var canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
@@ -53,5 +57,21 @@ export class VideoDisplayComponent implements OnInit {
           transport: "dash",
           autoplay: true
         })*/
+  }
+
+  ngOnDestroy() {
+    this.socket.disconnect();
+  }
+
+  public stop(){
+    this.socket.emit("live", false);
+    document.getElementById("pause").style.color = 'red';
+    document.getElementById("pause").innerHTML = "En pause";
+  }
+
+  public start(){
+    this.socket.emit("live", true);
+    document.getElementById("pause").style.color = 'green';
+    document.getElementById("pause").innerHTML = "En live";
   }
 }
