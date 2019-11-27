@@ -8,7 +8,7 @@ import { retry, catchError } from 'rxjs/operators';
 })
 export class DataService {
 
-  private REST_API_SERVER = "http://192.168.43.77/water";
+  private REST_API_SERVER = "http://192.168.43.68:1337/water";
 
   constructor(private httpClient: HttpClient) { }
 
