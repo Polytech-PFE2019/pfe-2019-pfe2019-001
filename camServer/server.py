@@ -4,8 +4,13 @@ import time, threading
 import cv2
 import base64
 
+# Permet de patch les threads d'eventlet
+eventlet.monkey_patch()
+
 clients = []
 recording = False
+fps = 15
+print('Live FPS: ' + str(fps))
 capture = cv2.VideoCapture('/dev/video0')
 
 sio = socketio.Server()
@@ -39,14 +44,6 @@ class setInterval :
 #t=threading.Timer(5,inter.cancel)
 #t.start()
 
-def temp():
-    print('mock')
-    flag, frame = capture.read()
-    if flag:
-        image = cv2.imencode('.jpg', frame)[1].tostring();
-        image = base64.b64encode(image)
-        sio.emit('image', image);
-
 def sendImage():
     flag, frame = capture.read()
     if flag:
@@ -64,13 +61,15 @@ def start():
     global recording
     print('start recording')
     if not recording:
-        recording = setInterval(0.1, sendImage)
+        recording = setInterval(1/float(fps), sendImage)
 
 def stop():
     global recording
     print('stop recording')
     if recording != False:
         recording.cancel()
+        del recording
+        recording = False
 
 @sio.event
 def connect(sid, environ):
