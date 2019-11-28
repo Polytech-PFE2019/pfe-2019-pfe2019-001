@@ -264,7 +264,7 @@
 <div class="toolbar" role="banner">
   <a routerLink="/"><img
     width="40"
-    alt="Angular Logo"
+    alt="Bird Control Logo"
     src="../assets/bird.png"
   /></a>
   <nav>
@@ -280,6 +280,11 @@
     <a routerLink="/resourcesMonitor">Eau/Nourriture</a>
   </nav>
     <div class="spacer"></div>
+    <a id="blink" routerLink="/videoDisplay" *ngIf="presence"><img
+      width="40"
+      alt="Présence"
+      src="../assets/birdAlert.png"
+    /></a>
 </div>
 
 <mat-card id="card" class="example-card" *ngIf="isHome">

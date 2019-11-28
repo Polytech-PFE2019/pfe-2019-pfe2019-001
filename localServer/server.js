@@ -5,6 +5,8 @@ var firebase = require("firebase");
 const bodyParser = require("body-parser");
 var cors = require('cors')
 
+const waterRoutes = require("./routes/waterControl");
+
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -28,27 +30,7 @@ ref.once('value')
     console.log('snap.val()', snap.val());
   });
 
-app.post('/water', function (req, res) {
-  console.log(req.body.key)
-  var usersRef = ref.child('users');
-  // Create a new ref and log it’s push key
-  var userRef = usersRef.push();
-  console.log('user key', userRef.key);
-  // Create a new ref and save data to it in one step
-  var userRef = usersRef.push({
-    name: 'water',
-    empty: true
-  });
-  res.status(200).json({
-    message: "Message received",
-  });
-});
-
-app.get('/water', function (req, res) {
-  res.status(200).json({
-    water: false,
-  });
-});
+app.use("/water", waterRoutes);
 
 
 
