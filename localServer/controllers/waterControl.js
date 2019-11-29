@@ -1,5 +1,5 @@
 const fs = require('fs');
-
+const server = require('../server')
 var nodemailer = require('nodemailer');
 
 var transporter = nodemailer.createTransport({
@@ -22,7 +22,7 @@ async function setValue(req, res) {
     var file = require('./../ressources.json');
     file.water = req.body.water;
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
-    io.emit('water', req.body.water);
+    server.io.emit('water', req.body.water);
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
