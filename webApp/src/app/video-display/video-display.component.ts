@@ -9,7 +9,7 @@ import * as io from "socket.io-client";
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://192.168.43.200:3000";
+  private url = "http://192.168.43.77:3000";
   private socket;
 
   constructor() {

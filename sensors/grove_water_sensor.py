@@ -1,61 +1,94 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
-# GrovePi Example for using the Grove Water Sensor (http://www.seeedstudio.com/wiki/Grove_-_Water_Sensor)
+# The MIT License (MIT)
 #
-# The GrovePi connects the Raspberry Pi and Grove sensors.  You can learn more about GrovePi here:  http://www.dexterindustries.com/GrovePi
-#
-# Have a question about this example?  Ask on the forums here:  http://forum.dexterindustries.com/c/grovepi
-#
+# Grove Base Hat for the Raspberry Pi, used to connect grove sensors.
+# Copyright (C) 2018  Seeed Technology Co.,Ltd.
 '''
-## License
+This is the code for
+    - `Grove - Water Sensor <https://www.seeedstudio.com/Grove-Water-Sensor-p-748.html>`_
 
-The MIT License (MIT)
+Examples:
 
-GrovePi for the Raspberry Pi: an open source platform for connecting Grove Sensors to the Raspberry Pi.
-Copyright (C) 2017  Dexter Industries
+    .. code-block:: python
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+        import time
+        from grove.grove_water_sensor import GroveWaterSensor
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+        # connect to alalog pin 2(slot A2)
+        PIN = 2
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+        sensor = GroveWaterSensor(PIN)
+
+        print('Detecting ...')
+        while True:
+        value = sensor.value
+            if sensor.value > 800:
+                print("{}, Detected Water.".format(value))
+            else:
+                print("{}, Dry.".format(value))
+
+            time.sleep(.1)
 '''
-import time
-import grovepi
+import time, sys, math
+from grove.adc import ADC
 import requests
 
-# Connect the Grove Water Sensor to digital port D2
-# SIG,NC,VCC,GND
-water_sensor = 2
 
-grovepi.pinMode(water_sensor, "INPUT")
+__all__ = ["GroveWaterSensor"]
 
-while True:
-    try:
-        print(grovepi.digitalRead(water_sensor))
-        wet = True
-        if wet == True and grovepi.digitalRead(water_sensor) == 0:
-            r = requests.post(
-                'http://192.168.43.68:1337/water', json={"Empty": "1"})
-            print(r.text)
-            wet = False
-        else if wet == False and grovepi.digitalRead(water_sensor) == 1:
-            r = requests.post(
-                'http://192.168.43.68:1337/water', json={"Empty": "0"})
-            wet = True
-        time.sleep(.5)
+class GroveWaterSensor:
+    '''
+    Grove Water Sensor class
 
-    except IOError:
-        print("Error")
+    Args:
+        pin(int): number of analog pin/channel the sensor connected.
+    '''
+    def __init__(self, channel):
+        self.channel = channel
+        self.adc = ADC()
+
+    @property
+    def value(self):
+        '''
+        Get the water strength value
+
+        Returns:
+            (int): ratio, 0(0.0%) - 1000(100.0%)
+        '''
+        return self.adc.read(self.channel)
+
+Grove = GroveWaterSensor
+
+
+def main():
+    from grove.helper import SlotHelper
+    sh = SlotHelper(SlotHelper.ADC)
+    pin = sh.argv2pin()
+
+    sensor = GroveWaterSensor(pin)
+
+    wet = True
+
+    print('Detecting ...')
+    while True:
+        value = sensor.value
+        if sensor.value > 800:
+            print("{}, Dry.".format(value))
+            if wet == True :
+                r = requests.post(
+                'http://localhost:1337/water', json={"Empty": "1"})
+                wet = False
+
+        else:
+            print("{}, Detected Water.".format(value))
+            if wet == False:
+                r = requests.post(
+                'http://localhost:1337/water', json={"Empty": "0"})
+                wet = True
+
+        time.sleep(.1)
+
+if __name__ == '__main__':
+    main()
