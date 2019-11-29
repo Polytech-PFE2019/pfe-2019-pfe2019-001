@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("", waterController.setValue);
 
-router.get("", waterController.getValue)
+router.get("", waterController.getValue);
 
 
 

@@ -4,7 +4,7 @@ var app = express();
 var firebase = require("firebase");
 const bodyParser = require("body-parser");
 var cors = require('cors')
-
+ 
 const waterRoutes = require("./routes/waterControl");
 
 
@@ -24,6 +24,7 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+
 var ref = firebase.app().database().ref();
 ref.once('value')
   .then(function (snap) {
@@ -31,6 +32,8 @@ ref.once('value')
   });
 
 app.use("/water", waterRoutes);
+app.use("/food", foodRoutes);
+
 
 
 
