@@ -19,7 +19,6 @@ export class ResourcesMonitorComponent implements OnInit {
 
   ngOnInit() {
 
-<<<<<<< HEAD
     this.dataService.sendGetRequest().pipe(takeUntil(this.destroy$)).subscribe((data: any[])=>{
       console.log(data["water"]);
       this.products = data;
@@ -27,15 +26,6 @@ export class ResourcesMonitorComponent implements OnInit {
       if(data["water"] == true){
         this.water = true;
       }else if(data["water"] == false){
-=======
-    this.dataService.sendGetRequest().pipe(takeUntil(this.destroy$)).subscribe((data: any[]) => {
-      console.log(data.water);
-      this.products = data;
-
-      if (data.water == true) {
-        this.water = true;
-      } else if (data.water == false) {
->>>>>>> be43d96fa15ca336e7298024251bb619e1458037
         this.water = false;
       }
     })
