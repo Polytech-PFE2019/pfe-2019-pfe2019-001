@@ -44,10 +44,10 @@ export class AppComponent{
   ngOnInit() {
     setInterval(() => {
       if(this.presence){
-        document.getElementById('blink').style.opacity = 1;
+        document.getElementById('blink').style.opacity = "1";
         document.getElementById('blink').style.backgroundColor = "red";
         setTimeout(() =>{
-          document.getElementById('blink').style.opacity = 0;
+          document.getElementById('blink').style.opacity = "0";
         },3000);
       }
     }, 2000);
