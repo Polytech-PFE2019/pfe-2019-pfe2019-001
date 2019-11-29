@@ -44,5 +44,13 @@ export class SocketService {
 
     }
 
+    emitName(sock, value){
+      this.socket.emit(sock,value);
+    }
+
+    emitMail(sock, value){
+      this.socket.emit(sock,value);
+    }
+
 
 }
