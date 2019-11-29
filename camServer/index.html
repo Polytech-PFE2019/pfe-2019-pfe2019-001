@@ -8,7 +8,7 @@
     <img id="image">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <script type="text/javascript">
-      const socket = io.connect('http://localhost:3000');
+      const socket = io.connect('http://192.168.43.77:3000');
       socket.on('image', (image) => {
         const imageElm = document.getElementById('image');
         imageElm.src = `data:image/jpeg;base64,${image}`;
