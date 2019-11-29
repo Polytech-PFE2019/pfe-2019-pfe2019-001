@@ -3,7 +3,7 @@ var path = require("path");
 var app = express();
 var firebase = require("firebase");
 const bodyParser = require("body-parser");
-var cors = require('cors')
+var cors = require('cors');
 
 const waterRoutes = require("./routes/waterControl");
 
@@ -24,17 +24,45 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-var ref = firebase.app().database().ref();
-ref.once('value')
-  .then(function (snap) {
-    console.log('snap.val()', snap.val());
-  });
+// var ref = firebase.app().database().ref();
+// ref.once('value')
+//   .then(function (snap) {
+//     console.log('snap.val()', snap.val());
+//   });
 
 app.use("/water", waterRoutes);
 
-
-
 var port = 1337;
-app.listen(port, function () {
+var server = app.listen(port, function () {
   console.log("Connected on port 1337");
 })
+
+var io = require('socket.io').listen(server);
+
+
+io.on('connection', function (socket) {
+  console.log('User connected, starting to record...');
+  console.log("clients: " + Object.keys(io.sockets.sockets).length);
+
+  socket.on('live', function (msg) {
+    console.log("Message: " + msg);
+  });
+  socket.on('disconnect', function () {
+    console.log("clients: " + Object.keys(io.sockets.sockets).length);
+  });
+});
+
+app.post('/bird', function (req, res) {
+  if (req.body.presence == true) {
+    io.emit('presence', true);
+    console.log("here")
+  }
+  else {
+    io.emit('presence', false);
+    console.log("not here")
+
+  }
+  res.status(200).json({
+    ok: "ok",
+  });
+});
