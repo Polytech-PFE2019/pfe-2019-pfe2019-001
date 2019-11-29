@@ -6,19 +6,23 @@ import base64
 import subprocess
 
 picam_proc = subprocess.Popen(["./picam.sh"], stdout=subprocess.PIPE)
-picam = picam_proc.stdout.read().decode("utf-8").rstrip()
+picam = picam_proc.stdout.read().decode("utf-8").strip()
 print("picam : " + picam)
-camera_ids = ["/dev/v4l/by-id/usb-Generic_USB2.0_PC_CAMERA-video-index0"]
 
+usbcam_proc = subprocess.Popen(["./usbcam.sh"], stdout=subprocess.PIPE)
+usbcam = usbcam_proc.stdout.read().decode("utf8").strip().split()
+print("usbcams : " + " ".join(usbcam))
+
+encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
 # Permet de patch les threads d'eventlet
 eventlet.monkey_patch()
 clients = []
 recording = False
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
-capture = cv2.VideoCapture(picam)
-capture.set(3, 640)
-capture.set(4, 480)
+capture = cv2.VideoCapture(usbcam[0])
+#capture.set(3, 640)
+#capture.set(4, 480)
 
 
 sio = socketio.Server(cors_allowed_origins="*")
@@ -61,7 +65,7 @@ def rescale_frame(frame, percent=75):
 def sendImage():
     flag, frame = capture.read()
     if flag:
-        image = cv2.imencode('.jpg', rescale_frame(frame))[1].tostring();
+        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring();
         image = base64.b64encode(image)
         #print('image: ' + str(image))
         sio.emit('image', image.decode('utf-8'));
