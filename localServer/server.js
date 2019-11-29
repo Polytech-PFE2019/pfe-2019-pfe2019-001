@@ -43,6 +43,10 @@ io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
+  var file = require('./ressources.json');
+  console.log(file.water)
+  io.emit("water", file.water)
+
   socket.on('live', function (msg) {
     console.log("Message: " + msg);
   });

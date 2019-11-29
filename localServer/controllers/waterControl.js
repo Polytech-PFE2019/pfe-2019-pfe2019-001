@@ -1,3 +1,4 @@
+const fs = require('fs');
 
 var nodemailer = require('nodemailer');
 
@@ -16,15 +17,13 @@ var mailOptions = {
     text: 'That was easy!'
 };
 
-exports.setValue = (req, res) => {
-    console.log(req.body.Empty)
+async function setValue(req, res) {
+    console.log(req.body.water)
+    var file = require('./../ressources.json');
+    file.water = req.body.water;
+    await fs.writeFileSync('ressources.json', JSON.stringify(file));
+    io.emit('water', req.body.water);
     res.status(200).json({
         message: "Message received",
     });
-};
-
-exports.getValue = (req, res) => {
-    res.status(200).json({
-        water: false,
-    });
-}
+}; module.exports.setValue = setValue;
