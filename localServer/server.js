@@ -2,9 +2,11 @@ var express = require("express");
 var path = require("path");
 var app = express();
 const bodyParser = require("body-parser");
-var cors = require('cors');
-
+var cors = require('cors')
+ 
 const waterRoutes = require("./routes/waterControl");
+const foodRoutes = require("./routes/foodControl");
+
 
 
 app.use(cors())
@@ -30,6 +32,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //   });
 
 app.use("/water", waterRoutes);
+app.use("/food", foodRoutes);
+
 
 var port = 1337;
 var server = app.listen(port, function () {
@@ -37,6 +41,7 @@ var server = app.listen(port, function () {
 })
 
 var io = require('socket.io').listen(server);
+exports.io = io;
 
 
 io.on('connection', function (socket) {

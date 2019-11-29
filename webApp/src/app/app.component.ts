@@ -37,5 +37,9 @@ export class AppComponent {
       this.presence = data;
     })
 
+    this.socket.error.subscribe((data) => {
+      this.presence = false;
+    })
+
   }
 }
