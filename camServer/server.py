@@ -3,17 +3,20 @@ import socketio
 import time, threading
 import cv2
 import base64
+import subprocess
 
-camera_ids = ["usb-Generic_USB2.0_PC_CAMERA-video-index0"]
+picam_proc = subprocess.Popen(["./picam.sh"], stdout=subprocess.PIPE)
+picam = picam_proc.stdout.read().decode("utf-8").rstrip()
+print("picam : " + picam)
+camera_ids = ["/dev/v4l/by-id/usb-Generic_USB2.0_PC_CAMERA-video-index0"]
 
 # Permet de patch les threads d'eventlet
 eventlet.monkey_patch()
-print(eventlet.patcher.is_monkey_patched(threading))
 clients = []
 recording = False
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
-capture = cv2.VideoCapture(camera_ids[0])
+capture = cv2.VideoCapture(picam)
 capture.set(3, 640)
 capture.set(4, 480)
 
