@@ -89,17 +89,15 @@ while True:
 
         if cnts:
             if text == "Unoccupied":
-                # pload = {'username':'Test','password':'123'}
-                # r = requests.post('https://httpbin.org/post',data = pload)
-                # print(r.text)
-                print("LIVE")
+            r = requests.post(
+                'http://192.168.43.68:1337/bird', json={"Presence": True})
+            print("LIVE")
 
             text = "Occupied"
         else:
             if text == "Occupied":
-                # pload = {'username':'Test','password':'123'}
-                # r = requests.post('https://httpbin.org/post',data = pload)
-                # print(r.text)
+                 r = requests.post(
+                     'http://192.168.43.68:1337/bird', json={"Presence": False})
                 print("COUPER LIVE")
             text = "Unoccupied"
 
