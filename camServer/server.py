@@ -4,11 +4,16 @@ import time, threading
 import cv2
 import base64
 
+# Permet de patch les threads d'eventlet
+eventlet.monkey_patch()
+
 clients = []
 recording = False
+fps = 15
+print('## LOG ## Live FPS: ' + str(fps))
 capture = cv2.VideoCapture('/dev/video0')
 
-sio = socketio.Server()
+sio = socketio.Server(cors_allowed_origins="*")
 app = socketio.WSGIApp(sio, static_files={
     '/': {'content_type': 'text/html', 'filename': 'index.html'}
 })
@@ -28,7 +33,7 @@ class setInterval :
             self.action()
 
     def cancel(self) :
-        print('called')
+        print('## LOG ## Streaming thread stopped')
         self.stopEvent.set()
 
 # start action every 0.6s
@@ -39,14 +44,6 @@ class setInterval :
 #t=threading.Timer(5,inter.cancel)
 #t.start()
 
-def temp():
-    print('mock')
-    flag, frame = capture.read()
-    if flag:
-        image = cv2.imencode('.jpg', frame)[1].tostring();
-        image = base64.b64encode(image)
-        sio.emit('image', image);
-
 def sendImage():
     flag, frame = capture.read()
     if flag:
@@ -54,7 +51,7 @@ def sendImage():
         image = base64.b64encode(image)
         #print('image: ' + image)
         sio.emit('image', image);
-        print('sending image')
+        #print('sending image')
 
 def printClients():
     for client in clients:
@@ -62,27 +59,28 @@ def printClients():
 
 def start():
     global recording
-    print('start recording')
     if not recording:
-        recording = setInterval(0.1, sendImage)
+        print('## LOG ## Live started')
+        recording = setInterval(1/float(fps), sendImage)
 
 def stop():
     global recording
-    print('stop recording')
     if recording != False:
+        print('## LOG ## Live stopped')
         recording.cancel()
+        del recording
+        recording = False
 
 @sio.event
 def connect(sid, environ):
-    print('connect ', sid)
-
+    print('## LOG ## Client connected, sid: ' + str(sid))
     clients.append(sid)
     printClients()
     start()
 
 @sio.event
 def live(sid, data):
-    print('message ', data)
+    print('## LOG ## Live event, value: ' + str(data))
     if data:
         start()
     else:
@@ -90,11 +88,11 @@ def live(sid, data):
 
 @sio.event
 def disconnect(sid):
-    print('disconnect ', sid)
+    print('## LOG ## Client disconnected, sid: ', str(sid))
     clients.remove(sid)
     if len(clients) == 0:
+        print("## LOG ## No more clients, stopping live")
         stop()
-        print('Live stopped')
 
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)
