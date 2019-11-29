@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 var cors = require('cors')
  
 const waterRoutes = require("./routes/waterControl");
+const foodRoutes = require("./routes/foodControl");
+
 
 
 app.use(cors())
