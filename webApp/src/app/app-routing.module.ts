@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { VideoDisplayComponent } from './video-display/video-display.component';
 import { StatsDisplayComponent } from './stats-display/stats-display.component';
 import { ResourcesMonitorComponent } from './resources-monitor/resources-monitor.component';
+import { SettingsComponent } from './settings/settings.component';
 
 
 const routes: Routes = [{
@@ -15,7 +16,11 @@ const routes: Routes = [{
     {
         path: 'resourcesMonitor',
         component: ResourcesMonitorComponent
-      }];
+      },
+      {
+          path: 'settings',
+          component: SettingsComponent
+        }];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],

@@ -22,6 +22,10 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { environment } from '../environments/environment';
+import { SettingsComponent } from './settings/settings.component';
+
+import {MatInputModule} from '@angular/material/input';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 
 @NgModule({
@@ -30,7 +34,8 @@ import { environment } from '../environments/environment';
     HomeComponent,
     VideoDisplayComponent,
     StatsDisplayComponent,
-    ResourcesMonitorComponent
+    ResourcesMonitorComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -45,6 +50,7 @@ import { environment } from '../environments/environment';
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebase, 'bird'),
     AngularFireDatabaseModule,
+    MatInputModule,FormsModule, ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
