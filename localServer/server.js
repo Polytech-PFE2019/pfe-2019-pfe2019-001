@@ -5,15 +5,12 @@ var app = express();
 const bodyParser = require("body-parser");
 var waitUntil = require('wait-until');
 var cors = require('cors');
-
-global.mail = "";
-global.name = "";
-var valid = true;
  
 const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
 
-
+global.mail = "";
+global.name = "";
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -29,6 +26,10 @@ var firebaseConfig = {
   appId: "1:687579025809:web:33036a6e9e2983f6da8a30"
 };
 firebase.initializeApp(firebaseConfig);
+
+var ref = firebase.database().ref();
+var usersRef = ref.child('users');
+var userRef = usersRef.push();
 
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
@@ -46,6 +47,14 @@ exports.io = io;
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
+
+  ref.once('value')
+        .then(function (snap) {
+          if(snap.numChildren() == 1){
+            global.name = snap.child("users/nom").val();
+            global.mail = snap.child("users/email").val();
+          }
+        });
 
   var file = require('./ressources.json');
   console.log(file.water)
@@ -72,24 +81,15 @@ io.on('connection', function (socket) {
         return (name != "" &&  mail != "");
     })
     .done(function(result) {
-      var ref = firebase.database().ref();
       console.log(name + " " + mail);
       ref.once('value')
         .then(function (snap) {
           console.log(snap.numChildren());
           if(snap.numChildren() >= 1){
-            console.log("update");
-            var usersRef = ref.child('users');
-            var userRef = usersRef.push();
-            console.log('user key', userRef.key);
             var userRef = usersRef.update({
              nom: name, email: mail
             });
           }else{
-            console.log("pas update");
-            var usersRef = ref.child('users');
-            var userRef = usersRef.push();
-            console.log('user key', userRef.key);
             var userRef = usersRef.push({
              nom: name, email: mail
             });
