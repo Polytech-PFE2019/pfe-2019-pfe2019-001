@@ -26,7 +26,7 @@ async function setValue(req, res) {
 
     var score = 0
     nb_of_frames = 0
-    socket.on('foodVideoStart', (image) => {
+    server.io.on('foodVideoStart', (image) => {
         score += runScript(image)
         nb_of_frames += 1 
     });
@@ -44,7 +44,7 @@ async function setValue(req, res) {
 
 
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
-    io.emit('food', file.food);
+    server.io.emit('food', file.food);
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
