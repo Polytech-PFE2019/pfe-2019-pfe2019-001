@@ -23,6 +23,9 @@ export class SettingsComponent implements OnInit {
   submit(name, mail) {
     this.socket.emitName("name",name);
     this.socket.emitMail("mail",mail);
+
+    document.getElementById("validation").style.display = 'inline';
+    
   }
 
   constructor(private socket : SocketService) { }
