@@ -1,4 +1,4 @@
-<form class="form">
+<form name="form"class="form">
   <mat-form-field class="example-full-width">
       <input matInput #name placeholder="Nom"[formControl]="nameFormControl"
              [errorStateMatcher]="matcher">
@@ -17,4 +17,5 @@
     </mat-error>
   </mat-form-field>
 </form><br>
+<h2 id="validation" style="color:green;display:none">Enregistré !</h2><br>
 <button (click)="submit(name.value,mail.value)">Enregistrer</button>

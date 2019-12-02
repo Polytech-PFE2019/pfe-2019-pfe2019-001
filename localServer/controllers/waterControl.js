@@ -1,6 +1,7 @@
 const fs = require('fs');
 const server = require('../server')
 var nodemailer = require('nodemailer');
+var firebase = require("firebase");
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -12,9 +13,9 @@ var transporter = nodemailer.createTransport({
 
 var mailOptions = {
     from: 'birdcontrol06@gmail.com',
-    to: 'camille.leroux97@orange.fr',
+    to: mail,
     subject: 'Sending Email using Node.js',
-    text: 'That was easy!'
+    text: 'That was easy!' + name
 };
 
 async function setValue(req, res) {
