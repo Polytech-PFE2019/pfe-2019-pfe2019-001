@@ -43,18 +43,28 @@ app = socketio.WSGIApp(sio, static_files={
 })
 
 class setInterval :
-    def __init__(self,interval,action) :
+    def __init__(self,interval,action, iter=0) :
         self.interval=interval
         self.action=action
         self.stopEvent=threading.Event()
+        self.iter=iter
+        self.currIter=iter
         thread=threading.Thread(target=self.__setInterval)
         thread.start()
 
     def __setInterval(self) :
         nextTime=time.time()+self.interval
-        while not self.stopEvent.wait(nextTime-time.time()) :
-            nextTime+=self.interval
-            self.action()
+        if self.iter > 0:
+            while not self.stopEvent.wait(nextTime-time.time()):
+                nextTime+=self.interval
+                self.action()
+                self.currIter = self.currIter - 1
+                if self.currIter == 0:
+                    self.stopEvent.set()
+        else:
+            while not self.stopEvent.wait(nextTime-time.time()) :
+                nextTime+=self.interval
+                self.action()
 
     def cancel(self) :
         print('## LOG ## Streaming thread stopped')
@@ -87,6 +97,9 @@ def printClients():
     for client in clients:
         print('client: ' + client)
 
+#def test():
+#    print("test")
+
 def start():
     global recording
     global capture
@@ -94,6 +107,7 @@ def start():
         capture = cv2.VideoCapture(streamingCamera)
         print('## LOG ## Live started')
         recording = setInterval(1/float(fps), sendImage)
+        #oui = setInterval(1/float(fps), test, 5)
 
 def stop():
     global recording
