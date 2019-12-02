@@ -10,7 +10,7 @@ export class SocketService {
     private url = "http://localhost:1337";
     private socket;
     public water = new Subject<boolean>();
-    public false = new Subject<boolean>();
+    public food = new Subject<boolean>();
     public pres = new Subject<boolean>();
     public error = new Subject<boolean>();
 
@@ -26,7 +26,7 @@ export class SocketService {
 
         this.socket.on("food", (data) => {
             console.log("ok")
-            this.water.next(data)
+            this.food.next(data)
         });
 
         this.socket.on('presence', (pres) => {
