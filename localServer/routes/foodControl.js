@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("", foodController.setValue);
 
-//router.post("", foodController.setEtalon);
+router.post("", foodController.setEtalon);
 
 // router.get("", foodController.getValue);
 

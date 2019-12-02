@@ -211,6 +211,10 @@ def foodVideoStart(sid,cpt):
 def foodVideoStop(sid):
     print('## LOG ## Client close the thread for food detection, sid: ', str(sid))
     stopFoodDetection()
+@sio.event
+def captureEtalon(sid):
+    print('## LOG ## Client get a new etalon for food detection, sid: ', str(sid))
+    sendImageForFoodDetection()
 
 
 

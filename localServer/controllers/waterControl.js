@@ -5,7 +5,7 @@ var firebase = require("firebase");
 
 var credentialsError = false;
 
-if(global.mail == "" || global.name == ""){
+if (global.mail == "" || global.name == "") {
     credentialsError = true;
 }
 
@@ -27,11 +27,12 @@ async function setValue(req, res) {
     };
 
     console.log("Test : " + req.body.water);
-    var file = require('./../ressources.json');
+    var file = require('./../ressources/ressources.json');
     file.water = req.body.water;
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
     server.io.emit('water', req.body.water);
-    if(!credentialsError){
+    if (!credentialsError) {
+        server.io.emit("errorCred", false);
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
@@ -39,8 +40,9 @@ async function setValue(req, res) {
                 console.log('Email sent: ' + info.response);
             }
         });
-    }else{
-        console.log("pb de credentials !")
+    } else {
+        server.io.emit("errorCred", true);
+        console.log("pb de credentials !");
     }
 
     res.status(200).json({
