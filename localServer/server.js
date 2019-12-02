@@ -6,10 +6,6 @@ const bodyParser = require("body-parser");
 var waitUntil = require('wait-until');
 var cors = require('cors');
 
-global.mail = "";
-global.name = "";
-var valid = true;
-
 const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
 
