@@ -5,11 +5,11 @@ RES=""
 for LINK in $LINKS
 do
 	INFOS="$(sudo udevadm info --query=all --name=/dev/$LINK | grep ID_V4L_PRODUCT=mmal)"
-	if [ INFOS != "" ]
+	if [ $? -eq 0 ]
 	then
-		RES=$LINK
+		RES="/dev/$LINK"
 		break
 	fi
 done 
 
-echo "/dev/$RES"
+echo "$RES"

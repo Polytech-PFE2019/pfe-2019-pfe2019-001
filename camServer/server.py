@@ -7,11 +7,15 @@ import subprocess
 
 picam_proc = subprocess.Popen(["./picam.sh"], stdout=subprocess.PIPE)
 picam = picam_proc.stdout.read().decode("utf-8").strip()
-print("picam : " + picam)
+if picam == "":
+    picam = None
+else:
+    print("picam : " + picam)
 
 usbcam_proc = subprocess.Popen(["./usbcam.sh"], stdout=subprocess.PIPE)
 usbcam = usbcam_proc.stdout.read().decode("utf8").strip().split()
-print("usbcams : " + " ".join(usbcam))
+if len(usbcam) > 0:
+    print("usbcams : " + " ".join(usbcam))
 
 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
 # Permet de patch les threads d'eventlet
@@ -20,7 +24,15 @@ clients = []
 recording = False
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
-capture = cv2.VideoCapture(usbcam[0])
+
+id = 0
+streamingCamera = ""
+if picam != None:
+    streamingCamera = picam
+else:
+    streamingCamera = usbcam[id]
+capture = None
+#capture = cv2.VideoCapture(usbcam[0])
 #capture.set(3, 640)
 #capture.set(4, 480)
 
@@ -77,17 +89,36 @@ def printClients():
 
 def start():
     global recording
+    global capture
     if not recording:
+        capture = cv2.VideoCapture(streamingCamera)
         print('## LOG ## Live started')
         recording = setInterval(1/float(fps), sendImage)
 
 def stop():
     global recording
+    global capture
     if recording != False:
         print('## LOG ## Live stopped')
         recording.cancel()
         del recording
+        capture.release()
         recording = False
+
+def switchCamera():
+    global streamingCamera
+    global id
+    stop()
+    if picam != None:
+        id = (id + 1) % (len(usbcam) + 1)
+        if id == 0:
+            streamingCamera = picam
+        else:
+            streamingCamera = usbcam[id - 1]
+    else:
+        id = (id + 1) % len(usbcam)
+        streamingCamera = usbcam[id]
+    start()
 
 @sio.event
 def connect(sid, environ):
@@ -103,6 +134,15 @@ def live(sid, data):
         start()
     else:
         stop()
+
+@sio.event
+def switch(sid, data):
+    print('## LOG ## Switch event, value: ' + str(data))
+    if picam != None:
+        if (len(usbcam) + 1) > 1:
+            switchCamera()
+    elif len(usbcam) > 1:
+        switchCamera()
 
 @sio.event
 def disconnect(sid):
