@@ -19,7 +19,7 @@ var mailOptions = {
 
 async function setValue(req, res) {
     console.log(req.body.water)
-    var file = require('./../ressources.json');
+    var file = require('./ressources/ressources.json');
     file.water = req.body.water;
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
     server.io.emit('water', req.body.water);
