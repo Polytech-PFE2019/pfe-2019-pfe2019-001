@@ -9,7 +9,7 @@ var cors = require('cors');
 global.mail = "";
 global.name = "";
 var valid = true;
- 
+
 const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
 
@@ -68,34 +68,34 @@ io.on('connection', function (socket) {
     name = msg;
 
     waitUntil().interval(500)
-    .times(10).condition(function() {
-        return (name != "" &&  mail != "");
-    })
-    .done(function(result) {
-      var ref = firebase.database().ref();
-      console.log(name + " " + mail);
-      ref.once('value')
-        .then(function (snap) {
-          console.log(snap.numChildren());
-          if(snap.numChildren() >= 1){
-            console.log("update");
-            var usersRef = ref.child('users');
-            var userRef = usersRef.push();
-            console.log('user key', userRef.key);
-            var userRef = usersRef.update({
-             nom: name, email: mail
-            });
-          }else{
-            console.log("pas update");
-            var usersRef = ref.child('users');
-            var userRef = usersRef.push();
-            console.log('user key', userRef.key);
-            var userRef = usersRef.push({
-             nom: name, email: mail
-            });
-          }
+      .times(10).condition(function () {
+        return (name != "" && mail != "");
+      })
+      .done(function (result) {
+        var ref = firebase.database().ref();
+        console.log(name + " " + mail);
+        ref.once('value')
+          .then(function (snap) {
+            console.log(snap.numChildren());
+            if (snap.numChildren() >= 1) {
+              console.log("update");
+              var usersRef = ref.child('users');
+              var userRef = usersRef.push();
+              console.log('user key', userRef.key);
+              var userRef = usersRef.update({
+                nom: name, email: mail
+              });
+            } else {
+              console.log("pas update");
+              var usersRef = ref.child('users');
+              var userRef = usersRef.push();
+              console.log('user key', userRef.key);
+              var userRef = usersRef.push({
+                nom: name, email: mail
+              });
+            }
+          });
       });
-    });
 
   });
 });
@@ -113,4 +113,29 @@ app.post('/bird', function (req, res) {
   res.status(200).json({
     ok: "ok",
   });
+});
+
+app.post('/count', (req, res) => {
+  const { spawn } = require('child_process');
+  const path = require('path');
+  require("fs").writeFile("out.png", req.body.data, 'base64', function (err) {
+  });
+  function runScript() {
+    const imagePath = path.join(__dirname, '/out.png');
+    return spawn(`cd ../../darknet && ./darknet detect cfg/yolov3.cfg yolov3.weights ${imagePath}`,
+      { shell: true }
+    );
+  }
+  const subprocess = runScript();
+  subprocess.stdout.on('data', (data) => {
+    const text = "" + data;
+    console.log(text);
+    console.log((text.match(new RegExp("bird", "g")) || []).length);
+  });
+  subprocess.stderr.on('close', () => {
+    console.log("Closed");
+  });
+  res.set('Content-Type', 'text/plain');
+  subprocess.stdout.pipe(res);
+  subprocess.stderr.pipe(res);
 });
