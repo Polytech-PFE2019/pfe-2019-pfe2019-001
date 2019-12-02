@@ -24,6 +24,10 @@ export class ResourcesMonitorComponent implements OnInit {
       this.water = data;
     })
 
+    this.socket.food.subscribe((data) => {
+      this.food = data;
+    })
+
   }
 
   ngOnDestroy() {
