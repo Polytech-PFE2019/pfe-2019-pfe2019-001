@@ -22,6 +22,7 @@ encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
 eventlet.monkey_patch()
 clients = []
 recording = False
+foodDetectionThread = False
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
 
@@ -165,6 +166,34 @@ def disconnect(sid):
     if len(clients) == 0:
         print("## LOG ## No more clients, stopping live")
         stop()
+
+def sendImageForFoodDetection():
+    flag, frame = capture.read()
+    if flag:
+        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring();
+        image = base64.b64encode(image)
+        sio.emit('imageForFoodDetection', image.decode('utf-8'));
+def startFoodDetection(cpt):
+    global foodDetectionThread
+    if not foodDetectionThread:
+        foodDetectionThread = setInterval(1/float(fps), sendImageForFoodDetection, cpt)  
+def stopFoodDetection():
+    global foodDetectionThread
+    if foodDetectionThread != False:
+        foodDetectionThread.cancel()
+        del foodDetectionThread
+        foodDetectionThread = False
+
+@sio.event
+def foodVideoStart(sid,cpt):
+    print('## LOG ## Client get short video for food detection, sid: ', str(sid))
+    startFoodDetection(cpt)
+@sio.event
+def foodVideoStop(sid):
+    print('## LOG ## Client close the thread for food detection, sid: ', str(sid))
+    stopFoodDetection()
+    
+
 
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)
