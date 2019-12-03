@@ -5,7 +5,9 @@ var firebase = require("firebase");
 
 var credentialsError = false;
 
-if (global.mail == "" || global.name == "") {
+if (global.mail == undefined || global.name == undefined) {
+    console.log("ok")
+    console.log(global.mail)
     credentialsError = true;
 }
 
