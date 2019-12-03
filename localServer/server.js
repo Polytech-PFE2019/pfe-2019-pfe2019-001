@@ -49,14 +49,14 @@ io.on('connection', function (socket) {
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
   ref.once('value')
-        .then(function (snap) {
-          if(snap.numChildren() == 1){
-            global.name = snap.child("users/nom").val();
-            global.mail = snap.child("users/email").val();
-          }
-        });
+    .then(function (snap) {
+      if (snap.numChildren() == 1) {
+        global.name = snap.child("users/nom").val();
+        global.mail = snap.child("users/email").val();
+      }
+    });
 
-  var file = require('./ressources.json');
+  var file = require('./ressources/ressources.json');
   console.log(file.water)
   io.emit("water", file.water)
 
@@ -131,7 +131,7 @@ app.post('/count', (req, res) => {
   });
   function runScript() {
     const imagePath = path.join(__dirname, '/out.png');
-    return spawn(`cd ../../darknet && ./darknet detect cfg/yolov3.cfg yolov3.weights ${imagePath}`,
+    return spawn(`cd darknet && ./darknet detect cfg/yolov3.cfg yolov3.weights ${imagePath}`,
       { shell: true }
     );
   }
