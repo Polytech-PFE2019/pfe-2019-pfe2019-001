@@ -5,7 +5,7 @@ var firebase = require("firebase");
 
 var credentialsError = false;
 
-if(global.mail == "" || global.name == ""){
+if (global.mail == "" || global.name == "") {
     credentialsError = true;
 }
 
@@ -31,8 +31,8 @@ async function setValue(req, res) {
     file.water = req.body.water;
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
     server.io.emit('water', req.body.water);
-    if(!credentialsError){
-        io.emit("errorCred", false);
+    if (!credentialsError) {
+        server.io.emit("errorCred", false);
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
@@ -40,8 +40,8 @@ async function setValue(req, res) {
                 console.log('Email sent: ' + info.response);
             }
         });
-    }else{
-        io.emit("errorCred", true);
+    } else {
+        server.io.emit("errorCred", true);
         console.log("pb de credentials !");
     }
 
