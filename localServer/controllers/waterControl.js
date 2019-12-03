@@ -32,6 +32,7 @@ async function setValue(req, res) {
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
     server.io.emit('water', req.body.water);
     if(!credentialsError){
+        io.emit("errorCred", false);
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
@@ -40,7 +41,8 @@ async function setValue(req, res) {
             }
         });
     }else{
-        console.log("pb de credentials !")
+        io.emit("errorCred", true);
+        console.log("pb de credentials !");
     }
 
     res.status(200).json({

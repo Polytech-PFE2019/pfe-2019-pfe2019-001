@@ -11,6 +11,7 @@ export class SocketService {
     private socket;
     public water = new Subject<boolean>();
     public food = new Subject<boolean>();
+    public errorCred = new Subject<boolean>();
     public pres = new Subject<boolean>();
     public error = new Subject<boolean>();
 
@@ -27,6 +28,11 @@ export class SocketService {
         this.socket.on("food", (data) => {
             console.log("ok")
             this.food.next(data)
+        });
+
+        this.socket.on("errorCred", (data) => {
+            console.log("ok")
+            this.errorCred.next(data)
         });
 
         this.socket.on('presence', (pres) => {
@@ -53,6 +59,7 @@ export class SocketService {
         this.food.next(false);
         this.pres.next(false);
         this.error.next(false);
+        this.errorCred.next(false);
     }
 
     emitName(sock, value){

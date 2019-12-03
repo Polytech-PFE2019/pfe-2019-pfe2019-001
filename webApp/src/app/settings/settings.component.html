@@ -19,3 +19,4 @@
 </form><br>
 <h2 id="validation" style="color:green;display:none">Enregistré !</h2><br>
 <button (click)="submit(name.value,mail.value)">Enregistrer</button>
+<h1 id="error" style="color:red;display:none" *ngIf="errorCred">Probleme d'informations veuillez réenregistrer vos informations !</h1><br>
