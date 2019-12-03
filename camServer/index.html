@@ -11,18 +11,18 @@
     <button onclick="screenshot()">Capture</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <script type="text/javascript">
-      const socket = io.connect('http://raspberry.local:3000');
+      const socket = io.connect('http://raspberrypi.local:3000');
       socket.on('image', (image) => {
         const imageElm = document.getElementById('image');
         imageElm.src = `data:image/jpeg;base64,${image}`;
       });
-      socket.on('pictureResult', (image) => {
+      socket.on('picture', (image) => {
         const imageElm = document.getElementById('picture');
         imageElm.src = `data:image/jpeg;base64,${image}`;
       });
 
       function switchi() {
-        socket.emit('switch', true);
+        socket.emit('switch', 1);
       }
       function screenshot() {
         socket.emit('picture', true);
