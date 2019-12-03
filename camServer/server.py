@@ -33,6 +33,8 @@ if picam != None:
 else:
     streamingCamera = usbcam[id]
 capture = None
+
+processing = False
 #capture = cv2.VideoCapture(usbcam[0])
 #capture.set(3, 640)
 #capture.set(4, 480)
@@ -104,7 +106,7 @@ def printClients():
 def start():
     global recording
     global capture
-    if not recording:
+    if not recording and not processing:
         capture = cv2.VideoCapture(streamingCamera)
         print('## LOG ## Live started')
         recording = setInterval(1/float(fps), sendImage)
@@ -113,7 +115,7 @@ def start():
 def stop():
     global recording
     global capture
-    if recording != False:
+    if recording != False and not processing:
         print('## LOG ## Live stopped')
         recording.cancel()
         del recording
@@ -134,6 +136,13 @@ def switchCamera():
         id = (id + 1) % len(usbcam)
         streamingCamera = usbcam[id]
     start()
+
+def sendPicture(channel, source):
+    flag, frame = source.read()
+    if flag:
+        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring();
+        image = base64.b64encode(image)
+        sio.emit(channel, image.decode('utf-8'));
 
 @sio.event
 def connect(sid, environ):
@@ -160,6 +169,16 @@ def switch(sid, data):
         switchCamera()
 
 @sio.event
+def picture(sid, data):
+    usb = False
+    if streamingCamera == usbcam[0]:
+        sendPicture('pictureResult', capture)
+    else:
+        usb = cv2.VideoCapture(usbcam[0])
+        sendPicture('pictureResult', usb)
+        usb.release()
+
+@sio.event
 def disconnect(sid):
     print('## LOG ## Client disconnected, sid: ', str(sid))
     clients.remove(sid)
@@ -176,7 +195,7 @@ def sendImageForFoodDetection():
 def startFoodDetection(cpt):
     global foodDetectionThread
     if not foodDetectionThread:
-        foodDetectionThread = setInterval(1/float(fps), sendImageForFoodDetection, cpt)  
+        foodDetectionThread = setInterval(1/float(fps), sendImageForFoodDetection, cpt)
 def stopFoodDetection():
     global foodDetectionThread
     if foodDetectionThread != False:
@@ -192,7 +211,11 @@ def foodVideoStart(sid,cpt):
 def foodVideoStop(sid):
     print('## LOG ## Client close the thread for food detection, sid: ', str(sid))
     stopFoodDetection()
-    
+@sio.event
+def captureEtalon(sid):
+    print('## LOG ## Client get a new etalon for food detection, sid: ', str(sid))
+    sendImageForFoodDetection()
+
 
 
 if __name__ == '__main__':

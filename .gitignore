@@ -328,4 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-localServer/darknet/yolov3.weights
+
+# weights from a neural network
+*.weights

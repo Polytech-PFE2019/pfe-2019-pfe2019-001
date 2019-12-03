@@ -58,3 +58,10 @@ async function setValue(req, res) {
         message: "Message received",
     });
 }; module.exports.setValue = setValue;
+
+async function setEtalon(req, res) {
+    server.io.emit('captureEtalon')
+    server.io.on('imageForFoodDetection', (image) => {
+        require("fs").writeFile("./../ressources/etalon.jpg", image, 'base64', function (err) {  });            
+    });
+}; module.exports.setEtalon = setEtalon;
