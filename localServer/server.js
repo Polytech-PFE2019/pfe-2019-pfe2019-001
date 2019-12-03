@@ -56,7 +56,7 @@ io.on('connection', function (socket) {
       }
     });
 
-  var file = require('./ressources.json');
+  var file = require('./ressources/ressources.json');
   console.log(file.water)
   io.emit("water", file.water)
 
