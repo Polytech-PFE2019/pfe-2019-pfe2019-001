@@ -29,11 +29,6 @@
   p {
     margin: 0;
   }
-
-  .spacer {
-    flex: 1;
-  }
-
   .toolbar {
     height: 60px;
     margin: -8px;
@@ -269,7 +264,7 @@
 <div class="toolbar" role="banner">
   <a routerLink="/"><img
     width="40"
-    alt="Angular Logo"
+    alt="Bird Control Logo"
     src="../assets/bird.png"
   /></a>
   <nav>
@@ -281,14 +276,26 @@
   <nav>
     <a routerLink="/statsDisplay">Visualisation stats</a>
   </nav>
+  <nav>
+    <a routerLink="/resourcesMonitor">Eau/Nourriture</a>
+  </nav>
+  <nav>
+    <a routerLink="/settings">Options</a>
+  </nav>
     <div class="spacer"></div>
+    <a id="blink" routerLink="/videoDisplay" *ngIf="presence"><img
+      width="40"
+      alt="Présence"
+      src="../assets/birdAlert.png"
+    /></a>
 </div>
 
 <mat-card id="card" class="example-card" *ngIf="isHome">
   <img id="logo" mat-card-image src="../assets/polytech.png" alt="logo Polytech">
   <mat-card-content>
+<br><br><h2>PFE de polytech Nice-Sophia 2019</h2>
     <p>
-      PFE de polytech Nice-Sophia 2019
+
 
 La croissance du marché des objets connectés met clairement en évidence l’intérêt,
 aussi bien du grand public que des industriels, pour les objets de tous les jours améliorés avec des technologies du numérique qui transforment leur usage.

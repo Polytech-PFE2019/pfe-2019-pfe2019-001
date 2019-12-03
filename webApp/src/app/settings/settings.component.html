@@ -1,0 +1,22 @@
+<form name="form"class="form">
+  <mat-form-field class="example-full-width">
+      <input matInput #name placeholder="Nom"[formControl]="nameFormControl"
+             [errorStateMatcher]="matcher">
+      <mat-error *ngIf="nameFormControl.hasError('required')">
+        Un nom est <strong>requis</strong>
+      </mat-error>
+    </mat-form-field><br>
+  <mat-form-field class="full-width">
+    <input matInput #mail placeholder="Email" [formControl]="emailFormControl"
+           [errorStateMatcher]="matcher">
+    <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+      Entrez une adresse mail
+    </mat-error>
+    <mat-error *ngIf="emailFormControl.hasError('required')">
+      Un email est <strong>requis</strong>
+    </mat-error>
+  </mat-form-field>
+</form><br>
+<h2 id="validation" style="color:green;display:none">Enregistré !</h2><br>
+<button (click)="submit(name.value,mail.value)">Enregistrer</button>
+<h1 id="error" style="color:red;display:none" *ngIf="errorCred">Probleme d'informations veuillez réenregistrer vos informations !</h1><br>

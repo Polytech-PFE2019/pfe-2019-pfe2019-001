@@ -1,3 +1,16 @@
+
+<!--<div id ="center" style="position:fixed;top:50%;left:50%;">
+<div id="loading">
+    <h2>LOADING...</h2>
+    <mat-progress-spinner
+        color="primary"
+        mode="indeterminate">
+    </mat-progress-spinner>
+</div>
+</div>
+<iframe id="video" src="http://192.168.43.14:8080" frameBorder="0" scrolling="no"></iframe>-->
+
+
 <div id ="center" style="position:fixed;top:50%;left:50%;">
 <div id="loading">
     <h2>LOADING...</h2>
@@ -7,4 +20,14 @@
     </mat-progress-spinner>
 </div>
 </div>
-<iframe id="video" src="http://192.168.43.14:8080" frameBorder="0" scrolling="no"></iframe>
+<body style="display: block;  margin-left: auto;  margin-right: auto;  width: 50%;">
+    <table>
+      <td><img id="image" width="640dx"></td>
+      <td><button id="capture" mat-raised-button color="primary" (click) = "capture()">Capture</button></td>
+      <td><button id="switch" mat-raised-button color="primary" (click) = "switch()">Switch</button></td>
+      <td><div id="cap" style="color:green;display:none">Capture</div></td>
+
+  </table>
+</body>
+
+<!--<video id="video" width = "640" controls autoplay></video>-->
