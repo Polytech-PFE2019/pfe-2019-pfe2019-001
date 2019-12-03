@@ -331,3 +331,6 @@ ASALocalRun/
 
 # weights from a neural network
 *.weights
+localServer/out.png
+localServer/darknet/predictions.jpg
+localServer/out.png
