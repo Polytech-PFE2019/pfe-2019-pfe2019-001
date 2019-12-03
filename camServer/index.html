@@ -1,37 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-<<<<<<< HEAD
-  <head>
-    <meta charset="utf-8">
-    <title>Test</title>
-  </head>
-  <body>
-    <img id="image">
-    <img id="picture">
-    <button onclick="switchi()">Switch</button>
-    <button onclick="screenshot()">Capture</button>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
-    <script type="text/javascript">
-      const socket = io.connect('http://raspberrypi.local:3000');
-      socket.on('image', (image) => {
-        const imageElm = document.getElementById('image');
-        imageElm.src = `data:image/jpeg;base64,${image}`;
-      });
-      socket.on('picture', (image) => {
-        const imageElm = document.getElementById('picture');
-        imageElm.src = `data:image/jpeg;base64,${image}`;
-      });
-
-      function switchi() {
-        socket.emit('switch', 1);
-      }
-      function screenshot() {
-        socket.emit('picture', true);
-      }
-    </script>
-  </body>
-</html>
-=======
 
 <head>
   <meta charset="utf-8">
@@ -65,4 +33,3 @@
 </body>
 
 </html>
->>>>>>> 079d537536740ea7a7b0a6e409ac04110fd76990
