@@ -1,7 +1,6 @@
 const fs = require('fs');
 const server = require('../server')
 var nodemailer = require('nodemailer');
-var socket = require('socket.io-client')('http://raspberrypi.local:3000');
 
 
 const path = require('path');
@@ -21,41 +20,33 @@ function runScript(image) {
 async function setValue(req, res) {
     console.log(req.body.food)
     var file = require('./../ressources/ressources.json');
-
-    socket.emit('foodVideoStart', iterations);
-    //server.io.emit('foodVideoStart', iterations);
+    var socket = require('socket.io-client')('http://raspberrypi.local:3000');
+    //ip de la rasp : 192.168.43.77
 
     var score = 0
     nb_of_frames = 0
-    server.io.on('foodVideoStart', (image) => {
-        score += runScript(image)
-        nb_of_frames += 1 
+    socket.on('image', (image) => {
+        if (nb_of_frames < 50) {
+            score += runScript(image)
+            nb_of_frames += 1;
+        }
+        else if (nb_of_frames == 50) {
+            score = score / nb_of_frames
+            console.log(score);
+            if (score > 0.2) {
+                file.food = true
+            } else {
+                file.food = false
+            }
+        }
     });
     
-    socket.emit('foodVideoStop');
-    // server.io.emit('foodVideoStop');
-    score = score / nb_of_frames
-    console.log(score);
-
-    if (score > 0.2) {
-        file.food = true
-    } else {
-        file.food = false
-    }
-
 
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
     socket.emit('food', file.food);
     // server.io.emit('food', file.food);
 
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-
+    
     res.status(200).json({
         message: "Message received",
     });
@@ -63,7 +54,8 @@ async function setValue(req, res) {
 
 async function setEtalon(req, res) {
     console.log("update etalon begin");
-    socket.emit('picture', true);
+    var socket = require('socket.io-client')('http://raspberrypi.local:3000');
+    socket.emit('picture', 0);
     socket.on('picture', (image) => {
         console.log("update etalon in process");
         var ressourcespath = path.join(__dirname,"/../ressources/etalon.jpg");
@@ -72,7 +64,7 @@ async function setEtalon(req, res) {
     });
 
 
-    res.status(200).json({
-        message: "Message received",
-    });
+    // res.status(200).json({
+    //     message: "Message received",
+    // });
 }; module.exports.setEtalon = setEtalon;
