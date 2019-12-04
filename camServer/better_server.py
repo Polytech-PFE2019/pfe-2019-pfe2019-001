@@ -138,29 +138,59 @@ def remove_client(sid):
 
 def start():
     for i in range(0, len(camera_captures)):
-        if len(camera_captures[i][2]) > 0 and camera_captures[i][1] == None:
+        if len(camera_captures[i][2]) > 0:
             start_camera(i)
+            if len(camera_captures[i][2]) == 1 and 666 in camera_captures[i][2]:
+                continue
+            else:
+                start_streaming(i)
 
 def start_camera(id):
     global camera_captures
+    if camera_captures[id][1] != None:
+        return
     temp = camera_captures[id]
     temp2 = cv2.VideoCapture(temp[0])
-    params = ["image", temp2, "camera_" + str(id), False]
-    camera_captures[id] = (temp[0], temp2, temp[2], setInterval(1/float(fps), sendImage, params))
-    print('## LOG ## Live started for camera ' + str(id))
+    camera_captures[id] = (temp[0], temp2, temp[2], None)
+    print('## LOG ## Camera started for camera ' + str(id))
+
+def start_streaming(id):
+    global camera_captures
+    if camera_captures[id][3] != None:
+        return
+    temp = camera_captures[id]
+    if camera_captures[id][1] == None:
+        print("Error while starting the stream")
+        return
+    params = ["image", temp[1], "camera_" + str(id), False]
+    camera_captures[id] = (temp[0], temp[1], temp[2], setInterval(1/float(fps), sendImage, params))
+    print('## LOG ## Streaming started for camera ' + str(id))
 
 def stop():
     for i in range(0, len(camera_captures)):
-        if len(camera_captures[i][2]) == 0 and camera_captures[i][1] != None:
+        if len(camera_captures[i][2]) == 1 and 666 in camera_captures[i][2]:
+            stop_streaming(i)
+        elif len(camera_captures[i][2]) == 0 and camera_captures[i][1] != None:
+            stop_streaming(i)
             stop_camera(i)
 
 def stop_camera(id):
     global camera_captures
-    camera_captures[id][3].cancel()
+    if camera_captures[id][1] == None:
+        return
     camera_captures[id][1].release()
     temp = camera_captures[id]
-    camera_captures[id] = (temp[0], None, temp[2], None)
-    print('## LOG ## Live stopped for camera ' + str(id))
+    camera_captures[id] = (temp[0], None, temp[2], temp[3])
+    print('## LOG ## Camera stopped for camera ' + str(id))
+
+def stop_streaming(id):
+    global camera_captures
+    if camera_captures[id][3] == None:
+        return
+    camera_captures[id][3].cancel()
+    temp = camera_captures[id]
+    camera_captures[id] = (temp[0], temp[1], temp[2], None)
+    print('## LOG ## Streaming stopped for camera ' + str(id))
 
 @sio.event
 def connect(sid, environ):
@@ -205,6 +235,6 @@ if len(camera_captures) > 1:
     bind_client(666, 1)
 else:
     bind_client(666, 0)
-    
+
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)
