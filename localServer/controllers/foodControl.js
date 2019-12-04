@@ -27,17 +27,24 @@ async function setValue(req, res) {
     nb_of_frames = 0
     socket.on('image', (image) => {
         if (nb_of_frames < 50) {
-            score += runScript(image)
+            const subprocess = runScript(image);
+            subprocess.stdout.on('data', (data) => {
+                const text = data;
+                console.log(text);
+                score += parseInt(text, 10);
+            });
             nb_of_frames += 1;
         }
         else if (nb_of_frames == 50) {
+
             score = score / nb_of_frames
             console.log(score);
             if (score > 0.2) {
-                file.food = true
+                file.food = true;
             } else {
-                file.food = false
+                file.food = false;
             }
+            socket.removeAllListeners('image');
         }
     });
     
