@@ -1,4 +1,6 @@
 import eventlet
+from eventlet import wsgi
+import os
 import socketio
 import time, threading
 import cv2
@@ -33,10 +35,28 @@ for camera in all_cameras:
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
 
+def wsgi_handler(env, start_response):
+    if env['PATH_INFO'] == "/":
+        if os.path.exists("./index.html"):
+            h = open("./index.html", 'rb')
+            content = h.read()
+            h.close()
+            headers = [('content-type', 'text/html')]
+            start_response('200 OK', headers)
+            return [content]
+    elif env['PATH_INFO'] == "/picture":
+        cap = camera_captures[0][1]
+        if cap != None:
+            params = ["picture", cap, 2, 100]
+            response = html_sendImage(params)
+            headers = [('content-type', 'text/plain')]
+            start_response('200 OK', headers)
+            return [response]
+    start_response('200 OK', [('Content-Type', 'text/plain')])
+    return ['Hello, World!\r\n']
+
 sio = socketio.Server(cors_allowed_origins="*")
-app = socketio.WSGIApp(sio, static_files={
-    '/': {'content_type': 'text/html', 'filename': 'index.html'}
-})
+app = socketio.WSGIApp(sio, wsgi_handler)
 
 class setInterval :
     def __init__(self,interval,action, parameters=None, iter=0) :
@@ -81,6 +101,18 @@ def sendImage(params):
         image = base64.b64encode(image)
         image = image.decode('utf-8')
         sio.emit(params[0], image, params[2]);
+        return image
+    return False
+
+def html_sendImage(params):
+    flag, frame = params[1].read()
+    if flag:
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
+        if not isinstance(params[3], bool) and isinstance(params[3], int) and params[3] >= 0 and params[3] <= 100:
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), params[3]]
+        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring();
+        image = base64.b64encode(image)
+        image = image.decode('utf-8')
         return image
     return False
 
@@ -169,5 +201,10 @@ def picture(sid, data):
         return sendImage(params)
     return False
 
+if len(camera_captures) > 1:
+    bind_client(666, 1)
+else:
+    bind_client(666, 0)
+    
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)
