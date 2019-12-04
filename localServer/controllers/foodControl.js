@@ -47,13 +47,12 @@ async function setValue(req, res) {
             socket.removeAllListeners('image');
         }
     });
-    
+
 
     await fs.writeFileSync('ressources.json', JSON.stringify(file));
     socket.emit('food', file.food);
     // server.io.emit('food', file.food);
 
-    
     res.status(200).json({
         message: "Message received",
     });
@@ -65,9 +64,9 @@ async function setEtalon(req, res) {
     socket.emit('picture', 0);
     socket.on('picture', (image) => {
         console.log("update etalon in process");
-        var ressourcespath = path.join(__dirname,"/../ressources/etalon.jpg");
-        fs.writeFile(ressourcespath, image, 'base64', function (err) {  });
-        console.log("update etalon done");            
+        var ressourcespath = path.join(__dirname, "/../ressources/etalon.jpg");
+        fs.writeFile(ressourcespath, image, 'base64', function (err) { });
+        console.log("update etalon done");
     });
 
 

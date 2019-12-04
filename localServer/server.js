@@ -6,6 +6,7 @@ var waitUntil = require('wait-until');
 var cors = require('cors');
 var functions = require('./functions')
 var schedule = require('node-schedule');
+var path = require('path');
 
 
 const waterRoutes = require("./routes/waterControl");
@@ -119,6 +120,12 @@ app.post('/bird', function (req, res) {
     ok: "ok",
   });
 });
+
+app.use("/", express.static(path.join(__dirname, "dist")));
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
 
 var port = 1337;
 var server = app.listen(port, function () {
