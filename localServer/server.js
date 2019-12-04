@@ -1,10 +1,12 @@
 var express = require("express");
-var path = require("path");
 var firebase = require("firebase");
 var app = express();
 const bodyParser = require("body-parser");
 var waitUntil = require('wait-until');
 var cors = require('cors');
+var functions = require('./functions')
+var schedule = require('node-schedule');
+
 
 const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
@@ -15,6 +17,8 @@ global.name = "";
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use("/water", waterRoutes);
+app.use("/food", foodRoutes);
 
 var firebaseConfig = {
   apiKey: "AIzaSyCncb_SkW0LNdf2phmjahcwr5R3KOGQzDM",
@@ -31,14 +35,10 @@ var ref = firebase.database().ref();
 var usersRef = ref.child('users');
 var userRef = usersRef.push();
 
-app.use("/water", waterRoutes);
-app.use("/food", foodRoutes);
+schedule.scheduleJob('* */10 * * * *', function () {
+  functions.count()
+});
 
-
-var port = 1337;
-var server = app.listen(port, function () {
-  console.log("Connected on port 1337");
-})
 
 var io = require('socket.io').listen(server);
 exports.io = io;
@@ -57,7 +57,6 @@ io.on('connection', function (socket) {
     });
 
   var file = require('./ressources/ressources.json');
-  console.log(file.water)
   io.emit("water", file.water)
 
   socket.on('live', function (msg) {
@@ -112,47 +111,16 @@ io.on('connection', function (socket) {
 app.post('/bird', function (req, res) {
   if (req.body.presence == true) {
     io.emit('presence', true);
-    console.log("here")
   }
   else {
     io.emit('presence', false);
-    console.log("not here")
-
   }
   res.status(200).json({
     ok: "ok",
   });
 });
 
-app.post('/count', (req, res) => {
-  const { spawn } = require('child_process');
-  const path = require('path');
-  var socket = require('socket.io-client')('http://raspberrypi.local:3000')
-  socket.emit("switch", 1)
-  socket.emit("picture", 0)
-  socket.on('picture', function (data) {
-    require("fs").writeFile("out.png", data, 'base64', function (err) {
-      function runScript() {
-        const imagePath = path.join(__dirname, '/out.png');
-        return spawn(`cd darknet && ./darknet detect cfg/yolov3.cfg yolov3.weights ${imagePath}`,
-          { shell: true }
-        );
-      }
-      const subprocess = runScript();
-      subprocess.stdout.on('data', (data) => {
-        const text = "" + data;
-        console.log(text);
-        console.log((text.match(new RegExp("bird", "g")) || []).length);
-      });
-      subprocess.stderr.on('close', () => {
-        `serv`
-        console.log("Closed");
-      });
-      res.set('Content-Type', 'text/plain');
-      subprocess.stdout.pipe(res);
-      subprocess.stderr.pipe(res);
-    });
-  })
-
-
-});
+var port = 1337;
+var server = app.listen(port, function () {
+  console.log("Connected on port 1337");
+})

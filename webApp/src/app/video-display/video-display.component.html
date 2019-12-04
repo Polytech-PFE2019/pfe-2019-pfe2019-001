@@ -20,11 +20,14 @@
     </mat-progress-spinner>
 </div>
 </div>
-<body>
-    <img id="image" width="700dx">
-    <button type="button" id="stop" (click)="stop()">Stop</button>
-    <button type="button" id="start" (click)="start()">Start</button>
-    <div id="pause" style="color:green">En live</div>
+<body style="display: block;  margin-left: auto;  margin-right: auto;  width: 50%;">
+    <table>
+      <td><img id="image" width="640dx"></td>
+      <td><button id="capture" mat-raised-button color="primary" (click) = "capture()">Capture</button></td>
+      <td><button id="switch" mat-raised-button color="primary" (click) = "switch()">Switch</button></td>
+      <td><div id="cap" style="color:green;display:none">Capture</div></td>
+
+  </table>
 </body>
 
 <!--<video id="video" width = "640" controls autoplay></video>-->
