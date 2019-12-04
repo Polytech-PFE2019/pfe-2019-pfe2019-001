@@ -4,9 +4,9 @@ const foodController = require("../controllers/foodControl");
 
 const router = express.Router();
 
-router.post("", foodController.setValue);
+router.post("/setValue", foodController.setValue);
 
-router.post("", foodController.setEtalon);
+router.post("/setEtalon", foodController.setEtalon);
 
 // router.get("", foodController.getValue);
 

@@ -9,7 +9,7 @@ import * as io from "socket.io-client";
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://raspberrypi.local:3000";
+  private url = "http://192.168.43.77:3000";
   private socket;
 
   constructor() {
@@ -19,17 +19,15 @@ export class VideoDisplayComponent implements OnInit {
       const imageElm = document.getElementById('image');
       imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
       document.getElementById("loading").style.display = 'none';
-      document.getElementById("stop").style.display = 'inline';
-      document.getElementById("start").style.display = 'inline';
+      document.getElementById("switch").style.display = 'inline';
+      document.getElementById("capture").style.display = 'inline';
     });
 
     this.socket.on("connect_error", function (exeception) {
       document.getElementById('image').setAttribute("src", "https://image.freepik.com/vecteurs-libre/modele-erreur-404-oiseau-dans-style-dessine-main_23-2147734776.jpg");
       document.getElementById("loading").style.display = 'none';
-      document.getElementById("stop").style.display = 'none';
-      document.getElementById("start").style.display = 'none';
-      document.getElementById("pause").style.color = 'red';
-      document.getElementById("pause").innerHTML = "Erreur";
+      document.getElementById("switch").style.display = 'none';
+      document.getElementById("capture").style.display = 'none';
     })
   }
 
@@ -63,15 +61,17 @@ export class VideoDisplayComponent implements OnInit {
     this.socket.disconnect();
   }
 
-  public stop() {
-    this.socket.emit("live", false);
-    document.getElementById("pause").style.color = 'red';
-    document.getElementById("pause").innerHTML = "En pause";
+  public capture() {
+    this.socket.emit("picture", false);
+    document.getElementById("cap").style.display = 'inline';
+    console.log("Capture");
+    setTimeout(() => {
+      document.getElementById('cap').style.display = "none";
+    }, 2000);
   }
 
-  public start() {
-    this.socket.emit("live", true);
-    document.getElementById("pause").style.color = 'green';
-    document.getElementById("pause").innerHTML = "En live";
+  public switch() {
+    this.socket.emit("switch", 0);
+    console.log("Switch");
   }
 }

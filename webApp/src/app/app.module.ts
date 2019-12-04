@@ -26,6 +26,7 @@ import { SettingsComponent } from './settings/settings.component';
 
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 
 
 @NgModule({
@@ -50,7 +51,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebase, 'bird'),
     AngularFireDatabaseModule,
-    MatInputModule,FormsModule, ReactiveFormsModule
+    MatInputModule,FormsModule, ReactiveFormsModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

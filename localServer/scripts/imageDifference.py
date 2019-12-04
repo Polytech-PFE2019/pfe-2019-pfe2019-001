@@ -87,7 +87,7 @@ def getDifferenceWithEtalon(image2):
 
 def main(argv):
     score = getDifferenceWithEtalon(image)
-    print(score)
+    return score
 
 
 if __name__ == "__main__":
