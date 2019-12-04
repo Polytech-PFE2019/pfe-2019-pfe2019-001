@@ -3,15 +3,14 @@ const server = require('../server')
 var nodemailer = require('nodemailer');
 var firebase = require("firebase");
 
-var credentialsError = false;
-
-if (global.mail == undefined || global.name == undefined) {
-    console.log("ok")
-    console.log(global.mail)
-    credentialsError = true;
-}
-
 async function setValue(req, res) {
+
+    var credentialsError = false;
+
+    if (global.mail == undefined || global.name == undefined) {
+        console.log("not ok")
+        credentialsError = true;
+    }
 
     var transporter = nodemailer.createTransport({
         service: 'gmail',

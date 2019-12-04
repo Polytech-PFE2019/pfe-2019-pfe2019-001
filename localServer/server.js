@@ -1,5 +1,4 @@
 var express = require("express");
-var firebase = require("firebase");
 var app = express();
 const bodyParser = require("body-parser");
 var waitUntil = require('wait-until');
@@ -8,6 +7,7 @@ var functions = require('./functions')
 var schedule = require('node-schedule');
 var path = require('path');
 
+var firebase = require("./firebase.js");
 
 const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
@@ -21,16 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
-var firebaseConfig = {
-  apiKey: "AIzaSyCncb_SkW0LNdf2phmjahcwr5R3KOGQzDM",
-  authDomain: "bird-c45f2.firebaseapp.com",
-  databaseURL: "https://bird-c45f2.firebaseio.com",
-  projectId: "bird-c45f2",
-  storageBucket: "bird-c45f2.appspot.com",
-  messagingSenderId: "687579025809",
-  appId: "1:687579025809:web:33036a6e9e2983f6da8a30"
-};
-firebase.initializeApp(firebaseConfig);
+
 
 var ref = firebase.database().ref();
 var usersRef = ref.child('users');
@@ -40,22 +31,26 @@ schedule.scheduleJob('* */10 * * * *', function () {
   functions.count()
 });
 
+var port = 1337;
+var server = app.listen(port, function () {
+  console.log("Connected on port 1337");
+})
 
 var io = require('socket.io').listen(server);
 exports.io = io;
 
-
-io.on('connection', function (socket) {
-  console.log('User connected, starting to record...');
-  console.log("clients: " + Object.keys(io.sockets.sockets).length);
-
-  ref.once('value')
+ref.once('value')
     .then(function (snap) {
       if (snap.numChildren() == 1) {
         global.name = snap.child("users/nom").val();
         global.mail = snap.child("users/email").val();
+        console.log(global.name + global.mail);
       }
     });
+
+io.on('connection', function (socket) {
+  console.log('User connected, starting to record...');
+  console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
   var file = require('./ressources/ressources.json');
   io.emit("water", file.water)
@@ -121,13 +116,3 @@ app.post('/bird', function (req, res) {
   });
 });
 
-app.use("/", express.static(path.join(__dirname, "dist")));
-app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
-
-
-var port = 1337;
-var server = app.listen(port, function () {
-  console.log("Connected on port 1337");
-})
