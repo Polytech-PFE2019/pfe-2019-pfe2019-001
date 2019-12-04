@@ -6,6 +6,7 @@ import time, threading
 import cv2
 import base64
 import subprocess
+import uuid
 
 #Récupération du lien vers la picam
 picam_proc = subprocess.Popen(["./picam.sh"], stdout=subprocess.PIPE)
@@ -45,15 +46,27 @@ def wsgi_handler(env, start_response):
             start_response('200 OK', headers)
             return [content]
     elif env['PATH_INFO'] == "/picture":
-        cap = camera_captures[0][1]
-        if cap != None:
-            params = ["picture", cap, 2, 100]
-            response = html_sendImage(params)
+        response = html_picture()
+        if response != False:
             headers = [('content-type', 'text/plain')]
             start_response('200 OK', headers)
             return [response]
     start_response('200 OK', [('Content-Type', 'text/plain')])
     return ['Hello, World!\r\n']
+
+def html_picture():
+    service_camera_id = 0
+    service_id = uuid.uuid4()
+    if len(camera_captures) > 1:
+        service_camera_id = 1
+    bind_client(service_id, service_camera_id, False)
+    cap = camera_captures[service_camera_id][1]
+    response = False
+    if cap != None:
+        params = ["picture", cap, 2, 100]
+        response = html_sendImage(params)
+    remove_client(service_id)
+    return response
 
 sio = socketio.Server(cors_allowed_origins="*")
 app = socketio.WSGIApp(sio, wsgi_handler)
@@ -116,13 +129,13 @@ def html_sendImage(params):
         return image
     return False
 
-def bind_client(sid, camera_id):
+def bind_client(sid, camera_id, stream=True):
     global camera_captures
     temp = camera_captures[camera_id]
     camera_captures[camera_id] = (temp[0], temp[1], temp[2] + [sid], temp[3])
     sio.enter_room(sid, "camera_" + str(camera_id))
     print("## LOG ## Client binded to room camera_" + str(camera_id))
-    start()
+    start(stream)
 
 def remove_client(sid):
     global camera_captures
@@ -136,13 +149,11 @@ def remove_client(sid):
             break
     stop()
 
-def start():
+def start(stream=True):
     for i in range(0, len(camera_captures)):
         if len(camera_captures[i][2]) > 0:
             start_camera(i)
-            if len(camera_captures[i][2]) == 1 and 666 in camera_captures[i][2]:
-                continue
-            else:
+            if stream:
                 start_streaming(i)
 
 def start_camera(id):
@@ -168,9 +179,7 @@ def start_streaming(id):
 
 def stop():
     for i in range(0, len(camera_captures)):
-        if len(camera_captures[i][2]) == 1 and 666 in camera_captures[i][2]:
-            stop_streaming(i)
-        elif len(camera_captures[i][2]) == 0 and camera_captures[i][1] != None:
+        if len(camera_captures[i][2]) == 0:
             stop_streaming(i)
             stop_camera(i)
 
@@ -230,11 +239,6 @@ def picture(sid, data):
         params = ["picture", cap, sid, data]
         return sendImage(params)
     return False
-
-if len(camera_captures) > 1:
-    bind_client(666, 1)
-else:
-    bind_client(666, 0)
 
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)
