@@ -25,9 +25,11 @@ var ref = firebase.database().ref();
 var usersRef = ref.child('users');
 var userRef = usersRef.push();
 
-schedule.scheduleJob('* */10 * * * *', function () {
-  functions.count()
-});
+//Règle à fixer
+//schedule.scheduleJob('* */10 * * * *', function () {
+//  console.log("scheduler proc");
+//  functions.count()
+//});
 
 var port = 1337;
 var server = app.listen(port, function () {
@@ -113,4 +115,3 @@ app.post('/bird', function (req, res) {
     ok: "ok",
   });
 });
-

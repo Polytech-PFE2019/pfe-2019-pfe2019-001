@@ -19,8 +19,8 @@ function runScript(image) {
 // La requéte contient le channel image de la socket
 async function setValue(req, res) {
     console.log(req.body.food)
-    var file = require('./../ressources/ressources.json');
     var socket = require('socket.io-client')('http://raspberrypi.local:3000');
+    var file = require('./../ressources/ressources.json');
     //ip de la rasp : 192.168.43.77
 
     var score = 0
@@ -45,6 +45,7 @@ async function setValue(req, res) {
                 file.food = false;
             }
             socket.removeAllListeners('image');
+            socket.disconnect();
         }
     });
 
@@ -61,16 +62,15 @@ async function setValue(req, res) {
 async function setEtalon(req, res) {
     console.log("update etalon begin");
     var socket = require('socket.io-client')('http://raspberrypi.local:3000');
-    socket.emit('picture', 0);
-    socket.on('picture', (image) => {
+    socket.emit('picture', 0, (image) => {
         console.log("update etalon in process");
         var ressourcespath = path.join(__dirname, "/../ressources/etalon.jpg");
         fs.writeFile(ressourcespath, image, 'base64', function (err) { });
         console.log("update etalon done");
+        socket.disconnect();
     });
 
-
-    // res.status(200).json({
-    //     message: "Message received",
-    // });
+    res.status(200).json({
+        message: "Message received",
+    });
 }; module.exports.setEtalon = setEtalon;
