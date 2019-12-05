@@ -337,3 +337,4 @@ localServer/out.png
 
 dist/
 localServer/ressources/etalon.jpg
+.vscode/
