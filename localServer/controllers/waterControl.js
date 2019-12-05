@@ -3,6 +3,7 @@ const server = require('../server')
 var nodemailer = require('nodemailer');
 var firebase = require("firebase");
 
+// Test command line: curl -X POST --data '{"water":true}' -H "content-Type: application/json" http://localhost:1337/water
 async function setValue(req, res) {
 
     var credentialsError = false;
@@ -28,9 +29,22 @@ async function setValue(req, res) {
     };
 
     console.log("Test : " + req.body.water);
+    try {
+      var ref = firebase.database().ref();
+      var waterRef = ref.child('stats/water');
+      var waterObj = {
+        time: Date.now(),
+        value: req.body.water
+      };
+      waterRef.push(waterObj);
+      console.log("Water value added to database.")
+    } catch(e) {
+      console.log("Couldn't add water value to database.");
+    }
+
     var file = require('./../ressources/ressources.json');
     file.water = req.body.water;
-    await fs.writeFileSync('ressources.json', JSON.stringify(file));
+    await fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
     server.io.emit('water', req.body.water);
     if (!credentialsError) {
         server.io.emit("errorCred", false);

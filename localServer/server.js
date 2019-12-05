@@ -5,8 +5,6 @@ var waitUntil = require('wait-until');
 var cors = require('cors');
 var functions = require('./functions')
 var schedule = require('node-schedule');
-var path = require('path');
-
 var firebase = require("./firebase.js");
 
 const waterRoutes = require("./routes/waterControl");
@@ -27,9 +25,11 @@ var ref = firebase.database().ref();
 var usersRef = ref.child('users');
 var userRef = usersRef.push();
 
-schedule.scheduleJob('* */10 * * * *', function () {
-  functions.count()
-});
+//Règle à fixer
+//schedule.scheduleJob('* */10 * * * *', function () {
+//  console.log("scheduler proc");
+//  functions.count()
+//});
 
 var port = 1337;
 var server = app.listen(port, function () {
@@ -40,13 +40,13 @@ var io = require('socket.io').listen(server);
 exports.io = io;
 
 ref.once('value')
-    .then(function (snap) {
-      if (snap.numChildren() == 1) {
-        global.name = snap.child("users/nom").val();
-        global.mail = snap.child("users/email").val();
-        console.log(global.name + global.mail);
-      }
-    });
+  .then(function (snap) {
+    if (snap.numChildren() == 1) {
+      global.name = snap.child("users/nom").val();
+      global.mail = snap.child("users/email").val();
+      console.log(global.name + global.mail);
+    }
+  });
 
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
@@ -115,4 +115,3 @@ app.post('/bird', function (req, res) {
     ok: "ok",
   });
 });
-
