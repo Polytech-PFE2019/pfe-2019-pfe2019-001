@@ -1,3 +1,5 @@
+var firebase = require("firebase");
+
 function count() {
     const { spawn } = require('child_process');
     const path = require('path');
@@ -15,8 +17,21 @@ function count() {
             const subprocess = runScript();
             subprocess.stdout.on('data', (data) => {
                 const text = "" + data;
+                var count = (text.match(new RegExp("bird", "g")) || []).length
                 console.log(text);
-                console.log((text.match(new RegExp("bird", "g")) || []).length);
+                console.log(count);
+                try {
+                  var ref = firebase.database().ref();
+                  var birdsCountRef = ref.child('stats/birds_count');
+                  var birdsCountObj = {
+                    time: Date.now(),
+                    value: count
+                  };
+                  birdsCountRef.push(birdsCountObj);
+                  console.log("Bird count value added to database.")
+                } catch(e) {
+                  console.log("Couldn't add bird count value to database.");
+                }
             });
             subprocess.stderr.on('close', () => {
                 `serv`
