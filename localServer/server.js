@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 var waitUntil = require('wait-until');
 var cors = require('cors');
 var functions = require('./functions')
-var schedule = require('node-schedule');
 var firebase = require("./firebase.js");
 
 const waterRoutes = require("./routes/waterControl");
@@ -19,17 +18,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
-
-
 var ref = firebase.database().ref();
 var usersRef = ref.child('users');
 var userRef = usersRef.push();
 
-//Règle à fixer
-//schedule.scheduleJob('* */10 * * * *', function () {
-//  console.log("scheduler proc");
-//  functions.count()
-//});
+setInterval(functions.count, 600000);
 
 var port = 1337;
 var server = app.listen(port, function () {
