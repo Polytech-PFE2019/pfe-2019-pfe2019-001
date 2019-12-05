@@ -22,8 +22,6 @@ ap.add_argument("-a", "--min-area", type=int,
                 default=500, help="minimum area size")
 args = vars(ap.parse_args())
 
-# Take in base64 string and return PIL image
-
 
 def stringToImage(base64_string):
     img = imread(io.BytesIO(base64.b64decode(base64_string)))
@@ -43,11 +41,11 @@ while True:
         # grab the current frame and initialize the occupied/unoccupied
         # text
         r = requests.get('http://localhost:3000/picture')
-        print(r.text)
+        # print(r.text)
         frame = stringToImage(r.text)
         # if the frame could not be grabbed, then we have reached the end
         # of the video
-        print(frame)
+        # print(frame)
 
         if frame is None:
             break
@@ -95,14 +93,14 @@ while True:
         if cnts:
             if text == "Unoccupied":
                 r = requests.post(
-                    'http://localhost:1337/bird', json={"Presence": True})
-                print("LIVE")
+                    'http://localhost:1337/bird', json={"presence": True})
+                # print("LIVE")
                 text = "Occupied"
         else:
             if text == "Occupied":
                 r = requests.post(
-                    'http://localhost:1337/bird', json={"Presence": False})
-                print("COUPER LIVE")
+                    'http://localhost:1337/bird', json={"presence": False})
+                #print("COUPER LIVE")
                 text = "Unoccupied"
 
         # draw the text and timestamp on the frame
@@ -112,7 +110,7 @@ while True:
                     (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
         # show the frame and record if the user presses a key
-        cv2.imshow("Security Feed", frame)
+        #cv2.imshow("Security Feed", frame)
         # cv2.imshow("Thresh", thresh)
         # cv2.imshow("Frame Delta", frameDelta)
         key = cv2.waitKey(1) & 0xFF

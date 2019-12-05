@@ -5,6 +5,8 @@ var waitUntil = require('wait-until');
 var cors = require('cors');
 var functions = require('./functions')
 var firebase = require("./firebase.js");
+const fs = require('fs');
+
 
 const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
@@ -21,8 +23,6 @@ app.use("/food", foodRoutes);
 var ref = firebase.database().ref();
 var usersRef = ref.child('users');
 var userRef = usersRef.push();
-
-setInterval(functions.count, 600000);
 
 var port = 1337;
 var server = app.listen(port, function () {
@@ -97,12 +97,22 @@ io.on('connection', function (socket) {
   });
 });
 
+//lancement automatique de la détection de mouvement
+functions.motionDetection();
+
 app.post('/bird', function (req, res) {
+  console.log(req.body.presence)
+  var file = require('./ressources/ressources.json');
+  file.presence = req.body.presence;
+  fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
   if (req.body.presence == true) {
     io.emit('presence', true);
+    functions.count();
+    var intervalId = setInterval(functions.count, 300000);
   }
   else {
     io.emit('presence', false);
+    clearInterval(intervalId);
   }
   res.status(200).json({
     ok: "ok",
