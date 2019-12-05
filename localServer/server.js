@@ -5,8 +5,6 @@ var waitUntil = require('wait-until');
 var cors = require('cors');
 var functions = require('./functions')
 var schedule = require('node-schedule');
-var path = require('path');
-
 var firebase = require("./firebase.js");
 
 const waterRoutes = require("./routes/waterControl");
@@ -40,13 +38,13 @@ var io = require('socket.io').listen(server);
 exports.io = io;
 
 ref.once('value')
-    .then(function (snap) {
-      if (snap.numChildren() == 1) {
-        global.name = snap.child("users/nom").val();
-        global.mail = snap.child("users/email").val();
-        console.log(global.name + global.mail);
-      }
-    });
+  .then(function (snap) {
+    if (snap.numChildren() == 1) {
+      global.name = snap.child("users/nom").val();
+      global.mail = snap.child("users/email").val();
+      console.log(global.name + global.mail);
+    }
+  });
 
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');

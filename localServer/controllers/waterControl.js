@@ -44,7 +44,7 @@ async function setValue(req, res) {
 
     var file = require('./../ressources/ressources.json');
     file.water = req.body.water;
-    await fs.writeFileSync('ressources.json', JSON.stringify(file));
+    await fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
     server.io.emit('water', req.body.water);
     if (!credentialsError) {
         server.io.emit("errorCred", false);
