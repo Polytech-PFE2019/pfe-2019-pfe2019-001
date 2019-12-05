@@ -24,7 +24,7 @@ export class StatsDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getUsers();
+    this.getWaterStats();
   	let dataPoints = [];
   	let dpsLength = 0;
   	let chart = new CanvasJS.Chart("chartContainer",{
@@ -66,11 +66,51 @@ export class StatsDisplayComponent implements OnInit {
 
   }
 
-  getUsers() {
-    firebase.database().ref('/users')
-      .on('value', (data: any) => {
-            console.log(data.child("/nom").val());
+  getWaterStats() {
+    var statsWater = [];
+    var average = 0;
+    var temp = "";
+    var waterStatsRef = firebase.database().ref('/stats/water');
+    waterStatsRef.once('value', function (snap) {
+      snap.forEach(function (childSnap) {
+        if(temp == ""){
+          temp = new Date(childSnap.child("/time").val() * 1000)
+        }else{
+          var time = new Date(childSnap.child("/time").val() * 1000);
+          const diffTime = Math.abs(time - temp);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          statsWater.push(diffDays);
+          temp = time
         }
-      );
+      });
+      var total = 0;
+      for(var i = 0; i < statsWater.length; i++) {
+          total += statsWater[i];
+      }
+      average = total / statsWater.length;
+      var hours = (average / 60);
+      var rhours = Math.floor(hours);
+      var minutes = (hours - rhours) * 60;
+      var rminutes = Math.round(minutes);
+      var days = (hours / 24)
+      var rdays = Math.floor(days);
+      var hours = (days - rdays) * 24;
+      var rhours = Math.round(hours);
+      document.getElementById("waterStat").innerHTML = rdays+" jour(s), "+ rhours+" heure(s) et " + rminutes+" minute(s)";
+    });
   }
+}
+
+function convertToDateFormat(date){
+  var dd = date.getDate();
+  var mm = date.getMonth() + 1;
+
+  var yyyy = date.getFullYear();
+  if (dd < 10) {
+    dd = '0' + dd;
+  }
+  if (mm < 10) {
+    mm = '0' + mm;
+  }
+  return date = dd + '/' + mm + '/' + yyyy;
 }
