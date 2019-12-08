@@ -2,19 +2,20 @@ import eventlet
 from eventlet import wsgi
 import os
 import socketio
-import time, threading
+import time
+import threading
 import cv2
 import base64
 import subprocess
 import uuid
 
-#Récupération du lien vers la picam
+# Récupération du lien vers la picam
 picam_proc = subprocess.Popen(["./picam.sh"], stdout=subprocess.PIPE)
 picam = picam_proc.stdout.read().decode("utf-8").strip().split()
 if len(picam) > 0:
     print("picam : " + " ".join(picam))
 
-#Récupération des liens vers les caméras usb
+# Récupération des liens vers les caméras usb
 usbcam_proc = subprocess.Popen(["./usbcam.sh"], stdout=subprocess.PIPE)
 usbcam = usbcam_proc.stdout.read().decode("utf8").strip().split()
 if len(usbcam) > 0:
@@ -23,7 +24,7 @@ if len(usbcam) > 0:
 # Permet de patch les threads d'eventlet
 eventlet.monkey_patch()
 
-#Fusion des caméras en un tableau unique
+# Fusion des caméras en un tableau unique
 all_cameras = picam + usbcam
 camera_captures = []
 for camera in all_cameras:
@@ -32,9 +33,12 @@ for camera in all_cameras:
     # 3: Liste des clients connectés au flux
     # 4: Référence vers le thread de streaming
     camera_captures.append((camera, None, [], None))
+camera_captures.append([0, None, [], None])
+print(camera_captures)
 
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
+
 
 def wsgi_handler(env, start_response):
     if env['PATH_INFO'] == "/":
@@ -42,17 +46,20 @@ def wsgi_handler(env, start_response):
             h = open("./index.html", 'rb')
             content = h.read()
             h.close()
-            headers = [('content-type', 'text/html')]
+            headers = [("Access-Control-Allow-Origin", "*"),
+                       ('content-type', 'text/html')]
             start_response('200 OK', headers)
             return [content]
     elif env['PATH_INFO'] == "/picture":
         response = html_picture()
         if response != False:
-            headers = [('content-type', 'text/plain')]
+            headers = [("Access-Control-Allow-Origin", "*"),
+                       ('content-type', 'text/plain')]
             start_response('200 OK', headers)
             return [response]
     start_response('200 OK', [('Content-Type', 'text/plain')])
     return ['Hello, World!\r\n']
+
 
 def html_picture():
     service_camera_id = 0
@@ -68,35 +75,37 @@ def html_picture():
     remove_client(service_id)
     return response
 
+
 sio = socketio.Server(cors_allowed_origins="*")
 app = socketio.WSGIApp(sio, wsgi_handler)
 
-class setInterval :
-    def __init__(self,interval,action, parameters=None, iter=0) :
-        self.interval=interval
-        self.action=action
-        self.stopEvent=threading.Event()
-        self.parameters=parameters
-        self.iter=iter
-        self.currIter=iter
-        thread=threading.Thread(target=self.__setInterval)
+
+class setInterval:
+    def __init__(self, interval, action, parameters=None, iter=0):
+        self.interval = interval
+        self.action = action
+        self.stopEvent = threading.Event()
+        self.parameters = parameters
+        self.iter = iter
+        self.currIter = iter
+        thread = threading.Thread(target=self.__setInterval)
         thread.start()
 
-    def __setInterval(self) :
-        nextTime=time.time()+self.interval
+    def __setInterval(self):
+        nextTime = time.time()+self.interval
         if self.iter > 0:
             while not self.stopEvent.wait(nextTime-time.time()):
-                nextTime+=self.interval
+                nextTime += self.interval
                 self.action(self.parameters)
                 self.currIter = self.currIter - 1
                 if self.currIter == 0:
                     self.stopEvent.set()
         else:
-            while not self.stopEvent.wait(nextTime-time.time()) :
-                nextTime+=self.interval
+            while not self.stopEvent.wait(nextTime-time.time()):
+                nextTime += self.interval
                 self.action(self.parameters)
 
-    def cancel(self) :
+    def cancel(self):
         print('## LOG ## Streaming thread stopped')
         self.stopEvent.set()
 
@@ -104,18 +113,21 @@ class setInterval :
 # 1 : camera source
 # 2 : room
 # 3 : Encoding quality
+
+
 def sendImage(params):
     flag, frame = params[1].read()
     if flag:
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
         if not isinstance(params[3], bool) and isinstance(params[3], int) and params[3] >= 0 and params[3] <= 100:
             encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), params[3]]
-        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring();
+        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring()
         image = base64.b64encode(image)
         image = image.decode('utf-8')
-        sio.emit(params[0], image, params[2]);
+        sio.emit(params[0], image, params[2])
         return image
     return False
+
 
 def html_sendImage(params):
     flag, frame = params[1].read()
@@ -123,11 +135,12 @@ def html_sendImage(params):
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
         if not isinstance(params[3], bool) and isinstance(params[3], int) and params[3] >= 0 and params[3] <= 100:
             encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), params[3]]
-        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring();
+        image = cv2.imencode('.jpg', frame, encode_param)[1].tostring()
         image = base64.b64encode(image)
         image = image.decode('utf-8')
         return image
     return False
+
 
 def bind_client(sid, camera_id, stream=True):
     global camera_captures
@@ -136,6 +149,7 @@ def bind_client(sid, camera_id, stream=True):
     sio.enter_room(sid, "camera_" + str(camera_id))
     print("## LOG ## Client binded to room camera_" + str(camera_id))
     start(stream)
+
 
 def remove_client(sid):
     global camera_captures
@@ -149,6 +163,7 @@ def remove_client(sid):
             break
     stop()
 
+
 def start(stream=True):
     for i in range(0, len(camera_captures)):
         if len(camera_captures[i][2]) > 0:
@@ -156,14 +171,16 @@ def start(stream=True):
             if stream:
                 start_streaming(i)
 
+
 def start_camera(id):
     global camera_captures
     if camera_captures[id][1] != None:
         return
     temp = camera_captures[id]
-    temp2 = cv2.VideoCapture(temp[0])
+    temp2 = cv2.VideoCapture(0)
     camera_captures[id] = (temp[0], temp2, temp[2], None)
     print('## LOG ## Camera started for camera ' + str(id))
+
 
 def start_streaming(id):
     global camera_captures
@@ -174,14 +191,17 @@ def start_streaming(id):
         print("Error while starting the stream")
         return
     params = ["image", temp[1], "camera_" + str(id), False]
-    camera_captures[id] = (temp[0], temp[1], temp[2], setInterval(1/float(fps), sendImage, params))
+    camera_captures[id] = (temp[0], temp[1], temp[2],
+                           setInterval(1/float(fps), sendImage, params))
     print('## LOG ## Streaming started for camera ' + str(id))
+
 
 def stop():
     for i in range(0, len(camera_captures)):
         if len(camera_captures[i][2]) == 0:
             stop_streaming(i)
             stop_camera(i)
+
 
 def stop_camera(id):
     global camera_captures
@@ -192,6 +212,7 @@ def stop_camera(id):
     camera_captures[id] = (temp[0], None, temp[2], temp[3])
     print('## LOG ## Camera stopped for camera ' + str(id))
 
+
 def stop_streaming(id):
     global camera_captures
     if camera_captures[id][3] == None:
@@ -201,20 +222,24 @@ def stop_streaming(id):
     camera_captures[id] = (temp[0], temp[1], temp[2], None)
     print('## LOG ## Streaming stopped for camera ' + str(id))
 
+
 @sio.event
-def connect(sid, environ):
+def connect(sid, env):
     print('## LOG ## Client connected, sid: ' + str(sid))
     bind_client(sid, 0)
+
 
 @sio.event
 def disconnect(sid):
     print('## LOG ## Client disconnected, sid: ', str(sid))
     remove_client(sid)
 
+
 @sio.event
 def camera_count(sid, data):
     print("## LOG ## Camera count request")
     return len(camera_captures)
+
 
 @sio.event
 def switch(sid, camera_id):
@@ -224,6 +249,7 @@ def switch(sid, camera_id):
         bind_client(sid, camera_id)
     else:
         print("## LOG ## Error while switching camera: wrong index")
+
 
 @sio.event
 def picture(sid, data):
@@ -239,6 +265,7 @@ def picture(sid, data):
         params = ["picture", cap, sid, data]
         return sendImage(params)
     return False
+
 
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)
