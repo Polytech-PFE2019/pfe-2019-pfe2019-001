@@ -1,7 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import * as io from "socket.io-client";
 import { HttpClient } from '@angular/common/http';
 import { firebaseService } from '../services/firebaseService'
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+export interface DialogData {
+  image: string;
+}
 
 
 @Component({
@@ -14,7 +20,7 @@ export class VideoDisplayComponent implements OnInit {
   private url = "http://localhost:3000";
   private socket;
 
-  constructor(private http: HttpClient, private firebase: firebaseService) {
+  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog) {
     this.socket = io(this.url);
     console.log("Test");
     this.socket.on('image', (image) => {
@@ -34,29 +40,7 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-    /*var jsmpeg = require('jsmpeg');
-        var canvas = document.createElement("canvas");
-        document.body.appendChild(canvas);
-        var client = new WebSocket('ws://192.168.43.223:8080/video-stream');
-        var x = document.getElementById("video");
-        client.onerror = function(event){
-          x.setAttribute("src", "https://image.freepik.com/vecteurs-libre/modele-erreur-404-oiseau-dans-style-dessine-main_23-2147734776.jpg");
-        };
-        var player = new jsmpeg(client, {canvas:canvas});
 
-        x.onload = function(event){
-          document.getElementById("loading").style.display = 'none';
-        };
-
-        /*const player = new RxPlayer({
-          videoElement: document.getElementById("video")
-        });
-
-        player.loadVideo({
-          url : "http://192.168.43.14/video0.mpd",
-          transport: "dash",
-          autoplay: true
-        })*/
   }
 
   ngOnDestroy() {
@@ -67,18 +51,54 @@ export class VideoDisplayComponent implements OnInit {
     this.http.get(`http://localhost:3000/picture`, {
       responseType: 'text'
     }).subscribe((data) => {
-      this.firebase.push('picture', data);
+      this.chooseAlbum(data)
     })
     this.socket.emit("picture", false);
-    document.getElementById("cap").style.display = 'inline';
-    console.log("Capture");
-    setTimeout(() => {
-      document.getElementById('cap').style.display = "none";
-    }, 2000);
   }
 
   public switch() {
     this.socket.emit("switch", 0);
     console.log("Switch");
   }
+
+  chooseAlbum(image): void {
+    const dialogRef = this.dialog.open(DialogAlbum, {
+      width: '250px',
+      data: { image: image }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == true) {
+        this._snackBar.open("capture effectué", undefined, {
+          duration: 2000,
+        });
+      }
+    });
+
+  }
+
+}
+
+@Component({
+  selector: 'dialog-album',
+  templateUrl: 'dialog-album.html',
+})
+export class DialogAlbum {
+
+  albumName = "picture";
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogAlbum>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private firebase: firebaseService) { }
+
+  onNoClick(): void {
+    this.dialogRef.close(false);
+  }
+
+  uploadImage() {
+    this.firebase.push("picture/" + this.albumName, this.data.image);
+    this.dialogRef.close(true);
+  }
+
 }
