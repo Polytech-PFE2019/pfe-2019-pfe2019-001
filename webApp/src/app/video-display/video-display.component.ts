@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import RxPlayer from "rx-player";
 import * as io from "socket.io-client";
+import { HttpClient } from '@angular/common/http';
+import { firebaseService } from '../services/firebaseService'
+
 
 @Component({
   selector: 'app-video-display',
@@ -9,10 +11,10 @@ import * as io from "socket.io-client";
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://192.168.43.77:3000";
+  private url = "http://localhost:3000";
   private socket;
 
-  constructor() {
+  constructor(private http: HttpClient, private firebase: firebaseService) {
     this.socket = io(this.url);
     console.log("Test");
     this.socket.on('image', (image) => {
@@ -28,7 +30,7 @@ export class VideoDisplayComponent implements OnInit {
       document.getElementById("loading").style.display = 'none';
       document.getElementById("switch").style.display = 'none';
       document.getElementById("capture").style.display = 'none';
-    })
+    });
   }
 
   ngOnInit() {
@@ -62,6 +64,11 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   public capture() {
+    this.http.get(`http://localhost:3000/picture`, {
+      responseType: 'text'
+    }).subscribe((data) => {
+      this.firebase.push('picture', data);
+    })
     this.socket.emit("picture", false);
     document.getElementById("cap").style.display = 'inline';
     console.log("Capture");
