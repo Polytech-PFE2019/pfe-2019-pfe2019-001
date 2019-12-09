@@ -86,14 +86,24 @@ export class VideoDisplayComponent implements OnInit {
 export class DialogAlbum {
 
   albumName = "picture";
+  albums = undefined;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAlbum>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private firebase: firebaseService) { }
+    private firebase: firebaseService) {
+      this.loadAlbums();
+    }
 
   onNoClick(): void {
     this.dialogRef.close(false);
+  }
+
+  loadAlbums() {
+    this.firebase.getAlbums().then((albums) => {
+      console.log(albums);
+      this.albums = albums;
+    });
   }
 
   uploadImage() {
