@@ -45,12 +45,10 @@ export class VideoDisplayComponent implements OnInit {
 
   ngOnInit() {
     this._birdsService.getBirdsNearby().then(data => {
-      console.log("birds fetched");
       this.birdsNearby = data;
       this.birdsNearby.forEach((bird) => {
         this._birdsService.getBirdImage(bird.comName).then((result) => {
           var hits = Object.keys(result)[1]
-          console.log(result[hits])
           if (result[hits].length > 0) {
             this.birdsNearbyFull.push({name: bird.comName, url: result[hits][0].largeImageURL});
           }

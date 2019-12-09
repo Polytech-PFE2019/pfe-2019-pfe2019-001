@@ -18,7 +18,6 @@ export class BirdsService {
     return new Promise((resolve, reject) => {
       this.getPosition().then((data) => {
         var url = "https://api.ebird.org/v2/data/obs/geo/recent?lat=" + 43.62 + "&lng=" + 7.09 + "&sort=species&dist=50"
-        console.log(url);
         this.http.get(url, this.httpOptions).subscribe((data) => {
           resolve(data);
         })
