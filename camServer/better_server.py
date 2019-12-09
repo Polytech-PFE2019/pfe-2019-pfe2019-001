@@ -27,14 +27,16 @@ eventlet.monkey_patch()
 # Fusion des caméras en un tableau unique
 all_cameras = picam + usbcam
 camera_captures = []
+
+if len(all_cameras) == 0:
+    camera_captures.append([0, None, [], None])
+
 for camera in all_cameras:
     # 1: Nom de la caméra
     # 2: VideoCapture de la caméra
     # 3: Liste des clients connectés au flux
     # 4: Référence vers le thread de streaming
     camera_captures.append((camera, None, [], None))
-camera_captures.append([0, None, [], None])
-print(camera_captures)
 
 fps = 10
 print('## LOG ## Live FPS: ' + str(fps))
@@ -177,7 +179,7 @@ def start_camera(id):
     if camera_captures[id][1] != None:
         return
     temp = camera_captures[id]
-    temp2 = cv2.VideoCapture(0)
+    temp2 = cv2.VideoCapture(temp[0])
     camera_captures[id] = (temp[0], temp2, temp[2], None)
     print('## LOG ## Camera started for camera ' + str(id))
 
