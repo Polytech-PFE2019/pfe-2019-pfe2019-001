@@ -26,4 +26,17 @@ export class firebaseService {
         firebase.database().ref(ref).push(data)
     }
 
+    getAlbums() {
+      return new Promise((resolve, reject) => {
+        var albums = [];
+        var albumRef = this.getDatabase().ref('picture');
+        albumRef.once('value', (snapshot) => {
+          snapshot.forEach(function(_child){
+            albums.push(_child.key);
+          });
+          resolve(albums);
+        });
+      });
+    }
+
 }

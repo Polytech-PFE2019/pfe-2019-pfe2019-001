@@ -63,7 +63,7 @@ export class VideoDisplayComponent implements OnInit {
 
   chooseAlbum(image): void {
     const dialogRef = this.dialog.open(DialogAlbum, {
-      width: '250px',
+      width: '300px',
       data: { image: image }
     });
 
@@ -86,14 +86,23 @@ export class VideoDisplayComponent implements OnInit {
 export class DialogAlbum {
 
   albumName = "picture";
+  albums = undefined;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAlbum>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private firebase: firebaseService) { }
+    private firebase: firebaseService) {
+      this.loadAlbums();
+    }
 
   onNoClick(): void {
     this.dialogRef.close(false);
+  }
+
+  loadAlbums() {
+    this.firebase.getAlbums().then((albums) => {
+      this.albums = albums;
+    });
   }
 
   uploadImage() {
