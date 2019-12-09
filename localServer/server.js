@@ -41,6 +41,34 @@ ref.once('value')
     }
   });
 
+var ref = firebase.database().ref('stats/birds_count');
+ref.once('value', function (snap) {
+    snap.forEach(function (childSnap) {
+        var temp = new Date(childSnap.child("/time").val());
+        var now = new Date(Date.now());
+        if(temp.getDay() == now.getDay() 
+            && temp.getMonth() == now.getMonth() 
+            && temp.getFullYear() ==now.getFullYear()){
+            var ref = firebase.database().ref();
+            var countsRef = ref.child('stats/birds_count/'+childSnap.key);
+            var countRef = countsRef.update({
+              time: childSnap.child("/time").val(), value: (childSnap.child("/value").val()+10)
+            });
+
+        }else{
+            var ref = firebase.database().ref();
+            var birdsCountRef = ref.child('stats/birds_count');
+            var birdsCountObj = {
+                time: Date.now(),
+                value: 10
+            };
+            birdsCountRef.push(birdsCountObj);
+        }
+    });
+
+});
+
+
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
   console.log("clients: " + Object.keys(io.sockets.sockets).length);

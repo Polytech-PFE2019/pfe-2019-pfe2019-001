@@ -63,7 +63,7 @@ export class VideoDisplayComponent implements OnInit {
 
   chooseAlbum(image): void {
     const dialogRef = this.dialog.open(DialogAlbum, {
-      width: '250px',
+      width: '300px',
       data: { image: image }
     });
 
@@ -101,7 +101,6 @@ export class DialogAlbum {
 
   loadAlbums() {
     this.firebase.getAlbums().then((albums) => {
-      console.log(albums);
       this.albums = albums;
     });
   }

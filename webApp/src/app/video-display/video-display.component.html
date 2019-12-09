@@ -18,12 +18,17 @@
     </div>
 </div>
 
-<body style="display: block;  margin-left: auto;  margin-right: auto;  width: 50%;">
-    <table>
-        <td><img id="image" width="640dx"></td>
-        <td><button id="capture" mat-raised-button color="accent" (click)="capture()">Capture</button></td>
-        <td><button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button></td>
-    </table>
-</body>
+<div class="body">
+  <div class="video">
+    <img id="image">
+    <div class="buttons">
+      <button id="capture" mat-raised-button color="accent" (click)="capture()">Capture</button>
+      <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
+    </div>
+  </div>
+  <div class="pictures">
+
+  </div>
+</div>
 
 <!--<video id="video" width = "640" controls autoplay></video>-->
