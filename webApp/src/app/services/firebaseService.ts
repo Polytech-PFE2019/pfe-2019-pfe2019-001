@@ -27,7 +27,6 @@ export class firebaseService {
     }
 
     getAlbums() {
-      console.log('called album');
       return new Promise((resolve, reject) => {
         var albums = [];
         var albumRef = this.getDatabase().ref('picture');
