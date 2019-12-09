@@ -2,8 +2,10 @@ import { Component, OnInit, Inject } from '@angular/core';
 import * as io from "socket.io-client";
 import { HttpClient } from '@angular/common/http';
 import { firebaseService } from '../services/firebaseService'
+import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { image_search } from 'duckduckgo-images-api';
 
 export interface DialogData {
   image: string;
@@ -19,8 +21,10 @@ export class VideoDisplayComponent implements OnInit {
 
   private url = "http://localhost:3000";
   private socket;
+  private birdsNearby = undefined;
+  private birdsNearbyFull = [];
 
-  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog) {
+  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
     this.socket = io(this.url);
     console.log("Test");
     this.socket.on('image', (image) => {
@@ -40,7 +44,19 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    this._birdsService.getBirdsNearby().then(data => {
+      console.log("birds fetched");
+      this.birdsNearby = data;
+      this.birdsNearby.forEach((bird) => {
+        this._birdsService.getBirdImage(bird.comName).then((result) => {
+          var hits = Object.keys(result)[1]
+          console.log(result[hits])
+          if (result[hits].length > 0) {
+            this.birdsNearbyFull.push({name: bird.comName, url: result[hits][0].largeImageURL});
+          }
+        });
+      });
+    });
   }
 
   ngOnDestroy() {

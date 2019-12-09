@@ -3,6 +3,12 @@
   flex-direction: row;
 }
 
+.pictures {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 .video {
   display: flex;
   flex-direction: column;

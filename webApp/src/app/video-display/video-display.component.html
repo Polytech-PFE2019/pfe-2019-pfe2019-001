@@ -27,7 +27,10 @@
     </div>
   </div>
   <div class="pictures">
-
+    <div class="singlebird" *ngFor="let bird of birdsNearbyFull">
+      {{bird.name}}
+      <img width="150px" src="{{bird.url}}" alt="">
+    </div>
   </div>
 </div>
 
