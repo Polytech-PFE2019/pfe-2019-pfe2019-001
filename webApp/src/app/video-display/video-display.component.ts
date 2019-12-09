@@ -50,7 +50,7 @@ export class VideoDisplayComponent implements OnInit {
         this._birdsService.getBirdImage(bird.comName).then((result) => {
           var hits = Object.keys(result)[1]
           if (result[hits].length > 0) {
-            this.birdsNearbyFull.push({name: bird.comName, url: result[hits][0].largeImageURL});
+            this.birdsNearbyFull.push({ name: bird.comName, url: result[hits][0].largeImageURL });
           }
         });
       });
@@ -106,8 +106,8 @@ export class DialogAlbum {
     public dialogRef: MatDialogRef<DialogAlbum>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private firebase: firebaseService) {
-      this.loadAlbums();
-    }
+    this.loadAlbums();
+  }
 
   onNoClick(): void {
     this.dialogRef.close(false);
@@ -120,7 +120,8 @@ export class DialogAlbum {
   }
 
   uploadImage() {
-    this.firebase.push("picture/" + this.albumName, this.data.image);
+    var image = { value: this.data.image }
+    this.firebase.push("picture/" + this.albumName, image);
     this.dialogRef.close(true);
   }
 

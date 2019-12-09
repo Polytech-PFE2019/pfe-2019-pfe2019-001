@@ -18,7 +18,6 @@ export class StatsDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-    var waitUntil = require('wait-until');
     this.getWaterStats();
     this.getCountStats();
   }
@@ -57,12 +56,12 @@ export class StatsDisplayComponent implements OnInit {
     });
   }
 
-  getCountStats(){
+  getCountStats() {
     var dataPoints = [];
     var countRef = this.database.ref('/stats/birds_count');
     countRef.once('value', function (snap) {
       snap.forEach(function (childSnap) {
-        var obj = {y : childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val()))};
+        var obj = { y: childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val())) };
         dataPoints.push(obj);
       });
       console.log(dataPoints);
@@ -88,8 +87,8 @@ export class StatsDisplayComponent implements OnInit {
           ]*/
         }]
 
-    });
-    chart.render();
+      });
+      chart.render();
     });
   }
 }

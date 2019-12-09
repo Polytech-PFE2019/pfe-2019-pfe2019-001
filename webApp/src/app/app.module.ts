@@ -30,6 +30,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { AlbumComponent } from './album/album.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     StatsDisplayComponent,
     ResourcesMonitorComponent,
     SettingsComponent,
-    DialogAlbum
+    DialogAlbum,
+    AlbumComponent,
   ],
   imports: [
     BrowserModule,

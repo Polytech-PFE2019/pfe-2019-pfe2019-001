@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import * as firebase from 'firebase';
+import { ChildActivationEnd } from '@angular/router';
 
 
 
@@ -27,16 +28,22 @@ export class firebaseService {
     }
 
     getAlbums() {
-      return new Promise((resolve, reject) => {
-        var albums = [];
-        var albumRef = this.getDatabase().ref('picture');
-        albumRef.once('value', (snapshot) => {
-          snapshot.forEach(function(_child){
-            albums.push(_child.key);
-          });
-          resolve(albums);
+        return new Promise((resolve, reject) => {
+            var albums = [];
+            var temp = [];
+            var albumRef = this.getDatabase().ref('picture');
+            albumRef.once('value', (snapshot) => {
+                snapshot.forEach(function (_child) {
+                    _child.forEach(function (wtf) {
+                        temp.push(wtf.val())
+                    })
+                    albums.push({ name: _child.key, photos: temp });
+                    temp = [];
+                    console.log(albums)
+                });
+                resolve(albums);
+            });
         });
-      });
     }
 
 }
