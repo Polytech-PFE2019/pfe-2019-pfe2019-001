@@ -8,17 +8,17 @@ const { spawn } = require('child_process');
 
 var iterations = 50;
 
-function runScript(image) {
+function runScript() {
     return spawn('python', [
         path.join(__dirname, '/../scripts/food_control.py'),
         "--etalon-frame", "./ressources/etalon.jpg",
-        "--image", image
+        //"--image", image
     ]);
 }
 
 // La requéte contient le channel image de la socket
 async function setValue(req, res) {
-    console.log(req.body.food)
+    //console.log(req.body.food)
     var socket = require('socket.io-client')('http://raspberrypi.local:3000');
     var file = require('./../ressources/ressources.json');
     //ip de la rasp : 192.168.43.77
@@ -52,21 +52,41 @@ async function setValue(req, res) {
     //     }
     // });
 
-    // Création d'une requête HTTP
-    var req = new XMLHttpRequest();
-    // Requête HTTP GET asynchrone vers le fichier langages.txt publié localement
-    req.open("GET", "http://raspberrypi.local/picture");
-    req.addEventListener("load", function () {
-        // Affiche la réponse reçue pour la requête (ici un string de l'image en base64)
-        console.log(req.responseText);
+
+    // var image;
+    // // Création d'une requête HTTP
+    // const request = require('request');
+    // request("http://192.168.43.77:3000/picture", function (error, response, body) {
+    //     console.log('error:', error);
+    //     //console.log('statusCode:', response && response.statusCode);
+    //     //console.log('body:', body);
+    //     image = body;
+    // });
+    const subprocess = runScript();
+    subprocess.stderr.on('data', (data) => {
+        console.log("script for food detection launched");
+        const text = data;
+        console.log(data);
         score += parseInt(text, 10);
+        if (score > 0.2) {
+            file.food = true;
+        } else {
+            file.food = false;
+        }
+        fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
+        socket.emit('food', file.food);
+        console.log(score);
+
     });
-    // Envoi de la requête
-    req.send(null);
+    
+    console.log("food score computation finished");
+
+    // await fs.writeFileSync('ressources.json', JSON.stringify(file));
+    // socket.emit('food', file.food);
+    // console.log(score);
 
 
-    await fs.writeFileSync('ressources.json', JSON.stringify(file));
-    socket.emit('food', file.food);
+
     // server.io.emit('food', file.food);
 
     res.status(200).json({

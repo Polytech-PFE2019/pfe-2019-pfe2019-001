@@ -17,6 +17,8 @@ import numpy as np
 from PIL import Image
 from skimage.metrics import structural_similarity
 import socketio
+import requests
+
 
 # Take in base64 string and return PIL image
 def stringToImage(base64_string):
@@ -27,6 +29,16 @@ def stringToImage(base64_string):
 def toRGB(image):
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
+#compute the score of the differences between the image from the rasp and the etalon
+def getDifferenceWithEtalon(image2):
+    #frame = cv2.imread(image2,0)
+    frame = imutils.resize(image2, width=500)
+    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(frame, (21, 21), 0)
+
+    (score, diff) = structural_similarity(gray, firstFrame, full=True,  multichannel=True)
+    diff = (diff * 255).astype("uint8")
+    return(score)
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -41,7 +53,7 @@ args = vars(ap.parse_args())
 
 #Nombre de frames sur lequelles calculer le score
 iterations = 50
-
+score = 0
 
 # we read from the webcam
 if args.get("etalon", None) is None:
@@ -62,29 +74,25 @@ resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
 if args.get("image", None) is None:
-    print("error, no input image for food detection")
     #set a default image for testing
     file=open("../ressources/testimg.txt", "r")
     image = file.read()
 else :
     image = args.get("image")
-#conversion de l'image en tableau
-image = stringToImage(image)
-image = toRGB(image)
+    
+for i in range(iterations):
+    #test de récupération de la requète sur la rasp    
+    image = requests.get('http://192.168.43.77:3000/picture').text
+
+    #conversion de l'image en tableau
+    image = stringToImage(image)
+    image = toRGB(image)
+    score += getDifferenceWithEtalon(image)
+
+score = score/iterations
+print(score)
 
 
 
 
-def getDifferenceWithEtalon(image2):
-    #frame = cv2.imread(image2,0)
-    frame = imutils.resize(image2, width=500)
-    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(frame, (21, 21), 0)
 
-    (score, diff) = structural_similarity(gray, firstFrame, full=True,  multichannel=True)
-    diff = (diff * 255).astype("uint8")
-
-    print(score)
-
-
-score = getDifferenceWithEtalon(image)

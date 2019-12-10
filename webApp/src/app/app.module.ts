@@ -30,7 +30,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { AlbumComponent } from './album/album.component';
+import { BirdComparatorComponent } from './bird-comparator/bird-comparator.component';
+import { AlbumComponent, AlbumDetailComponent } from './album/album.component';
 
 
 @NgModule({
@@ -43,6 +44,8 @@ import { AlbumComponent } from './album/album.component';
     SettingsComponent,
     DialogAlbum,
     AlbumComponent,
+    BirdComparatorComponent,
+    AlbumDetailComponent
   ],
   imports: [
     BrowserModule,
@@ -61,10 +64,13 @@ import { AlbumComponent } from './album/album.component';
     MatButtonModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [DialogAlbum]
+  entryComponents: [DialogAlbum, AlbumDetailComponent]
 })
 export class AppModule { }
