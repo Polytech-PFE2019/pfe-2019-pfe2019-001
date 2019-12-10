@@ -4,6 +4,8 @@
 }
 
 .pictures {
+  height: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;

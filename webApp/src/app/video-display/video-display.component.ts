@@ -5,7 +5,6 @@ import { firebaseService } from '../services/firebaseService'
 import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { image_search } from 'duckduckgo-images-api';
 
 export interface DialogData {
   image: string;
