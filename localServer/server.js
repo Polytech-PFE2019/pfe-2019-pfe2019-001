@@ -34,7 +34,7 @@ var birdsCountRef = ref.child('users');
 ref.once('value')
   .then(function (snap) {
     console.log("num : " + snap.numChildren())
-    if (snap.numChildren() == 2) {
+    if (snap.numChildren() >= 2) {
       global.name = snap.child("users/nom").val();
       global.mail = snap.child("users/email").val();
       console.log(global.name + global.mail);

@@ -71,12 +71,21 @@ export class StatsDisplayComponent implements OnInit {
           console.log(Object.keys(dataPoints));
         }else{
           for (var i = 0; i < dataPoints.length; i++){
+            console.log(dataPoints.length)
+            var check = false;
+            console.log("Datapoint : " + dataPoints[i].label);
+            console.log("DateBdd : " + convertToDateFormat(new Date(childSnap.child("/time").val())))
             if (dataPoints[i].label == convertToDateFormat(new Date(childSnap.child("/time").val()))){
+              console.log("check !")
               dataPoints[i].y += childSnap.child("/value").val();
+              check = true;
               break;
-            }else{
+            }
+            if(!check){
+              console.log("pas check !")
               var obj = {y : childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val()))};
               dataPoints.push(obj);
+              check = false;
             }
           }
         }
