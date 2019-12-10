@@ -33,6 +33,10 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { BirdComparatorComponent } from './bird-comparator/bird-comparator.component';
 import { AlbumComponent, AlbumDetailComponent } from './album/album.component';
 
+import 'hammerjs'; // Mandatory for angular-modal-gallery 3.x.x or greater (`npm i --save hammerjs`)
+import 'mousetrap'; // Mandatory for angular-modal-gallery 3.x.x or greater (`npm i --save mousetrap`)
+import { GalleryModule } from '@ks89/angular-modal-gallery'; // <----------------- angular-modal-gallery library
+
 
 @NgModule({
   declarations: [
@@ -68,6 +72,7 @@ import { AlbumComponent, AlbumDetailComponent } from './album/album.component';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    GalleryModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],

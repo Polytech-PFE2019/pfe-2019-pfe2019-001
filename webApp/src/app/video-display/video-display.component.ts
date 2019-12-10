@@ -22,6 +22,7 @@ export class VideoDisplayComponent implements OnInit {
   private socket;
   private birdsNearby = undefined;
   private birdsNearbyFull = [];
+  private image;
 
   constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
     this.socket = io(this.url);
@@ -43,6 +44,7 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.image = document.getElementById('image');
     this._birdsService.getBirdsNearby().then(data => {
       this.birdsNearby = data;
       this.birdsNearby.forEach((bird) => {
@@ -58,6 +60,19 @@ export class VideoDisplayComponent implements OnInit {
 
   ngOnDestroy() {
     this.socket.disconnect();
+  }
+
+  fullScreen() {
+    console.log("full screen");
+    if (this.image.requestFullscreen) {
+      this.image.requestFullscreen();
+    } else if (this.image.mozRequestFullScreen) { /* Firefox */
+      this.image.mozRequestFullScreen();
+    } else if (this.image.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+      this.image.webkitRequestFullscreen();
+    } else if (this.image.msRequestFullscreen) { /* IE/Edge */
+      this.image.msRequestFullscreen();
+    }
   }
 
   public capture() {

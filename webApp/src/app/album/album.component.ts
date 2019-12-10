@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, Sanitizer } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { firebaseService } from '../services/firebaseService';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AccessibilityConfig, Image, ImageEvent } from '@ks89/angular-modal-gallery';
 
 export interface AlbumDetailData {
   albumName: string;
@@ -33,9 +34,9 @@ export class AlbumComponent implements OnInit {
     return 'data:image/jpg;base64,' + ((this.sanitizer.bypassSecurityTrustResourceUrl(base64)) as any).changingThisBreaksApplicationSecurity;
   }
 
-  openAlbum(albumImages) {
+  openAlbum(albumImages, albumName) {
     const dialogRef = this.dialog.open(AlbumDetailComponent, {
-      data: { images: albumImages }
+      data: { albumName: albumName, images: albumImages }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -53,16 +54,25 @@ export class AlbumComponent implements OnInit {
 export class AlbumDetailComponent {
 
   private images = [];
-  private
+  imagesRect: Image[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<AlbumDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AlbumDetailData,
     private firebase: firebaseService, private sanitizer: DomSanitizer) {
+      var cpt = 0
     this.data.images.forEach((image: any) => {
       this.images.push(this.displayImage(image.value));
-    })
-    console.log(this.images)
+      this.imagesRect.push(new Image(
+        cpt,
+        {
+          img: this.displayImage(image.value),
+          description: 'Description 1'
+        }
+      ));
+      cpt++;
+    });
+    console.log(this.images);
   }
 
   displayImage(base64) {
