@@ -18,11 +18,12 @@ export interface DialogData {
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://localhost:3000";
+  private url = "http://raspberrypi.local:3000";
   private socket;
   private birdsNearby = undefined;
   private birdsNearbyFull = [];
   private image;
+  private camera_id = 0;
 
   constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
     this.socket = io(this.url);
@@ -76,15 +77,15 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   public capture() {
-    this.http.get(`http://localhost:3000/picture`, {
-      responseType: 'text'
-    }).subscribe((data) => {
+    this.socket.emit('picture', 100, (data) => {
       this.chooseAlbum(data)
-    })
+    });
   }
 
   public switch() {
-    this.socket.emit("switch", 0);
+    this.camera_id = (this.camera_id + 1) % 2;
+    this.socket.emit("switch", this.camera_id);
+
     console.log("Switch");
   }
 
@@ -105,15 +106,13 @@ export class VideoDisplayComponent implements OnInit {
 
 
   matchCapture(name, ) {
-    this.http.get(`http://localhost:3000/picture`, {
-      responseType: 'text'
-    }).subscribe((data) => {
+    this.socket.emit('picture', 100, (data) => {
       var image = { value: data }
       this.firebase.push("picture/" + name, image);
       this._snackBar.open("capture effectuée", undefined, {
         duration: 2000,
       });
-    })
+    });
   }
 
 }
