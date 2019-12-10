@@ -29,6 +29,7 @@
   p {
     margin: 0;
   }
+
   .toolbar {
     height: 60px;
     margin: -8px;
@@ -182,7 +183,7 @@
   }
 
   .terminal pre {
-    font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
     color: white;
     padding: 0 1rem 1rem;
     margin: 0;
@@ -232,7 +233,7 @@
   /* Responsive Styles */
   @media screen and (max-width: 767px) {
 
-    .card-container > *:not(.circle-link) ,
+    .card-container>*:not(.circle-link),
     .terminal {
       width: 100%;
     }
@@ -262,16 +263,17 @@
 
 <!-- Toolbar -->
 <div class="toolbar" role="banner">
-  <a routerLink="/"><img
-    width="40"
-    alt="Bird Control Logo"
-    src="../assets/bird.png"
-  /></a>
+  <a routerLink="/"><img width="40" alt="Bird Control Logo" src="../assets/bird.png" /></a>
   <nav>
-    <a routerLink="/"><h1>Bird Control</h1></a>
+    <a routerLink="/">
+      <h1>Bird Control</h1>
+    </a>
   </nav>
   <nav>
     <a routerLink="/videoDisplay">Video en live</a>
+  </nav>
+  <nav>
+    <a routerLink="/album">Album</a>
   </nav>
   <nav>
     <a routerLink="/statsDisplay">Visualisation stats</a>
@@ -282,25 +284,25 @@
   <nav>
     <a routerLink="/settings">Options</a>
   </nav>
-    <div class="spacer"></div>
-    <a id="blink" routerLink="/videoDisplay" *ngIf="presence"><img
-      width="40"
-      alt="Présence"
-      src="../assets/birdAlert.png"
-    /></a>
+  <div class="spacer"></div>
+  <a id="blink" routerLink="/videoDisplay" *ngIf="presence"><img width="40" alt="Présence"
+      src="../assets/birdAlert.png" /></a>
 </div>
 
 <mat-card id="card" class="example-card" *ngIf="isHome">
   <img id="logo" mat-card-image src="../assets/polytech.png" alt="logo Polytech">
   <mat-card-content>
-<br><br><h2>PFE de polytech Nice-Sophia 2019</h2>
+    <br><br>
+    <h2>PFE de polytech Nice-Sophia 2019</h2>
     <p>
 
 
-La croissance du marché des objets connectés met clairement en évidence l’intérêt,
-aussi bien du grand public que des industriels, pour les objets de tous les jours améliorés avec des technologies du numérique qui transforment leur usage.
-<br><br>S’inscrivant pleinement dans les domaines de l’IoT,
-ce projet a pour but de développer une cabane à oiseaux connectée qui pourra à terme servir de “centre de contrôle” pour d’éventuels objets additionnels.
+      La croissance du marché des objets connectés met clairement en évidence l’intérêt,
+      aussi bien du grand public que des industriels, pour les objets de tous les jours améliorés avec des technologies
+      du numérique qui transforment leur usage.
+      <br><br>S’inscrivant pleinement dans les domaines de l’IoT,
+      ce projet a pour but de développer une cabane à oiseaux connectée qui pourra à terme servir de “centre de
+      contrôle” pour d’éventuels objets additionnels.
     </p>
   </mat-card-content>
 </mat-card>

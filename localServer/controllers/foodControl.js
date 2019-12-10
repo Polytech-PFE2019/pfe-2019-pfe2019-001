@@ -23,31 +23,46 @@ async function setValue(req, res) {
     var file = require('./../ressources/ressources.json');
     //ip de la rasp : 192.168.43.77
 
+
     var score = 0
     nb_of_frames = 0
-    socket.on('image', (image) => {
-        if (nb_of_frames < 50) {
-            const subprocess = runScript(image);
-            subprocess.stdout.on('data', (data) => {
-                const text = data;
-                console.log(text);
-                score += parseInt(text, 10);
-            });
-            nb_of_frames += 1;
-        }
-        else if (nb_of_frames == 50) {
 
-            score = score / nb_of_frames
-            console.log(score);
-            if (score > 0.2) {
-                file.food = true;
-            } else {
-                file.food = false;
-            }
-            socket.removeAllListeners('image');
-            socket.disconnect();
-        }
+    // tentative de récupération des images avec des sockets
+    // socket.on('image', (image) => {
+    //     if (nb_of_frames < 50) {
+    //         const subprocess = runScript(image);
+    //         subprocess.stdout.on('data', (data) => {
+    //             const text = data;
+    //             console.log(text);
+    //             score += parseInt(text, 10);
+    //         });
+    //         nb_of_frames += 1;
+    //     }
+    //     else if (nb_of_frames == 50) {
+
+    //         score = score / nb_of_frames
+    //         console.log(score);
+    //         if (score > 0.2) {
+    //             file.food = true;
+    //         } else {
+    //             file.food = false;
+    //         }
+    //         socket.removeAllListeners('image');
+    //         socket.disconnect();
+    //     }
+    // });
+
+    // Création d'une requête HTTP
+    var req = new XMLHttpRequest();
+    // Requête HTTP GET asynchrone vers le fichier langages.txt publié localement
+    req.open("GET", "http://raspberrypi.local/picture");
+    req.addEventListener("load", function () {
+        // Affiche la réponse reçue pour la requête (ici un string de l'image en base64)
+        console.log(req.responseText);
+        score += parseInt(text, 10);
     });
+    // Envoi de la requête
+    req.send(null);
 
 
     await fs.writeFileSync('ressources.json', JSON.stringify(file));

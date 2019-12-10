@@ -124,8 +124,8 @@ export class StatsDisplayComponent implements OnInit {
           dataPoints: dataPoints
         }]
 
-    });
-    chart.render();
+      });
+      chart.render();
     });
   }
 
