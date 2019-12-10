@@ -1,26 +1,31 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { VideoDisplayComponent } from './video-display/video-display.component';
 import { StatsDisplayComponent } from './stats-display/stats-display.component';
 import { ResourcesMonitorComponent } from './resources-monitor/resources-monitor.component';
 import { SettingsComponent } from './settings/settings.component';
+import { AlbumComponent } from './album/album.component';
 
 
 const routes: Routes = [{
-    path: 'videoDisplay',
-    component: VideoDisplayComponent
-  },{
-      path: 'statsDisplay',
-      component: StatsDisplayComponent
-    },
-    {
-        path: 'resourcesMonitor',
-        component: ResourcesMonitorComponent
-      },
-      {
-          path: 'settings',
-          component: SettingsComponent
-        }];
+  path: 'videoDisplay',
+  component: VideoDisplayComponent
+}, {
+  path: 'statsDisplay',
+  component: StatsDisplayComponent
+},
+{
+  path: 'resourcesMonitor',
+  component: ResourcesMonitorComponent
+},
+{
+  path: 'settings',
+  component: SettingsComponent
+},
+{
+  path: 'album',
+  component: AlbumComponent
+}];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],

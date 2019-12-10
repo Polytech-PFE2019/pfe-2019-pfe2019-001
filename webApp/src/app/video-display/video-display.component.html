@@ -1,4 +1,3 @@
-
 <!--<div id ="center" style="position:fixed;top:50%;left:50%;">
 <div id="loading">
     <h2>LOADING...</h2>
@@ -11,23 +10,26 @@
 <iframe id="video" src="http://192.168.43.14:8080" frameBorder="0" scrolling="no"></iframe>-->
 
 
-<div id ="center" style="position:fixed;top:50%;left:50%;">
-<div id="loading">
+<div id="center" style="position:fixed;top:50%;left:50%;">
+  <div id="loading">
     <h2>LOADING...</h2>
-    <mat-progress-spinner
-        color="primary"
-        mode="indeterminate">
+    <mat-progress-spinner color="primary" mode="indeterminate">
     </mat-progress-spinner>
+  </div>
 </div>
-</div>
-<body style="display: block;  margin-left: auto;  margin-right: auto;  width: 50%;">
-    <table>
-      <td><img id="image" width="640dx"></td>
-      <td><button id="capture" mat-raised-button color="primary" (click) = "capture()">Capture</button></td>
-      <td><button id="switch" mat-raised-button color="primary" (click) = "switch()">Switch</button></td>
-      <td><div id="cap" style="color:green;display:none">Capture</div></td>
 
-  </table>
-</body>
+<div class="body">
+  <div class="video">
+    <img id="image" (click)="fullScreen()">
+    <div class="buttons">
+      <button id="capture" mat-raised-button color="accent" (click)="capture()">Capture</button>
+      <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
+    </div>
+  </div>
+  <div class="pictures">
+    <app-bird-comparator *ngFor="let bird of birdsNearbyFull" name="{{bird.name}}" url="{{bird.url}}"
+      (click)="matchCapture(bird.name)" style="cursor:pointer"></app-bird-comparator>
+  </div>
+</div>
 
 <!--<video id="video" width = "640" controls autoplay></video>-->

@@ -31,12 +31,15 @@ Examples:
 
             time.sleep(.1)
 '''
-import time, sys, math
+import time
+import sys
+import math
 from grove.adc import ADC
 import requests
 
 
 __all__ = ["GroveWaterSensor"]
+
 
 class GroveWaterSensor:
     '''
@@ -45,6 +48,7 @@ class GroveWaterSensor:
     Args:
         pin(int): number of analog pin/channel the sensor connected.
     '''
+
     def __init__(self, channel):
         self.channel = channel
         self.adc = ADC()
@@ -59,6 +63,7 @@ class GroveWaterSensor:
         '''
         return self.adc.read(self.channel)
 
+
 Grove = GroveWaterSensor
 
 
@@ -72,23 +77,31 @@ def main():
     wet = True
 
     print('Detecting ...')
+    empty = 0
+    water = 0
     while True:
         value = sensor.value
         if sensor.value > 800:
+            empty += 1
             print("{}, Dry.".format(value))
-            if wet == True :
+            if wet == True and empty == 50:
                 r = requests.post(
-                'http://localhost:1337/water', json={"Empty": "1"})
+                    'http://localhost:1337/water', json={"Empty": "1"})
                 wet = False
+                empty = 0
+                water = 0
 
         else:
+            water += 1
             print("{}, Detected Water.".format(value))
-            if wet == False:
+            if wet == False and water == 100:
                 r = requests.post(
-                'http://localhost:1337/water', json={"Empty": "0"})
+                    'http://localhost:1337/water', json={"Empty": "0"})
                 wet = True
-
+                water = 0
+                empty = 0
         time.sleep(.1)
+
 
 if __name__ == '__main__':
     main()

@@ -334,3 +334,9 @@ ASALocalRun/
 localServer/out.png
 localServer/darknet/predictions.jpg
 localServer/out.png
+
+dist/
+localServer/ressources/etalon.jpg
+.vscode/
+.vscode/settings.json
+.vscode/settings.json
