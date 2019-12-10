@@ -12,13 +12,13 @@ import { firebaseService } from '../services/firebaseService';
 export class StatsDisplayComponent implements OnInit {
 
   database;
+  return = false;
 
   constructor(private firebaseService: firebaseService) {
     this.database = firebaseService.getDatabase();
   }
 
   ngOnInit() {
-    var waitUntil = require('wait-until');
     this.getWaterStats();
     this.getCountStats();
   }
@@ -58,14 +58,29 @@ export class StatsDisplayComponent implements OnInit {
   }
 
   getCountStats(){
+    this.return = false;
     var dataPoints = [];
     var countRef = this.database.ref('/stats/birds_count');
+    var newThis = this;
+    const newClickGraphCount = this.clickGraphCount.bind(this);
     countRef.once('value', function (snap) {
       snap.forEach(function (childSnap) {
-        var obj = {y : childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val()))};
-        dataPoints.push(obj);
+        if(dataPoints.length == 0){
+          var obj = {y : childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val()))};
+          dataPoints.push(obj);
+          console.log(Object.keys(dataPoints));
+        }else{
+          for (var i = 0; i < dataPoints.length; i++){
+            if (dataPoints[i].label == convertToDateFormat(new Date(childSnap.child("/time").val()))){
+              dataPoints[i].y += childSnap.child("/value").val();
+              break;
+            }else{
+              var obj = {y : childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val()))};
+              dataPoints.push(obj);
+            }
+          }
+        }
       });
-      console.log(dataPoints);
       let chart = new CanvasJS.Chart("chartContainer", {
         animationEnabled: true,
         exportEnabled: true,
@@ -75,23 +90,46 @@ export class StatsDisplayComponent implements OnInit {
         data: [{
           type: "column",
           indexLabel: "{y} oiseaux",
-          dataPoints: dataPoints/*[
-            { y: 71, label: "Apple" },
-            { y: 55, label: "Mango" },
-            { y: 50, label: "Orange" },
-            { y: 65, label: "Banana" },
-            { y: 95, label: "Pineapple" },
-            { y: 68, label: "Pears" },
-            { y: 28, label: "Grapes" },
-            { y: 34, label: "Lychee" },
-            { y: 14, label: "Jackfruit" }
-          ]*/
+          click: newClickGraphCount,
+          dataPoints: dataPoints
         }]
 
     });
     chart.render();
     });
   }
+
+  clickGraphCount(e){
+    this.return = true;
+    var dataPoints = [];
+    var countRef = this.database.ref('/stats/birds_count');
+    countRef.once('value', function (snap) {
+      snap.forEach(function (childSnap) {
+          if (e.dataPoint.label == convertToDateFormat(new Date(childSnap.child("/time").val()))){
+            var tmp = new Date(childSnap.child("/time").val());
+            var time = ""+tmp.getHours()+":"+tmp.getMinutes()+":"+tmp.getSeconds();
+            var obj = {y : childSnap.child("/value").val(), label: time};
+            dataPoints.push(obj);
+          }
+      });
+      let chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        exportEnabled: true,
+        title: {
+          text: "Nombre d'oiseaux le " + e.dataPoint.label
+        },
+        data: [{
+          type: "spline",
+          indexLabel: "{y} oiseaux",
+          dataPoints: dataPoints
+        }]
+
+    });
+    chart.render();
+    });
+  }
+
+
 }
 
 function convertToDateFormat(date) {

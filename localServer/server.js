@@ -40,7 +40,7 @@ ref.once('value')
       console.log(global.name + global.mail);
     }
   });
-
+/*
 var ref = firebase.database().ref('stats/birds_count');
 ref.once('value', function (snap) {
     snap.forEach(function (childSnap) {
@@ -67,6 +67,15 @@ ref.once('value', function (snap) {
     });
 
 });
+*/
+
+var ref = firebase.database().ref();
+var birdsCountRef = ref.child('stats/birds_count');
+var birdsCountObj = {
+    time: Date.now(),
+    value: Math.floor(Math.random() * 10)
+};
+birdsCountRef.push(birdsCountObj);
 
 
 io.on('connection', function (socket) {
