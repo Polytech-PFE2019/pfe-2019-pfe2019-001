@@ -15,7 +15,6 @@ import io
 import base64 
 import numpy as np
 from PIL import Image
-from skimage.metrics import structural_similarity
 import socketio
 import requests
 
