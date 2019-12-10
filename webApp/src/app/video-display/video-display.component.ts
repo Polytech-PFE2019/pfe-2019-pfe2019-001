@@ -66,7 +66,6 @@ export class VideoDisplayComponent implements OnInit {
     }).subscribe((data) => {
       this.chooseAlbum(data)
     })
-    this.socket.emit("picture", false);
   }
 
   public switch() {
@@ -82,12 +81,24 @@ export class VideoDisplayComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == true) {
-        this._snackBar.open("capture effectué", undefined, {
+        this._snackBar.open("capture effectuée", undefined, {
           duration: 2000,
         });
       }
     });
+  }
 
+
+  matchCapture(name, ) {
+    this.http.get(`http://localhost:3000/picture`, {
+      responseType: 'text'
+    }).subscribe((data) => {
+      var image = { value: data }
+      this.firebase.push("picture/" + name, image);
+      this._snackBar.open("capture effectuée", undefined, {
+        duration: 2000,
+      });
+    })
   }
 
 }

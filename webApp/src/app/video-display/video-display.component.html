@@ -11,11 +11,11 @@
 
 
 <div id="center" style="position:fixed;top:50%;left:50%;">
-    <div id="loading">
-        <h2>LOADING...</h2>
-        <mat-progress-spinner color="primary" mode="indeterminate">
-        </mat-progress-spinner>
-    </div>
+  <div id="loading">
+    <h2>LOADING...</h2>
+    <mat-progress-spinner color="primary" mode="indeterminate">
+    </mat-progress-spinner>
+  </div>
 </div>
 
 <div class="body">
@@ -26,8 +26,9 @@
       <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
     </div>
   </div>
-  <div class="pictures" >
-    <app-bird-comparator *ngFor="let bird of birdsNearbyFull" name="{{bird.name}}" url="{{bird.url}}"></app-bird-comparator>
+  <div class="pictures">
+    <app-bird-comparator *ngFor="let bird of birdsNearbyFull" name="{{bird.name}}" url="{{bird.url}}"
+      (click)="matchCapture(bird.name)" style="cursor:pointer"></app-bird-comparator>
   </div>
 </div>
 
