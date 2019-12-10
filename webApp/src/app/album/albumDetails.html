@@ -1,9 +1,6 @@
 <html>
-<h1>Albums :</h1>
-<div class="pictures">
-    <div *ngFor="let image of images">
-        <img [src]="image" style="width:150px" class="thumbnail">
-    </div>
-</div>
-
+<h1>{{data.albumName}}</h1>
+  <section>
+    <ks-carousel [id]="100" [images]="imagesRect"></ks-carousel>
+  </section>
 </html>
