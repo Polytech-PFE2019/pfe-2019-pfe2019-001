@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import * as io from "socket.io-client";
 import { HttpClient } from '@angular/common/http';
 import { firebaseService } from '../services/firebaseService'
+import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -19,8 +20,10 @@ export class VideoDisplayComponent implements OnInit {
 
   private url = "http://localhost:3000";
   private socket;
+  private birdsNearby = undefined;
+  private birdsNearbyFull = [];
 
-  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog) {
+  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
     this.socket = io(this.url);
     console.log("Test");
     this.socket.on('image', (image) => {
@@ -40,7 +43,17 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    this._birdsService.getBirdsNearby().then(data => {
+      this.birdsNearby = data;
+      this.birdsNearby.forEach((bird) => {
+        this._birdsService.getBirdImage(bird.comName).then((result) => {
+          var hits = Object.keys(result)[1]
+          if (result[hits].length > 0) {
+            this.birdsNearbyFull.push({ name: bird.comName, url: result[hits][0].largeImageURL });
+          }
+        });
+      });
+    });
   }
 
   ngOnDestroy() {
@@ -92,8 +105,8 @@ export class DialogAlbum {
     public dialogRef: MatDialogRef<DialogAlbum>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private firebase: firebaseService) {
-      this.loadAlbums();
-    }
+    this.loadAlbums();
+  }
 
   onNoClick(): void {
     this.dialogRef.close(false);
@@ -106,7 +119,8 @@ export class DialogAlbum {
   }
 
   uploadImage() {
-    this.firebase.push("picture/" + this.albumName, this.data.image);
+    var image = { value: this.data.image }
+    this.firebase.push("picture/" + this.albumName, image);
     this.dialogRef.close(true);
   }
 

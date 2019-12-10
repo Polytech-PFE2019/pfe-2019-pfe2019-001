@@ -26,8 +26,8 @@
       <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
     </div>
   </div>
-  <div class="pictures">
-
+  <div class="pictures" >
+    <app-bird-comparator *ngFor="let bird of birdsNearbyFull" name="{{bird.name}}" url="{{bird.url}}"></app-bird-comparator>
   </div>
 </div>
 
