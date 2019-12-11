@@ -108,3 +108,4 @@ if(score > 0.40):
 else:
     ressources['food'] = 'false'
 
+json.dump(ressources, fileRessources)
