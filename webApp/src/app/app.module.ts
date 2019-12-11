@@ -35,7 +35,8 @@ import { AlbumComponent, AlbumDetailComponent } from './album/album.component';
 
 import 'hammerjs'; // Mandatory for angular-modal-gallery 3.x.x or greater (`npm i --save hammerjs`)
 import 'mousetrap'; // Mandatory for angular-modal-gallery 3.x.x or greater (`npm i --save mousetrap`)
-import { GalleryModule } from '@ks89/angular-modal-gallery'; // <----------------- angular-modal-gallery library
+import { GalleryModule } from '@ks89/angular-modal-gallery';
+import { DebugComponent } from './debug/debug.component'; // <----------------- angular-modal-gallery library
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { GalleryModule } from '@ks89/angular-modal-gallery'; // <---------------
     DialogAlbum,
     AlbumComponent,
     BirdComparatorComponent,
-    AlbumDetailComponent
+    AlbumDetailComponent,
+    DebugComponent
   ],
   imports: [
     BrowserModule,

@@ -12,7 +12,7 @@ import cv2
 import requests
 import os
 import io
-import base64 
+import base64
 import numpy as np
 from PIL import Image
 import socketio
@@ -25,44 +25,49 @@ def stringToImage(base64_string):
     return Image.open(io.BytesIO(imgdata))
 
 # convert PIL Image to an GRAY image( technically a numpy array ) that's compatible with opencv
+
+
 def toRGB(image):
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
-#compute the score of the differences between the image from the rasp and the etalon
+# compute the score of the differences between the image from the rasp and the etalon
+
+
 def getDifferenceWithEtalon(image2):
     #frame = cv2.imread(image2,0)
     frame = imutils.resize(image2, width=500)
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(frame, (21, 21), 0)
 
-    (score, diff) = structural_similarity(gray, firstFrame, full=True,  multichannel=True)
+    (score, diff) = structural_similarity(
+        gray, firstFrame, full=True,  multichannel=True)
     diff = (diff * 255).astype("uint8")
     return(score)
+
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-a", "--min-area", type=int,
                 default=500, help="minimum area size")
-ap.add_argument("-e", "--etalon", 
+ap.add_argument("-e", "--etalon",
                 default=None, help="The frame which contains max food")
-ap.add_argument("-i", "--image", 
+ap.add_argument("-i", "--image",
                 default=None, help="the image to compare")
 
 args = vars(ap.parse_args())
 
-#Nombre de frames sur lequelles calculer le score
+# Nombre de frames sur lequelles calculer le score
 iterations = 50
 score = 0
 
 # we read from the webcam
 if args.get("etalon", None) is None:
     etalon_path = "./../ressources/etalon.jpg"
-else :
+else:
     etalon_path = args.get("etalon")
 
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, etalon_path)
-
 
 
 # initialize the first frame in the video stream
@@ -73,25 +78,21 @@ resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
 if args.get("image", None) is None:
-    #set a default image for testing
-    file=open("../ressources/testimg.txt", "r")
+    # set a default image for testing
+    file = open("../ressources/testimg.txt", "r")
     image = file.read()
-else :
+else:
     image = args.get("image")
-    
-for i in range(iterations):
-    #test de récupération de la requète sur la rasp    
-    image = requests.get('http://192.168.43.77:3000/picture').text
 
-    #conversion de l'image en tableau
+for i in range(iterations):
+    # test de récupération de la requète sur la rasp
+    image = requests.get("http://"+os.environ.get('CAMSERVER') +
+                         ":"+os.environ.get('CAMPORT')+"/picture").text
+
+    # conversion de l'image en tableau
     image = stringToImage(image)
     image = toRGB(image)
     score += getDifferenceWithEtalon(image)
 
 score = score/iterations
 print(score)
-
-
-
-
-

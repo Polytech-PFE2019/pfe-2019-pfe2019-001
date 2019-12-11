@@ -14,15 +14,20 @@ const foodRoutes = require("./routes/foodControl");
 global.mail = "";
 global.name = "";
 
+console.log(process.env.PORT);
+console.log(process.env.CAMSERVER);
+console.log(process.env.SERVER);
+console.log(process.env.CAMPORT);
+
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
-var port = 1337;
+var port = process.env.PORT;
 var server = app.listen(port, function () {
-  console.log("Connected on port 1337");
+  console.log("Connected on port " + process.env.PORT);
 })
 
 var io = require('socket.io').listen(server);
@@ -69,13 +74,13 @@ ref.once('value', function (snap) {
 });
 */
 
-var ref = firebase.database().ref();
-var birdsCountRef = ref.child('stats/birds_count');
-var birdsCountObj = {
-    time: Date.now(),
-    value: Math.floor(Math.random() * 10)
-};
-birdsCountRef.push(birdsCountObj);
+// var ref = firebase.database().ref();
+// var birdsCountRef = ref.child('stats/birds_count');
+// var birdsCountObj = {
+//   time: Date.now(),
+//   value: Math.floor(Math.random() * 10)
+// };
+// birdsCountRef.push(birdsCountObj);
 
 
 io.on('connection', function (socket) {
