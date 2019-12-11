@@ -19,7 +19,7 @@ function runScript() {
 // La requéte contient le channel image de la socket
 async function setValue(req, res) {
     //console.log(req.body.food)
-    var socket = require('socket.io-client')('http://raspberrypi.local:3000');
+    var socket = require('socket.io-client')(`http://${process.env.CAMSERVER}:${process.env.CAMPORT}`);
     var file = require('./../ressources/ressources.json');
     //ip de la rasp : 192.168.43.77
 
@@ -45,8 +45,8 @@ async function setValue(req, res) {
     subprocess.stderr.on('data', (data) => {
         console.log("" + data);
     });
-    
-    //console.log("food score computation finished");
+
+    console.log("food score computation finished");
 
     // await fs.writeFileSync('ressources.json', JSON.stringify(file));
     // socket.emit('food', file.food);
@@ -63,7 +63,7 @@ async function setValue(req, res) {
 
 async function setEtalon(req, res) {
     console.log("update etalon begin");
-    var socket = require('socket.io-client')('http://raspberrypi.local:3000');
+    var socket = require('socket.io-client')(`http://${process.env.CAMSERVER}:${process.env.CAMPORT}`);
     socket.emit('picture', 0, (image) => {
         console.log("update etalon in process");
         var ressourcespath = path.join(__dirname, "/../ressources/etalon.jpg");

@@ -3,11 +3,11 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { ThrowStmt } from '@angular/compiler';
+import { localServer } from '../../environments/environment';
 
 
 @Injectable({ providedIn: "root" })
 export class SocketService {
-    private url = "http://localhost:1337";
     private socket;
     public water = new Subject<boolean>();
     public food = new Subject<boolean>();
@@ -17,7 +17,7 @@ export class SocketService {
 
 
     constructor(private router: Router) {
-        this.socket = io(this.url);
+        this.socket = io(localServer);
         this.init();
 
         this.socket.on("water", (data) => {

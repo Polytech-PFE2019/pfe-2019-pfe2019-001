@@ -5,6 +5,7 @@ import { firebaseService } from '../services/firebaseService'
 import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { camServer } from '../../environments/environment';
 
 export interface DialogData {
   image: string;
@@ -18,13 +19,14 @@ export interface DialogData {
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://localhost:3000";
   private socket;
   private birdsNearby = undefined;
   private birdsNearbyFull = [];
+  private image;
+  private camera_id = 0;
 
   constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
-    this.socket = io(this.url);
+    this.socket = io(camServer);
     console.log("Test");
     this.socket.on('image', (image) => {
       const imageElm = document.getElementById('image');
@@ -43,6 +45,7 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.image = document.getElementById('image');
     this._birdsService.getBirdsNearby().then(data => {
       this.birdsNearby = data;
       this.birdsNearby.forEach((bird) => {
@@ -60,17 +63,29 @@ export class VideoDisplayComponent implements OnInit {
     this.socket.disconnect();
   }
 
+  fullScreen() {
+    console.log("full screen");
+    if (this.image.requestFullscreen) {
+      this.image.requestFullscreen();
+    } else if (this.image.mozRequestFullScreen) { /* Firefox */
+      this.image.mozRequestFullScreen();
+    } else if (this.image.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+      this.image.webkitRequestFullscreen();
+    } else if (this.image.msRequestFullscreen) { /* IE/Edge */
+      this.image.msRequestFullscreen();
+    }
+  }
+
   public capture() {
-    this.http.get(`http://localhost:3000/picture`, {
-      responseType: 'text'
-    }).subscribe((data) => {
+    this.socket.emit('picture', 100, (data) => {
       this.chooseAlbum(data)
-    })
-    this.socket.emit("picture", false);
+    });
   }
 
   public switch() {
-    this.socket.emit("switch", 0);
+    this.camera_id = (this.camera_id + 1) % 2;
+    this.socket.emit("switch", this.camera_id);
+
     console.log("Switch");
   }
 
@@ -82,12 +97,22 @@ export class VideoDisplayComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == true) {
-        this._snackBar.open("capture effectué", undefined, {
+        this._snackBar.open("capture effectuée", undefined, {
           duration: 2000,
         });
       }
     });
+  }
 
+
+  matchCapture(name) {
+    this.socket.emit('picture', 100, (data) => {
+      var image = { value: data }
+      this.firebase.push("picture/" + name, image);
+      this._snackBar.open("capture effectuée", undefined, {
+        duration: 2000,
+      });
+    });
   }
 
 }

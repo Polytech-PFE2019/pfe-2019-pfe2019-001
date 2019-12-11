@@ -14,40 +14,45 @@ const foodRoutes = require("./routes/foodControl");
 global.mail = "";
 global.name = "";
 
+console.log(process.env.PORT);
+console.log(process.env.CAMSERVER);
+console.log(process.env.SERVER);
+console.log(process.env.CAMPORT);
+
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
-var ref = firebase.database().ref();
-var usersRef = ref.child('users');
-var userRef = usersRef.push();
-
-var port = 1337;
+var port = process.env.PORT;
 var server = app.listen(port, function () {
-  console.log("Connected on port 1337");
+  console.log("Connected on port " + process.env.PORT);
 })
 
 var io = require('socket.io').listen(server);
 exports.io = io;
 
+
+var ref = firebase.database().ref();
+var birdsCountRef = ref.child('users');
 ref.once('value')
   .then(function (snap) {
-    if (snap.numChildren() == 1) {
+    console.log("num : " + snap.numChildren())
+    if (snap.numChildren() >= 2) {
       global.name = snap.child("users/nom").val();
       global.mail = snap.child("users/email").val();
       console.log(global.name + global.mail);
     }
   });
-
+/*
 var ref = firebase.database().ref('stats/birds_count');
 ref.once('value', function (snap) {
     snap.forEach(function (childSnap) {
         var temp = new Date(childSnap.child("/time").val());
         var now = new Date(Date.now());
-        if(temp.getDay() == now.getDay() 
-            && temp.getMonth() == now.getMonth() 
+        if(temp.getDay() == now.getDay()
+            && temp.getMonth() == now.getMonth()
             && temp.getFullYear() ==now.getFullYear()){
             var ref = firebase.database().ref();
             var countsRef = ref.child('stats/birds_count/'+childSnap.key);
@@ -67,6 +72,15 @@ ref.once('value', function (snap) {
     });
 
 });
+*/
+
+// var ref = firebase.database().ref();
+// var birdsCountRef = ref.child('stats/birds_count');
+// var birdsCountObj = {
+//   time: Date.now(),
+//   value: Math.floor(Math.random() * 10)
+// };
+// birdsCountRef.push(birdsCountObj);
 
 
 io.on('connection', function (socket) {

@@ -5,7 +5,7 @@ const path = require('path');
 function count() {
     var file = require('./ressources/ressources.json');
     if (file.presence == true) {
-        var socket = require('socket.io-client')('http://raspberrypi.local:3000')
+        var socket = require('socket.io-client')(`http://${process.env.CAMSERVER}:${process.env.CAMPORT}`)
         socket.emit("switch", 1)
         socket.emit("picture", 0)
         socket.on('picture', function (data) {
@@ -24,33 +24,14 @@ function count() {
                     console.log(text);
                     console.log(count);
                     try {
+                        var ref = firebase.database().ref();
+                        var birdsCountRef = ref.child('stats/birds_count');
+                        var birdsCountObj = {
+                            time: Date.now(),
+                            value: count
+                        };
+                        birdsCountRef.push(birdsCountObj);
 
-                        var ref = firebase.database().ref('stats/birds_count');
-                        ref.once('value', function (snap) {
-                            snap.forEach(function (childSnap) {
-                                var temp = new Date(childSnap.child("/time").val());
-                                var now = new Date(Date.now());
-                                if(temp.getDay() == now.getDay() 
-                                    && temp.getMonth() == now.getMonth() 
-                                    && temp.getFullYear() ==now.getFullYear()){
-                                    var ref = firebase.database().ref();
-                                    var countsRef = ref.child('stats/birds_count/'+childSnap.key);
-                                    var countRef = countsRef.update({
-                                      time: childSnap.child("/time").val(), value: (childSnap.child("/value").val()+10)
-                                    });
-
-                                }else{
-                                    var ref = firebase.database().ref();
-                                    var birdsCountRef = ref.child('stats/birds_count');
-                                    var birdsCountObj = {
-                                        time: Date.now(),
-                                        value: 10
-                                    };
-                                    birdsCountRef.push(birdsCountObj);
-                                }
-                            });
-
-                        });
                         console.log("Bird count value added to database.")
                     } catch (e) {
                         console.log("Couldn't add bird count value to database.");

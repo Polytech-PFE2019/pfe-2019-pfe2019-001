@@ -10,3 +10,6 @@ export const environment = {
     appId: "1:687579025809:web:33036a6e9e2983f6da8a30"
   }
 };
+
+export const camServer = "http://raspberrypi.local:3000";
+export const localServer = "http://localhost:1337";

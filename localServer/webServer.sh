@@ -5,11 +5,11 @@ else
     cd ../webApp
     if [ -d "$DIR" ]; then
         echo "$DIR exist"
-        mv dist ../localServer/dist
+        mv dist ../SERVER/dist
     else
         ng build --aot 
-        mv dist ../localServer/dist
+        mv dist ../SERVER/dist
     fi
-    cd ../localServer
+    cd ../SERVER
 fi
 node webServer.js
