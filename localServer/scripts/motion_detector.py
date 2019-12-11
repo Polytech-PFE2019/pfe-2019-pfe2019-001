@@ -7,7 +7,6 @@ from imutils.video import VideoStream
 import argparse
 import datetime
 import imutils
-import time
 import cv2
 import requests
 import base64
@@ -16,7 +15,8 @@ import io
 import numpy as np
 from imageio import imread
 import os
-import time
+import sys
+from socketIO_client import SocketIO
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
@@ -30,29 +30,30 @@ def stringToImage(base64_string):
     cv2_img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     return cv2_img
 
-
+i = 0
 # initialize the first frame in the video stream
 firstFrame = None
 text = "Unoccupied"
+oldFrame = None
 
-# loop over the frames of the video
-i = 0
-while True:
-    i += 1
-    # grab the current frame and initialize the occupied/unoccupied
-    # text
-    time.sleep(1)
-    r = requests.get("http://"+os.environ.get('CAMSERVER') +
-                     ":"+os.environ.get('CAMPORT')+"/picture")
-    # print(r.text)
-    frame = stringToImage(r.text)
-    # if the frame could not be grabbed, then we have reached the end
-    # of the video
-    # print(frame)
+def on_connect():
+    print('connect')
+
+def on_disconnect():
+    print('disconnect')
+
+def on_img_response(data):
+    global firstFrame
+    global i
+    global text
+    global oldFrame
+    print("img")
+    i = i+1
+    #print('message received with ', data)
+    frame = stringToImage(data)
 
     if frame is None:
-        break
-
+        return
     # resize the frame, convert it to grayscale, and blur it
     frame = imutils.resize(frame, width=500)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -62,12 +63,12 @@ while True:
     if firstFrame is None:
         firstFrame = gray
         oldFrame = gray
-        continue
+        return
     if i == 10:
         firstFrame = oldFrame
         oldFrame = gray
         i = 0
-        continue
+        return
 
     # compute the absolute difference between the current frame and
     # first frame
@@ -93,35 +94,43 @@ while True:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         # text = "Occupied"
 
-    if cnts:
-        if text == "Unoccupied":
-            r = requests.post("http://"+os.environ.get('SERVER') +
-                              ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
-            # print("LIVE")
-            text = "Occupied"
-    else:
-        if text == "Occupied":
-            r = requests.post(
-                "http://"+os.environ.get('SERVER') +
-                ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
-            #print("COUPER LIVE")
-            text = "Unoccupied"
+        if cnts:
+            if text == "Unoccupied":
+                #r = requests.post("http://"+os.environ.get('SERVER') +
+                #                  ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+                # print("LIVE")
+                text = "Occupied"
+        else:
+            if text == "Occupied":
+                #r = requests.post(
+                #    "http://"+os.environ.get('SERVER') +
+                #    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+                #print("COUPER LIVE")
+                text = "Unoccupied"
 
-    # draw the text and timestamp on the frame
-    cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+        # draw the text and timestamp on the frame
+        cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                    (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
-    # show the frame and record if the user presses a key
-    # cv2.imshow("Security Feed", frame)
-    # cv2.imshow("Thresh", thresh)
-    # cv2.imshow("Frame Delta", frameDelta)
-    key = cv2.waitKey(1) & 0xFF
+        # show the frame and record if the user presses a key
+        #cv2.imshow("Security Feed", frame)
+        cv2.imshow("Thresh", thresh)
+        # cv2.imshow("Frame Delta", frameDelta)
+        key = cv2.waitKey(1) & 0xFF
 
-    # if the `q` key is pressed, break from the lop
-    if key == ord("q"):
-        break
+        # if the `q` key is pressed, break from the lop
+        if key == ord("q"):
+            # cleanup the camera and close any open windows
+            cv2.destroyAllWindows()
+            sys.exit()
 
-# cleanup the camera and close any open windows
-cv2.destroyAllWindows()
+socketIO = SocketIO('127.0.0.1', 3000)
+socketIO.on('connect', on_connect)
+socketIO.on('disconnect', on_disconnect)
+
+# Listen
+socketIO.on('image', on_img_response)
+
+socketIO.wait()
