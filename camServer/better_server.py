@@ -27,6 +27,7 @@ eventlet.monkey_patch()
 # Fusion des caméras en un tableau unique
 all_cameras = picam + usbcam
 camera_captures = []
+usb_id = len(picam)
 
 if len(all_cameras) == 0:
     camera_captures.append([0, None, [], None])
@@ -65,16 +66,13 @@ def wsgi_handler(env, start_response):
 
 def html_picture():
     service_camera_id = 0
-    service_id = uuid.uuid4()
     if len(camera_captures) > 1:
         service_camera_id = 1
-    bind_client(service_id, service_camera_id, False)
     cap = camera_captures[service_camera_id][1]
     response = False
     if cap != None:
         params = ["picture", cap, 2, 100]
         response = html_sendImage(params)
-    remove_client(service_id)
     return response
 
 
@@ -200,7 +198,9 @@ def start_streaming(id):
 
 def stop():
     for i in range(0, len(camera_captures)):
-        if len(camera_captures[i][2]) == 0:
+        if len(camera_captures[i][2]) == 1 and 666 in camera_captures[i][2]:
+            stop_streaming(i)
+        elif len(camera_captures[i][2]) == 0:
             stop_streaming(i)
             stop_camera(i)
 
@@ -268,6 +268,7 @@ def picture(sid, data):
         return sendImage(params)
     return False
 
+bind_client(666, usb_id, False)
 
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 3000)), app)

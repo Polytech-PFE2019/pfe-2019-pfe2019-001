@@ -46,8 +46,8 @@ ref.once('value', function (snap) {
     snap.forEach(function (childSnap) {
         var temp = new Date(childSnap.child("/time").val());
         var now = new Date(Date.now());
-        if(temp.getDay() == now.getDay() 
-            && temp.getMonth() == now.getMonth() 
+        if(temp.getDay() == now.getDay()
+            && temp.getMonth() == now.getMonth()
             && temp.getFullYear() ==now.getFullYear()){
             var ref = firebase.database().ref();
             var countsRef = ref.child('stats/birds_count/'+childSnap.key);

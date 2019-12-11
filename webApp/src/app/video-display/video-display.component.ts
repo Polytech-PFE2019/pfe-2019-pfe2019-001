@@ -5,6 +5,7 @@ import { firebaseService } from '../services/firebaseService'
 import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { camServer } from '../../environments/environment';
 
 export interface DialogData {
   image: string;
@@ -18,7 +19,6 @@ export interface DialogData {
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://raspberrypi.local:3000";
   private socket;
   private birdsNearby = undefined;
   private birdsNearbyFull = [];
@@ -26,7 +26,7 @@ export class VideoDisplayComponent implements OnInit {
   private camera_id = 0;
 
   constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
-    this.socket = io(this.url);
+    this.socket = io(camServer);
     console.log("Test");
     this.socket.on('image', (image) => {
       const imageElm = document.getElementById('image');
@@ -105,7 +105,7 @@ export class VideoDisplayComponent implements OnInit {
   }
 
 
-  matchCapture(name, ) {
+  matchCapture(name) {
     this.socket.emit('picture', 100, (data) => {
       var image = { value: data }
       this.firebase.push("picture/" + name, image);
