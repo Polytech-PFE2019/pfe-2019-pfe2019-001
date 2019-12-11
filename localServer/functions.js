@@ -5,7 +5,7 @@ const path = require('path');
 function count() {
     var file = require('./ressources/ressources.json');
     if (file.presence == true) {
-        var socket = require('socket.io-client')('http://raspberrypi.local:3000')
+        var socket = require('socket.io-client')(`http://${process.env.CAMSERVER}:${process.env.CAMPORT}`)
         socket.emit("switch", 1)
         socket.emit("picture", 0)
         socket.on('picture', function (data) {
@@ -31,7 +31,7 @@ function count() {
                             value: count
                         };
                         birdsCountRef.push(birdsCountObj);
-                                
+
                         console.log("Bird count value added to database.")
                     } catch (e) {
                         console.log("Couldn't add bird count value to database.");

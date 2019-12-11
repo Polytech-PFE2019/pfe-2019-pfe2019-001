@@ -5,6 +5,7 @@ import { StatsDisplayComponent } from './stats-display/stats-display.component';
 import { ResourcesMonitorComponent } from './resources-monitor/resources-monitor.component';
 import { SettingsComponent } from './settings/settings.component';
 import { AlbumComponent } from './album/album.component';
+import { DebugComponent } from './debug/debug.component';
 
 
 const routes: Routes = [{
@@ -25,7 +26,11 @@ const routes: Routes = [{
 {
   path: 'album',
   component: AlbumComponent
-}];
+},
+{
+  path: 'debug',
+  component: DebugComponent
+},]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],
