@@ -18,6 +18,7 @@ from PIL import Image
 from skimage.metrics import structural_similarity
 import socketio
 import requests
+import json
 
 
 # Take in base64 string and return PIL image
@@ -73,12 +74,12 @@ firstFrame = cv2.imread(filename)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
-if args.get("image", None) is None:
-    #set a default image for testing
-    file=open("../ressources/testimg.txt", "r")
-    image = file.read()
-else :
-    image = args.get("image")
+# if args.get("image", None) is None:
+#     #set a default image for testing
+#     #file=open("../ressources/testimg.txt", "r")
+#     #image = file.read()
+# else :
+#     image = args.get("image")
     
 for i in range(iterations):
     #test de récupération de la requète sur la rasp    
@@ -92,7 +93,13 @@ for i in range(iterations):
 score = score/iterations
 print(score)
 
+#open and write in the JSON file
+fileRessources = open("../ressources/ressources.json", "r")
 
+ressources = json.load(fileRessources)
 
-
+if(score > 0.40):
+    ressources['food'] = 'true'
+else:
+    ressources['food'] = 'false'
 
