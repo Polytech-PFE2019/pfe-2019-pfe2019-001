@@ -20,6 +20,7 @@ export class StatsDisplayComponent implements OnInit {
 
   ngOnInit() {
     this.getWaterStats();
+    this.getFoodStats();
     this.getCountStats();
   }
 
@@ -90,7 +91,7 @@ export class StatsDisplayComponent implements OnInit {
         animationEnabled: true,
         exportEnabled: true,
         title: {
-          text: "Nombre d'oiseaux par jour"
+          text: "Nombre approximatif d'oiseaux par jour"
         },
         data: [{
           type: "column",
@@ -121,7 +122,7 @@ export class StatsDisplayComponent implements OnInit {
         animationEnabled: true,
         exportEnabled: true,
         title: {
-          text: "Nombre d'oiseaux le " + e.dataPoint.label
+          text: "Nombre approximatif d'oiseaux le " + e.dataPoint.label
         },
         data: [{
           type: "spline",
@@ -131,6 +132,40 @@ export class StatsDisplayComponent implements OnInit {
 
       });
       chart.render();
+    });
+  }
+
+  getFoodStats() {
+    var statsFood = [];
+    var average = 0;
+    var temp = undefined;
+    var foodStatsRef = this.database.ref('/stats/food');
+    foodStatsRef.once('value', function (snap) {
+      snap.forEach(function (childSnap) {
+        if (temp == undefined) {
+          temp = new Date(childSnap.child("/time").val()).valueOf()
+        } else {
+          var time = new Date(childSnap.child("/time").val()).valueOf();
+          const diffTime = Math.abs(time - temp);
+          const diffDays = Math.ceil(diffTime / (60 * 60 * 24));
+          statsFood.push(diffDays);
+          temp = time
+        }
+      });
+      var total = 0;
+      for (var i = 0; i < statsFood.length; i++) {
+        total += statsWater[i];
+      }
+      average = total / statsFood.length;
+      var hours = (average / 60);
+      var rhours = Math.floor(hours);
+      var minutes = (hours - rhours) * 60;
+      var rminutes = Math.round(minutes);
+      var days = (hours / 24)
+      var rdays = Math.floor(days);
+      var hours = (days - rdays) * 24;
+      var rhours = Math.round(hours);
+      document.getElementById("foodStat").innerHTML = rdays + " jour(s), " + rhours + " heure(s) et " + rminutes + " minute(s)";
     });
   }
 
