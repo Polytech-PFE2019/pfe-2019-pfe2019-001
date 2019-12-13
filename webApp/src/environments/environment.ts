@@ -15,7 +15,8 @@ export const environment = {
   }
 };
 
-export const camServer = "http://localhost:3000";
+export const picamServer = "http://192.168.43.175:3000";
+export const usbcamServer = "http://192.168.43.175:3001";
 export const localServer = "http://localhost:1337";
 
 /*

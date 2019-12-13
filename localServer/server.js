@@ -82,6 +82,19 @@ ref.once('value', function (snap) {
 // };
 // birdsCountRef.push(birdsCountObj);
 
+ /*var ref = firebase.database().ref();
+ var foodRef = ref.child('stats/food');
+ var foodObj = {
+   time: Date.now(),
+   value: false
+ };
+ var foodObj2 = {
+   time: Date.now(),
+   value: true
+ };
+ foodRef.push(foodObj);
+ foodRef.push(foodObj2);*/
+
 
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
