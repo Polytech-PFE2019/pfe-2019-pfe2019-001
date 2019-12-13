@@ -21,7 +21,7 @@ async function setValue(req, res) {
     //console.log(req.body.food)
     var socket = require('socket.io-client')(`http://${process.env.CAMSERVER}:${process.env.CAMPORT}`);
     var file = require('./../ressources/ressources.json');
-    //ip de la rasp : 192.168.43.77
+    //ip de la rasp : 192.168.43.175
 
 
     var score = 0

@@ -15,7 +15,7 @@ import io
 import base64
 import numpy as np
 from PIL import Image
-import socketio
+from socketIO_client import SocketIO
 import requests
 import json
 
@@ -59,7 +59,11 @@ args = vars(ap.parse_args())
 
 # Nombre de frames sur lequelles calculer le score
 iterations = 50
+i = 0
+
 score = 0
+
+#creation de la socket
 
 # we read from the webcam
 if args.get("etalon", None) is None:
@@ -71,32 +75,49 @@ dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, etalon_path)
 
 
+
 # initialize the first frame in the video stream
-# Load an color image in grayscale
+# Load an color image
 firstFrame = cv2.imread(filename)
 #firstFrame = cv2.cvtColor(firstFrame, cv2.COLOR_BGR2GRAY)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
-# if args.get("image", None) is None:
-#     #set a default image for testing
-#     #file=open("../ressources/testimg.txt", "r")
-#     #image = file.read()
-# else :
-#     image = args.get("image")
-    
-for i in range(iterations):
-    # test de récupération de la requète sur la rasp
-    image = requests.get("http://"+os.environ.get('CAMSERVER') +
-                         ":"+os.environ.get('CAMPORT')+"/picture").text
 
-    # conversion de l'image en tableau
-    image = stringToImage(image)
-    image = toRGB(image)
-    score += getDifferenceWithEtalon(image)
+    
+# for i in range(iterations):
+#     # test de récupération de la requète sur la rasp
+#     image = requests.get("http://"+os.environ.get('CAMSERVER') +
+#                          ":"+os.environ.get('CAMPORT')+"/picture").text
+
+#     # conversion de l'image en tableau
+#     image = stringToImage(image)
+#     image = toRGB(image)
+#     score += getDifferenceWithEtalon(image)
 
 score = score/iterations
 print(score)
+
+def on_img_response(image):
+    global i
+    global score
+
+    if (i < iterations):
+        #calcul du score
+        image = stringToImage(image)
+        image = toRGB(image)
+        score += getDifferenceWithEtalon(image)
+
+
+
+
+
+socketIO = SocketIO('192.168.43.175', 3000)
+socketIO.on('connect', print("connection"))
+socketIO.on('disconnect', print("disconnect"))
+
+socketIO.on('image', on_img_response)
+
 
 #open and write in the JSON file
 fileRessources = open("../ressources/ressources.json", "r")
