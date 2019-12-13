@@ -92,14 +92,20 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   public capture() {
-    this.piSocket.emit('picture', 100, (data) => {
+    var socket;
+    if (this.camera_id == 0) {
+      socket = this.piSocket;
+    } else if (this.camera_id == 1) {
+      socket = this.usbSocket;
+    }
+    socket.emit('picture', 100, (data) => {
       this.chooseAlbum(data)
     });
   }
 
   public switch() {
     this.camera_id = (this.camera_id + 1) % 2;
-    console.log("Switch");
+    console.log("Switchii");
   }
 
   chooseAlbum(image): void {
