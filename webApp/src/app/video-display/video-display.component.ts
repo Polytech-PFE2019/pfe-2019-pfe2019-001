@@ -5,7 +5,7 @@ import { firebaseService } from '../services/firebaseService'
 import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { camServer } from '../../environments/environment';
+import { picamServer, usbcamServer } from '../../environments/environment';
 
 export interface DialogData {
   image: string;
@@ -19,28 +19,42 @@ export interface DialogData {
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private socket;
+  private piSocket;
+  private usbSocket;
   private birdsNearby = undefined;
   private birdsNearbyFull = [];
   private image;
   private camera_id = 0;
 
   constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
-    this.socket = io(camServer);
+    this.piSocket = io(picamServer);
+    this.usbSocket = io(usbcamServer);
     console.log("Test");
-    this.socket.on('image', (image) => {
-      const imageElm = document.getElementById('image');
-      imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
-      document.getElementById("loading").style.display = 'none';
-      document.getElementById("switch").style.display = 'inline';
-      document.getElementById("capture").style.display = 'inline';
+    this.piSocket.on('image', (image) => {
+      if (this.camera_id == 0) {
+        const imageElm = document.getElementById('image');
+        imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
+        document.getElementById("loading").style.display = 'none';
+        document.getElementById("switch").style.display = 'inline';
+        document.getElementById("capture").style.display = 'inline';
+      }
     });
 
-    this.socket.on("connect_error", function (exeception) {
+    this.piSocket.on("connect_error", function (exeception) {
       document.getElementById('image').setAttribute("src", "https://image.freepik.com/vecteurs-libre/modele-erreur-404-oiseau-dans-style-dessine-main_23-2147734776.jpg");
       document.getElementById("loading").style.display = 'none';
       document.getElementById("switch").style.display = 'none';
       document.getElementById("capture").style.display = 'none';
+    });
+
+    this.usbSocket.on('image', (image) => {
+      if (this.camera_id == 1) {
+        const imageElm = document.getElementById('image');
+        imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
+        document.getElementById("loading").style.display = 'none';
+        document.getElementById("switch").style.display = 'inline';
+        document.getElementById("capture").style.display = 'inline';
+      }
     });
   }
 
@@ -60,7 +74,8 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.socket.disconnect();
+    this.piSocket.disconnect();
+    this.usbSocket.disconnect();
   }
 
   fullScreen() {
@@ -77,15 +92,13 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   public capture() {
-    this.socket.emit('picture', 100, (data) => {
+    this.piSocket.emit('picture', 100, (data) => {
       this.chooseAlbum(data)
     });
   }
 
   public switch() {
     this.camera_id = (this.camera_id + 1) % 2;
-    this.socket.emit("switch", this.camera_id);
-
     console.log("Switch");
   }
 
@@ -106,7 +119,7 @@ export class VideoDisplayComponent implements OnInit {
 
 
   matchCapture(name) {
-    this.socket.emit('picture', 100, (data) => {
+    this.piSocket.emit('picture', 100, (data) => {
       var image = { value: data }
       this.firebase.push("picture/" + name, image);
       this._snackBar.open("capture effectuée", undefined, {
