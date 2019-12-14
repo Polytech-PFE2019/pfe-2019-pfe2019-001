@@ -6,6 +6,11 @@ var cors = require('cors');
 var functions = require('./functions')
 var firebase = require("./firebase.js");
 const fs = require('fs');
+const path = require('path');
+var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+var ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
+var command = ffmpeg();
 
 
 const waterRoutes = require("./routes/waterControl");
@@ -82,18 +87,18 @@ ref.once('value', function (snap) {
 // };
 // birdsCountRef.push(birdsCountObj);
 
- /*var ref = firebase.database().ref();
- var foodRef = ref.child('stats/food');
- var foodObj = {
-   time: Date.now(),
-   value: false
- };
- var foodObj2 = {
-   time: Date.now(),
-   value: true
- };
- foodRef.push(foodObj);
- foodRef.push(foodObj2);*/
+/*var ref = firebase.database().ref();
+var foodRef = ref.child('stats/food');
+var foodObj = {
+  time: Date.now(),
+  value: false
+};
+var foodObj2 = {
+  time: Date.now(),
+  value: true
+};
+foodRef.push(foodObj);
+foodRef.push(foodObj2);*/
 
 
 io.on('connection', function (socket) {
@@ -173,3 +178,37 @@ app.post('/bird', function (req, res) {
     ok: "ok",
   });
 });
+
+
+// ==================================================================
+
+app.post('/video', function (req, res) {
+
+  var newSoc = require('socket.io-client').connect(`http://localhost:3000`);
+
+  var cpt = 0;
+  var tab = [];
+  newSoc.on('image', (image) => {
+    tab.push(image);
+    cpt += 1;
+    if (cpt == 50) {
+      newSoc.disconnect();
+      cpt = 0;
+      for (let img of tab) {
+        fs.writeFile(path.join(__dirname, `./ressources/image${zeroPad(cpt, 3)}.jpg`), img, 'base64', function (err) { });
+        cpt += 1;
+      }
+      command
+        .input('ressources/image%03d.png')
+        .inputFPS(10)
+        .output('video.mp4')
+        .outputFPS(30)
+        .noAudio()
+        .run();
+    }
+  });
+});
+
+function zeroPad(num, places) {
+  return String(num).padStart(places, '0')
+}
