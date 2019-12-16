@@ -39,7 +39,7 @@ def toRGB(image):
 
 
 def getDifferenceWithEtalon(image2):
-    global firstFrame 
+    global firstFrame
     #frame = cv2.imread(image2,0)
     frame = imutils.resize(image2, width=500)
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -70,7 +70,7 @@ score = 0
 
 # we read from the webcam
 if args.get("etalon", None) is None:
-    etalon_path = "./../ressources/etalon.jpg"
+    etalon_path = "./../ressources/etalon00000.jpg"
 else:
     etalon_path = args.get("etalon")
 
@@ -104,21 +104,20 @@ def on_img_response(image):
         score += getDifferenceWithEtalon(image)
         i += 1
         socketIO.emit('picture', 100, on_img_response)
-    else : 
+    else :
         #open and write in the JSON file
-        fileRessources = open("../ressources/ressources.json", "r")
-        ressources = json.load(fileRessources)
-        if(score > 0.40):
-            ressources['food'] = 'true'
-        else:
-            ressources['food'] = 'false'
-        json.dump(ressources, fileRessources)
+        #fileRessources = open("../ressources/ressources.json", "rw")
+        #ressources = json.load(fileRessources)
+        print(str(score/iterations))
+        #if(score > 0.40):
+        #    ressources['food'] = 'true'
+        #else:
+        #    ressources['food'] = 'false'
+        #json.dump(ressources, fileRessources)
         sys.exit()
 
 #creation de la socket
-socketIO = SocketIO('192.168.43.175', 3000)
+socketIO = SocketIO('192.168.43.175', 3001)
 socketIO.emit('picture', 100, on_img_response)
 
 socketIO.wait()
-
-

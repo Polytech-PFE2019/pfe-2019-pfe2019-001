@@ -9,7 +9,7 @@ const { spawn } = require('child_process');
 
 
 function runScript() {
-    return spawn('python3', [
+    return spawn('cd scripts && python3', [
         path.join(__dirname, '/../scripts/imageDifference.py'),
         //"-e", "./../ressources/etalon.jpg",
         //"--image", image
@@ -25,12 +25,13 @@ async function setValue(req, res) {
     var score = 0
     nb_of_frames = 0
 
-    const subprocess = runScript();
+    var subprocess = spawn(`cd scripts && python3 imageDifference.py`,
+        { shell: true }
+    );
+    console.log("script for food detection launched");
     subprocess.stdout.on('data', (data) => {
-        console.log("script for food detection launched");
-        const text = data;
-        console.log("" + data  );
-        score = parseInt(text, 10);
+        console.log("" + data);
+        score = parseFloat(data);
         // if (score > 0.2) {
         //     file.food = true;
         // } else {
@@ -39,12 +40,15 @@ async function setValue(req, res) {
         // fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
         // socket.emit('food', file.food);
         console.log(score);
+        console.log("food score computation finished");
+        res.status(200).json({
+            message: "Message received",
+        });
     });
     subprocess.stderr.on('data', (data) => {
         console.log("" + data);
     });
 
-    console.log("food score computation finished");
 
     // await fs.writeFileSync('ressources.json', JSON.stringify(file));
     // socket.emit('food', file.food);
@@ -53,10 +57,6 @@ async function setValue(req, res) {
 
 
     // server.io.emit('food', file.food);
-
-    res.status(200).json({
-        message: "Message received",
-    });
 }; module.exports.setValue = setValue;
 
 async function setEtalon(req, res) {
