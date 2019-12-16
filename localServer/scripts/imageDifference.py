@@ -18,6 +18,7 @@ from PIL import Image
 from socketIO_client import SocketIO
 import requests
 import json
+import sys
 
 
 # Take in base64 string and return PIL image
@@ -35,6 +36,7 @@ def toRGB(image):
 
 
 def getDifferenceWithEtalon(image2):
+    global firstFrame 
     #frame = cv2.imread(image2,0)
     frame = imutils.resize(image2, width=500)
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -60,10 +62,8 @@ args = vars(ap.parse_args())
 # Nombre de frames sur lequelles calculer le score
 iterations = 50
 i = 0
-
 score = 0
 
-#creation de la socket
 
 # we read from the webcam
 if args.get("etalon", None) is None:
@@ -84,20 +84,6 @@ resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
 
-    
-# for i in range(iterations):
-#     # test de récupération de la requète sur la rasp
-#     image = requests.get("http://"+os.environ.get('CAMSERVER') +
-#                          ":"+os.environ.get('CAMPORT')+"/picture").text
-
-#     # conversion de l'image en tableau
-#     image = stringToImage(image)
-#     image = toRGB(image)
-#     score += getDifferenceWithEtalon(image)
-
-score = score/iterations
-print(score)
-
 def on_img_response(image):
     global i
     global score
@@ -107,26 +93,23 @@ def on_img_response(image):
         image = stringToImage(image)
         image = toRGB(image)
         score += getDifferenceWithEtalon(image)
+        i += 1
+        socketIO.emit('picture', 100, on_img_response)
+    else : 
+        #open and write in the JSON file
+        fileRessources = open("../ressources/ressources.json", "r")
+        ressources = json.load(fileRessources)
+        if(score > 0.40):
+            ressources['food'] = 'true'
+        else:
+            ressources['food'] = 'false'
+        json.dump(ressources, fileRessources)
+        sys.exit()
 
-
-
-
-
+#creation de la socket
 socketIO = SocketIO('192.168.43.175', 3000)
-socketIO.on('connect', print("connection"))
-socketIO.on('disconnect', print("disconnect"))
+socketIO.emit('picture', 100, on_img_response)
 
-socketIO.on('image', on_img_response)
+socketIO.wait()
 
 
-#open and write in the JSON file
-fileRessources = open("../ressources/ressources.json", "r")
-
-ressources = json.load(fileRessources)
-
-if(score > 0.40):
-    ressources['food'] = 'true'
-else:
-    ressources['food'] = 'false'
-
-json.dump(ressources, fileRessources)
