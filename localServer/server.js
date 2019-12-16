@@ -11,6 +11,8 @@ var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 var command = ffmpeg();
+const { spawn } = require('child_process');
+var rimraf = require("rimraf");
 
 
 const waterRoutes = require("./routes/waterControl");
@@ -184,31 +186,34 @@ app.post('/bird', function (req, res) {
 
 app.post('/video', function (req, res) {
 
-  var newSoc = require('socket.io-client').connect(`http://localhost:3000`);
-
-  var cpt = 0;
-  var tab = [];
-  newSoc.on('image', (image) => {
-    tab.push(image);
-    cpt += 1;
-    if (cpt == 50) {
-      newSoc.disconnect();
-      cpt = 0;
-      for (let img of tab) {
-        fs.writeFile(path.join(__dirname, `./ressources/image${zeroPad(cpt, 3)}.jpg`), img, 'base64', function (err) { });
-        cpt += 1;
-      }
-      command
-        .input('ressources/image%03d.png')
-        .inputFPS(10)
-        .output('video.mp4')
-        .outputFPS(30)
-        .noAudio()
-        .run();
-    }
+  console.log("requetes lancée");
+  var subprocess = spawn(`cd scripts && python3 video_receiver.py`,
+      { shell: true }
+  );
+  subprocess.stderr.on('close', () => {
+    console.log('Data gathered, creating video ...');
+    command
+      .input('ressources/video/image%05d.jpg')
+      .inputFPS(10)
+      .output('video.mp4')
+      .outputFPS(30)
+      .noAudio()
+      .on('progress', function(progress) {
+       console.log('Processing: ' + progress.percent + '% done');
+      })
+      .on('error', function(err) {
+       console.log('Cannot process video: ' + err.message);
+       res.status(200).json({ok: "ok"});
+      })
+      .on('end', () => {
+        console.log('Video generated.');
+        const directory = './ressources/video/*';
+        console.log('Deleting pictures...');
+        rimraf(directory, function () {
+          console.log('Pictures deleted.');
+          res.status(200).json({ok: "ok"});
+        });
+      })
+      .run();
   });
 });
-
-function zeroPad(num, places) {
-  return String(num).padStart(places, '0')
-}
