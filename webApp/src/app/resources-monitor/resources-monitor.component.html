@@ -1,5 +1,9 @@
 <div id ="center" style="position:fixed;top:50%;left:50%;">
-  <mat-card class = "resources" [ngStyle]="{'background-color': food? 'green' : 'red'}">Food</mat-card>
-  <div class="spacer"></div>
-  <mat-card class = "resources" [ngStyle]="{'background-color': water? 'green' : 'red'}">Water</mat-card>
+  <table>
+    <td><mat-card class = "resources" [ngStyle]="{'background-color': food? 'green' : 'red'}">Food</mat-card>
+    <div class="spacer"></div>
+    <mat-card class = "resources" [ngStyle]="{'background-color': water? 'green' : 'red'}">Water</mat-card></td>
+
+    <td><button id="etalon" mat-raised-button color="primary" (click)="etalon()">Réapprovisionnement</button></td>
+  </table>
 </div>
