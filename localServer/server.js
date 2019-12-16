@@ -187,7 +187,7 @@ app.post('/bird', function (req, res) {
 app.post('/video', function (req, res) {
 
   console.log("requetes lancée");
-  var subprocess = spawn(`cd scripts && python3 video_receiver.py`,
+  var subprocess = spawn(`cd scripts && python3 video_receiver.py ../ressources/video image 50`,
       { shell: true }
   );
   subprocess.stderr.on('close', () => {

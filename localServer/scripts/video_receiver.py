@@ -3,6 +3,13 @@ import base64
 import sys
 import os
 
+if len(sys.argv) < 3:
+    print("Usage: python3 <path> <filename> <images_count>")
+    sys.exit()
+
+path = sys.argv[1]
+file_name = sys.argv[2]
+images_count = int(sys.argv[3])
 image_cpt = 0
 
 def on_connect():
@@ -15,16 +22,16 @@ def on_img_response(data):
     global image_cpt
     print('img')
     imgdata = base64.b64decode(data)
-    filename = '../ressources/video/image' + str(image_cpt).zfill(5) + '.jpg'
+    filename = path + '/' + file_name + str(image_cpt).zfill(5) + '.jpg'
     with open(filename, 'wb') as f:
         f.write(imgdata)
     image_cpt = image_cpt + 1
-    if image_cpt >= 6000:
+    if image_cpt >= images_count:
         sys.exit()
 
 try:
     # Create target Directory
-    os.mkdir('../ressources/video')
+    os.mkdir(path)
     print("Directory Created ")
 except FileExistsError:
     print("Directory already exists")
