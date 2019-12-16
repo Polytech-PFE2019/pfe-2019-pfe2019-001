@@ -20,6 +20,9 @@ import requests
 import json
 import sys
 
+from skimage import data, img_as_float
+from skimage.metrics import structural_similarity
+
 
 # Take in base64 string and return PIL image
 def stringToImage(base64_string):
@@ -83,6 +86,12 @@ firstFrame = cv2.imread(filename)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
+# f = open("ressources/testimg.txt", "r")
+# contents = f.read()
+# image = stringToImage(contents)
+# image = toRGB(image)
+# score += getDifferenceWithEtalon(image)
+# print(score)
 
 def on_img_response(image):
     global i
