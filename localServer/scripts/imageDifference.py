@@ -103,7 +103,7 @@ def on_img_response(image):
            food = True
         else:
            food = False
-        x = requests.post("http://localhost:1337/food/dataBaseUpdate", data = food)
+        x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
         sys.exit()
 
 #creation de la socket

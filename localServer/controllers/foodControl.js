@@ -2,6 +2,7 @@ const fs = require('fs');
 const fsPromises = fs.promises;
 const server = require('../server')
 var nodemailer = require('nodemailer');
+var firebase = require("firebase");
 
 
 const path = require('path');
@@ -74,16 +75,24 @@ async function setEtalon(req, res) {
 
 
 async function dataBaseUpdate(req, res) {
-    console.log("Test : " + req.body);
+    console.log("Test : " + req.body.food);
     try {
-      var ref = firebase.database().ref();
-      var foodRef = ref.child('stats/food');
-      var foodObj = {
-        time: Date.now(),
-        value: req.body
-      };
-      foodRef.push(foodObj);
-      console.log("food value added to database.");
+        var ref = firebase.database().ref();
+        var foodRef = ref.child('stats/food');
+        foodRef.limitToLast(1).once('child_added', function (snap) {
+            console.log("TestBDD : " + snap.child("/value").val());
+            if(req.body.food != snap.child("/value").val()){
+                var ref = firebase.database().ref();
+                var foodRef = ref.child('stats/food');
+                var foodObj = {
+                    time: Date.now(),
+                    value: req.body.food
+                };
+                foodRef.push(foodObj);
+                console.log("Water value added to database.")
+            }else{
+            }
+        }); 
     } catch(e) {
       console.log("Couldn't add food value to database.");
     }
