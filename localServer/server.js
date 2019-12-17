@@ -6,13 +6,13 @@ var cors = require('cors');
 var functions = require('./functions')
 var firebase = require("./firebase.js");
 const fs = require('fs');
-const path = require('path');
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 var command = ffmpeg();
 const { spawn } = require('child_process');
 var rimraf = require("rimraf");
+var app2 = require('./webServer')
 
 
 const waterRoutes = require("./routes/waterControl");
@@ -32,9 +32,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
-var port = process.env.PORT;
-var server = app.listen(port, function () {
+var server = app.listen(process.env.PORT, function () {
   console.log("Connected on port " + process.env.PORT);
+})
+
+app2.listen(process.env.WEBPORT, function () {
+  console.log("Connected on port " + process.env.WEBPORT);
 })
 
 var io = require('socket.io').listen(server);
@@ -42,7 +45,6 @@ exports.io = io;
 
 
 var ref = firebase.database().ref();
-var birdsCountRef = ref.child('users');
 ref.once('value')
   .then(function (snap) {
     console.log("num : " + snap.numChildren())
@@ -52,55 +54,6 @@ ref.once('value')
       console.log(global.name + global.mail);
     }
   });
-/*
-var ref = firebase.database().ref('stats/birds_count');
-ref.once('value', function (snap) {
-    snap.forEach(function (childSnap) {
-        var temp = new Date(childSnap.child("/time").val());
-        var now = new Date(Date.now());
-        if(temp.getDay() == now.getDay()
-            && temp.getMonth() == now.getMonth()
-            && temp.getFullYear() ==now.getFullYear()){
-            var ref = firebase.database().ref();
-            var countsRef = ref.child('stats/birds_count/'+childSnap.key);
-            var countRef = countsRef.update({
-              time: childSnap.child("/time").val(), value: (childSnap.child("/value").val()+10)
-            });
-
-        }else{
-            var ref = firebase.database().ref();
-            var birdsCountRef = ref.child('stats/birds_count');
-            var birdsCountObj = {
-                time: Date.now(),
-                value: 10
-            };
-            birdsCountRef.push(birdsCountObj);
-        }
-    });
-
-});
-*/
-
-// var ref = firebase.database().ref();
-// var birdsCountRef = ref.child('stats/birds_count');
-// var birdsCountObj = {
-//   time: Date.now(),
-//   value: Math.floor(Math.random() * 10)
-// };
-// birdsCountRef.push(birdsCountObj);
-
-/*var ref = firebase.database().ref();
-var foodRef = ref.child('stats/food');
-var foodObj = {
-  time: Date.now(),
-  value: false
-};
-var foodObj2 = {
-  time: Date.now(),
-  value: true
-};
-foodRef.push(foodObj);
-foodRef.push(foodObj2);*/
 
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
