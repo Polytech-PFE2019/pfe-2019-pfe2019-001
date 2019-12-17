@@ -11,6 +11,7 @@ from PIL import Image
 from socketIO_client import SocketIO
 import json
 import sys
+import requests
 
 from skimage import data, img_as_float
 from skimage.metrics import structural_similarity
@@ -96,15 +97,13 @@ def on_img_response(image):
         i += 1
         socketIO.emit('picture', 100, on_img_response)
     else :
-        #open and write in the JSON file
-        #fileRessources = open("../ressources/ressources.json", "rw")
-        #ressources = json.load(fileRessources)
         print(str(score/iterations))
-        #if(score > 0.40):
-        #    ressources['food'] = 'true'
-        #else:
-        #    ressources['food'] = 'false'
-        #json.dump(ressources, fileRessources)
+        food = True
+        if(score > 0.40):
+           food = True
+        else:
+           food = False
+        x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
         sys.exit()
 
 #creation de la socket

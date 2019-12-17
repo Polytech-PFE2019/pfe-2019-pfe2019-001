@@ -8,7 +8,7 @@ router.post("/setValue", foodController.setValue);
 
 router.post("/setEtalon", foodController.setEtalon);
 
-// router.get("", foodController.getValue);
+router.post("/dataBaseUpdate", foodController.dataBaseUpdate);
 
 
 
