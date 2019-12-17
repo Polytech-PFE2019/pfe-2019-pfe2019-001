@@ -1,63 +1,25 @@
-const fs = require('fs');
-const fsPromises = fs.promises;
-const server = require('../server')
-var nodemailer = require('nodemailer');
 var firebase = require("firebase");
 
-
-const path = require('path');
 const { spawn } = require('child_process');
-
-
-function runScript() {
-    return spawn('cd scripts && python3', [
-        path.join(__dirname, '/../scripts/imageDifference.py'),
-        //"-e", "./../ressources/etalon.jpg",
-        //"--image", image
-    ]);
-}
 
 // La requéte contient le channel image de la socket
 async function setValue(req, res) {
-    //console.log(req.body.food)
     //ip de la rasp : 192.168.43.175
-
-
-    var score = 0
-    nb_of_frames = 0
 
     var subprocess = spawn(`cd scripts && python3 imageDifference.py`,
         { shell: true }
     );
     console.log("script for food detection launched");
     subprocess.stdout.on('data', (data) => {
-        console.log("" + data);
         score = parseFloat(data);
-        // if (score > 0.2) {
-        //     file.food = true;
-        // } else {
-        //     file.food = false;
-        // }
-        // fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
-        // socket.emit('food', file.food);
-        console.log(score);
         console.log("food score computation finished");
         res.status(200).json({
             message: "Message received",
         });
     });
     subprocess.stderr.on('data', (data) => {
-        console.log("" + data);
+        console.log("error :" + data);
     });
-
-
-    // await fs.writeFileSync('ressources.json', JSON.stringify(file));
-    // socket.emit('food', file.food);
-    // console.log(score);
-
-
-
-    // server.io.emit('food', file.food);
 }; module.exports.setValue = setValue;
 
 async function setEtalon(req, res) {
@@ -75,12 +37,10 @@ async function setEtalon(req, res) {
 
 
 async function dataBaseUpdate(req, res) {
-    console.log("Test : " + req.body.food);
     try {
         var ref = firebase.database().ref();
         var foodRef = ref.child('stats/food');
         foodRef.limitToLast(1).once('child_added', function (snap) {
-            console.log("TestBDD : " + snap.child("/value").val());
             if(req.body.food != snap.child("/value").val()){
                 var ref = firebase.database().ref();
                 var foodRef = ref.child('stats/food');

@@ -9,7 +9,7 @@ const fs = require('fs');
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
-var command = ffmpeg();
+
 const { spawn } = require('child_process');
 var rimraf = require("rimraf");
 var app2 = require('./webServer')
@@ -141,19 +141,32 @@ app.post('/bird', function (req, res) {
 
 
 // ==================================================================
-
+var recording = false;
 app.post('/video', function (req, res) {
-
+  if (recording) {
+    res.status(200).json({ error: "Already recording." });
+    return;
+  }
+  var command = ffmpeg();
+  recording = true;
   console.log("requetes lancée");
-  var subprocess = spawn(`cd scripts && python3 video_receiver.py ../ressources/video image 50`,
+  var subprocess = spawn(`cd scripts && python3 video_receiver.py ../ressources/tmp-images image 50`,
     { shell: true }
   );
   subprocess.stderr.on('close', () => {
     console.log('Data gathered, creating video ...');
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth();
+    var yyyy = today.getFullYear();
+    var hh = today.getHours();
+    var min = today.getMinutes();
+    var secs = today.getSeconds();
+    var timestamp = `${dd}-${mm}-${yyyy};${hh}:${min}:${secs}`;
     command
-      .input('ressources/video/image%05d.jpg')
+      .input('ressources/tmp-images/image%05d.jpg')
       .inputFPS(10)
-      .output('video.mp4')
+      .output(`ressources/videos/${timestamp}.mp4`)
       .outputFPS(30)
       .noAudio()
       .on('progress', function (progress) {
@@ -161,15 +174,26 @@ app.post('/video', function (req, res) {
       })
       .on('error', function (err) {
         console.log('Cannot process video: ' + err.message);
-        res.status(200).json({ ok: "ok" });
+        recording = false;
+        try {
+          res.status(200).json({ error: "Cannot process video" });
+        } catch(e) {
+          console.log("error when sending response");
+        }
       })
       .on('end', () => {
         console.log('Video generated.');
-        const directory = './ressources/video/*';
+        const directory = './ressources/tmp-images/*';
         console.log('Deleting pictures...');
         rimraf(directory, function () {
           console.log('Pictures deleted.');
-          res.status(200).json({ ok: "ok" });
+          subprocess.kill();
+          recording = false;
+          try {
+            res.status(200).json({ ok: "ok" });
+          } catch(e) {
+            console.log("error when sending response");
+          }
         });
       })
       .run();

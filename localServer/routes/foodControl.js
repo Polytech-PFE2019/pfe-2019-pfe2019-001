@@ -10,6 +10,4 @@ router.post("/setEtalon", foodController.setEtalon);
 
 router.post("/dataBaseUpdate", foodController.dataBaseUpdate);
 
-
-
 module.exports = router;

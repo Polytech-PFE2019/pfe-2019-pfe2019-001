@@ -23,6 +23,7 @@
     "@angular/router": "~8.2.14",
     "@ks89/angular-modal-gallery": "^7.2.5",
     "angularfire2": "^5.2.3",
+    "file-saver": "^2.0.2",
     "firebase": "^7.5.0",
     "hammerjs": "^2.0.8",
     "mat-video": "^2.7.2",

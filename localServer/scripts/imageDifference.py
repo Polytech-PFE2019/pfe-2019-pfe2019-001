@@ -22,23 +22,17 @@ def stringToImage(base64_string):
     return Image.open(io.BytesIO(imgdata))
 
 # convert PIL Image to an GRAY image( technically a numpy array ) that's compatible with opencv
-
-
 def toRGB(image):
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
 # compute the score of the differences between the image from the rasp and the etalon
-
-
 def getDifferenceWithEtalon(image2):
     global firstFrame
-    #frame = cv2.imread(image2,0)
     frame = imutils.resize(image2, width=500)
-    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(frame, (21, 21), 0)
+    frame = cv2.GaussianBlur(frame, (21, 21), 0)
 
     (score, diff) = structural_similarity(
-        gray, firstFrame, full=True,  multichannel=True)
+        frame, firstFrame, full=True,  multichannel=True)
     diff = (diff * 255).astype("uint8")
     return(score)
 
@@ -54,43 +48,27 @@ ap.add_argument("-i", "--image",
 
 args = vars(ap.parse_args())
 
-# Nombre de frames sur lequelles calculer le score
+# Number of frames used to compute the score
 iterations = 50
 i = 0
 score = 0
 
 
-# we read from the webcam
-if args.get("etalon", None) is None:
-    etalon_path = "./../ressources/etalon00000.jpg"
-else:
-    etalon_path = args.get("etalon")
-
+# load the etalon frame
+etalon_path = "./../ressources/etalon00000.jpg"
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, etalon_path)
-
-
-
-# initialize the first frame in the video stream
-# Load an color image
 firstFrame = cv2.imread(filename)
-#firstFrame = cv2.cvtColor(firstFrame, cv2.COLOR_BGR2GRAY)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
-# f = open("ressources/testimg.txt", "r")
-# contents = f.read()
-# image = stringToImage(contents)
-# image = toRGB(image)
-# score += getDifferenceWithEtalon(image)
-# print(score)
-
+#take a frame and add the score of the comparison with the etalon to the global score. 
+#if it's the last frame to compare, then write the result of the food presence in the database
 def on_img_response(image):
     global i
     global score
-
     if (i < iterations):
-        #calcul du score
+        #sum for the score computation
         image = stringToImage(image)
         image = toRGB(image)
         score += getDifferenceWithEtalon(image)
@@ -106,7 +84,7 @@ def on_img_response(image):
         x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
         sys.exit()
 
-#creation de la socket
+#socket creation
 socketIO = SocketIO('192.168.43.175', 3001)
 socketIO.emit('picture', 100, on_img_response)
 

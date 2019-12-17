@@ -1,4 +1,5 @@
 <div mat-dialog-content>
+  <img [src]="image" alt="" width="320px" height="240px">
   <p>Entrez le nom de l'album :</p>
   <mat-form-field>
     <input matInput [(ngModel)]="albumName" [matAutocomplete]="auto">
@@ -11,5 +12,6 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Annuler</button>
-  <button mat-button cdkFocusInitial (click)="uploadImage()">Ok</button>
+  <button mat-button cdkFocusInitial (click)="uploadImage()">Enregistrer dans l'album</button>
+  <button mat-button (click)="download()">Télécharger</button>
 </div>
