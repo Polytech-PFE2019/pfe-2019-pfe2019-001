@@ -11,5 +11,6 @@ export const environment = {
   }
 };
 
-export const camServer = "http://raspberrypi.local:3000";
-export const localServer = "http://localhost:1337";
+export const picamServer = "http://raspberrypi.local:3000";
+export const usbcamServer = "http://raspberrypi.local:3001";
+export const localServer = "http://bird.local:1337";

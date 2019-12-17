@@ -8,8 +8,8 @@ import { firebaseService } from '../services/firebaseService';
 })
 export class DebugComponent implements OnInit {
 
-  private albumName;
-  private base64;
+  public albumName;
+  public base64;
   constructor(private firebase: firebaseService) { }
 
   ngOnInit() {

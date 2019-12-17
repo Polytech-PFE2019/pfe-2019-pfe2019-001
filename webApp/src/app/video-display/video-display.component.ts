@@ -23,7 +23,7 @@ export class VideoDisplayComponent implements OnInit {
   private piSocket;
   private usbSocket;
   private birdsNearby = undefined;
-  private birdsNearbyFull = [];
+  public birdsNearbyFull = [];
   private image;
   private camera_id = 0;
 
@@ -143,9 +143,9 @@ export class VideoDisplayComponent implements OnInit {
 })
 export class DialogAlbum {
 
-  albumName = "picture";
-  albums = undefined;
-  image;
+  public albumName = "picture";
+  public albums = undefined;
+  public image;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAlbum>,
