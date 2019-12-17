@@ -71,3 +71,20 @@ async function setEtalon(req, res) {
       });
     });
 }; module.exports.setEtalon = setEtalon;
+
+
+async function dataBaseUpdate(req, res) {
+    console.log("Test : " + req.body);
+    try {
+      var ref = firebase.database().ref();
+      var foodRef = ref.child('stats/food');
+      var foodObj = {
+        time: Date.now(),
+        value: req.body
+      };
+      foodRef.push(foodObj);
+      console.log("food value added to database.");
+    } catch(e) {
+      console.log("Couldn't add food value to database.");
+    }
+}; module.exports.dataBaseUpdate = dataBaseUpdate;
