@@ -102,13 +102,19 @@ var foodObj2 = {
 foodRef.push(foodObj);
 foodRef.push(foodObj2);*/
 
-
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
-  var file = require('./ressources/ressources.json');
-  io.emit("water", file.water)
+  var water;
+  var temp;
+  var waterStatsRef = ref.child('/stats/water');
+  waterStatsRef.orderByKey().limitToLast(1).once('value', function (snap) {
+    temp = snap.val()
+    water = temp[Object.keys(temp)[0]].value;
+  })
+
+  io.emit("water", water)
 
   socket.on('live', function (msg) {
     console.log("Message: " + msg);
@@ -155,7 +161,6 @@ io.on('connection', function (socket) {
             }
           });
       });
-
   });
 });
 
@@ -188,7 +193,7 @@ app.post('/video', function (req, res) {
 
   console.log("requetes lancée");
   var subprocess = spawn(`cd scripts && python3 video_receiver.py ../ressources/video image 50`,
-      { shell: true }
+    { shell: true }
   );
   subprocess.stderr.on('close', () => {
     console.log('Data gathered, creating video ...');
@@ -198,12 +203,12 @@ app.post('/video', function (req, res) {
       .output('video.mp4')
       .outputFPS(30)
       .noAudio()
-      .on('progress', function(progress) {
-       console.log('Processing: ' + progress.percent + '% done');
+      .on('progress', function (progress) {
+        console.log('Processing: ' + progress.percent + '% done');
       })
-      .on('error', function(err) {
-       console.log('Cannot process video: ' + err.message);
-       res.status(200).json({ok: "ok"});
+      .on('error', function (err) {
+        console.log('Cannot process video: ' + err.message);
+        res.status(200).json({ ok: "ok" });
       })
       .on('end', () => {
         console.log('Video generated.');
@@ -211,7 +216,7 @@ app.post('/video', function (req, res) {
         console.log('Deleting pictures...');
         rimraf(directory, function () {
           console.log('Pictures deleted.');
-          res.status(200).json({ok: "ok"});
+          res.status(200).json({ ok: "ok" });
         });
       })
       .run();
