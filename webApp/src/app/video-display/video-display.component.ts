@@ -6,6 +6,7 @@ import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { picamServer, usbcamServer } from '../../environments/environment';
+import { saveAs } from 'file-saver';
 
 export interface DialogData {
   image: string;
@@ -110,7 +111,7 @@ export class VideoDisplayComponent implements OnInit {
 
   chooseAlbum(image): void {
     const dialogRef = this.dialog.open(DialogAlbum, {
-      width: '300px',
+      //width: '300px',
       data: { image: image }
     });
 
@@ -144,11 +145,13 @@ export class DialogAlbum {
 
   albumName = "picture";
   albums = undefined;
+  image;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAlbum>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private firebase: firebaseService) {
+    this.image = `data:image/jpeg;base64,${data.image}`
     this.loadAlbums();
   }
 
@@ -160,6 +163,21 @@ export class DialogAlbum {
     this.firebase.getAlbums().then((albums) => {
       this.albums = albums;
     });
+  }
+
+  download() {
+    saveAs(this.b64toBlob(this.image), "capture.jpg");
+  }
+
+  b64toBlob(dataURI) {
+    var byteString = atob(dataURI.split(',')[1]);
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: 'image/jpeg' });
   }
 
   uploadImage() {
