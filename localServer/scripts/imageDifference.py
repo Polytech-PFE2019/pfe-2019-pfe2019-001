@@ -1,28 +1,19 @@
-# USAGE
-# python motion_detector.py
-# python motion_detector.py --video videos/example_01.mp4
-
 # import the necessary packages
 from imutils.video import VideoStream
 import argparse
-import datetime
 import imutils
-import time
 import cv2
-import requests
 import os
 import io
 import base64
 import numpy as np
 from PIL import Image
 from socketIO_client import SocketIO
-import requests
 import json
 import sys
 
 from skimage import data, img_as_float
 from skimage.metrics import structural_similarity
-
 
 # Take in base64 string and return PIL image
 def stringToImage(base64_string):
