@@ -17,15 +17,21 @@ from skimage import data, img_as_float
 from skimage.metrics import structural_similarity
 
 # Take in base64 string and return PIL image
+
+
 def stringToImage(base64_string):
     imgdata = base64.b64decode(base64_string)
     return Image.open(io.BytesIO(imgdata))
 
 # convert PIL Image to an GRAY image( technically a numpy array ) that's compatible with opencv
+
+
 def toRGB(image):
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
 # compute the score of the differences between the image from the rasp and the etalon
+
+
 def getDifferenceWithEtalon(image2):
     global firstFrame
     frame = imutils.resize(image2, width=500)
@@ -62,30 +68,34 @@ firstFrame = cv2.imread(filename)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
-#take a frame and add the score of the comparison with the etalon to the global score. 
-#if it's the last frame to compare, then write the result of the food presence in the database
+# take a frame and add the score of the comparison with the etalon to the global score.
+# if it's the last frame to compare, then write the result of the food presence in the database
+
+
 def on_img_response(image):
     global i
     global score
     if (i < iterations):
-        #sum for the score computation
+        # sum for the score computation
         image = stringToImage(image)
         image = toRGB(image)
         score += getDifferenceWithEtalon(image)
         i += 1
         socketIO.emit('picture', 100, on_img_response)
-    else :
+    else:
         print(str(score/iterations))
         food = True
         if(score > 0.40):
-           food = True
+            food = True
         else:
-           food = False
-        x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
+            food = False
+        requests.post(
+            "http://localhost:1337/food/dataBaseUpdate", json={"Food": food})
         sys.exit()
 
-#socket creation
-socketIO = SocketIO('192.168.43.175', 3001)
+
+# socket creation
+socketIO = SocketIO(os.environ.get('CAMSERVER'), os.environ.get('CAMPORT'))
 socketIO.emit('picture', 100, on_img_response)
 
 socketIO.wait()

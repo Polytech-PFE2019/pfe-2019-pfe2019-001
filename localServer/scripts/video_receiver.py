@@ -12,11 +12,14 @@ file_name = sys.argv[2]
 images_count = int(sys.argv[3])
 image_cpt = 0
 
+
 def on_connect():
     print('connect')
 
+
 def on_disconnect():
     print('disconnect')
+
 
 def on_img_response(data):
     global image_cpt
@@ -29,6 +32,7 @@ def on_img_response(data):
     if image_cpt >= images_count:
         sys.exit()
 
+
 try:
     # Create target Directory
     os.mkdir(path)
@@ -36,7 +40,7 @@ try:
 except FileExistsError:
     print("Directory already exists")
 
-socketIO = SocketIO('192.168.43.175', 3001)
+socketIO = SocketIO(os.environ.get('CAMSERVER'), os.environ.get('CAMPORT'))
 socketIO.on('connect', on_connect)
 socketIO.on('disconnect', on_disconnect)
 

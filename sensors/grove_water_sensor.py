@@ -86,7 +86,7 @@ def main():
                 empty += 1
                 if empty == 50:
                     print("{}, Dry.".format(value))
-                    requests.post('http://localhost:1337/water',
+                    requests.post('http://bird:1337/water',
                                   json={"Water": False})
                     wet = False
                     empty = 0
@@ -97,7 +97,7 @@ def main():
                 water += 1
                 print("{}, Detected Water.".format(value))
                 if water == 100:
-                    requests.post('http://localhost:1337/water',
+                    requests.post('http://bird:1337/water',
                                   json={"Water": True})
                     wet = True
                     water = 0
