@@ -72,11 +72,12 @@ firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 # if it's the last frame to compare, then write the result of the food presence in the database
 
 
+
 def on_img_response(image):
     global i
     global score
     if (i < iterations):
-        # sum for the score computation
+        # calcul du score
         image = stringToImage(image)
         image = toRGB(image)
         score += getDifferenceWithEtalon(image)
@@ -89,8 +90,11 @@ def on_img_response(image):
             food = True
         else:
             food = False
-        requests.post(
-            "http://localhost:1337/food/dataBaseUpdate", json={"Food": food})
+         try:
+            requests.post(
+                "http://localhost:1337/food/dataBaseUpdate", json={"Food": food})
+        except Exception:
+            pass
         sys.exit()
 
 

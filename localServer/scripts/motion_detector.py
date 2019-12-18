@@ -97,15 +97,21 @@ def on_img_response(data):
 
     if cnts:
         if text == "Unoccupied":
-            requests.post("http://"+os.environ.get('SERVER') +
-                          ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+            try:
+                requests.post("http://"+os.environ.get('SERVER') +
+                              ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+            except Exception:
+                pass
             print("LIVE")
             text = "Occupied"
     else:
         if text == "Occupied":
-            requests.post(
-                "http://"+os.environ.get('SERVER') +
-                ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+            try:
+                requests.post(
+                    "http://"+os.environ.get('SERVER') +
+                    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+            except Exception:
+                pass
             print("COUPER LIVE")
             text = "Unoccupied"
 

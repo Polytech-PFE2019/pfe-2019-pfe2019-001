@@ -18,7 +18,7 @@ RUN npm install
 # ---- Copy Files/Build ----
 FROM dependencies AS build  
 WORKDIR /app
-COPY . /app
+COPY src /app
 
 # --- Release with Alpine ----
 FROM node:8.9-alpine AS release  
@@ -33,8 +33,5 @@ COPY --from=dependencies /app/package.json ./
 # Install app dependencies
 RUN npm install
 COPY --from=build /app ./
-# RUN cd darknet
-# RUN wget https://pjreddie.com/media/files/yolov3.weights
-# RUN cd ..
 EXPOSE 1337 4200
 CMD ["node", "server.js"]
