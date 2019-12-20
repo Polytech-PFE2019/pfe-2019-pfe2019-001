@@ -5,6 +5,8 @@ import { firebaseService } from '../services/firebaseService'
 import { BirdsService } from '../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { picamServer, usbcamServer } from '../../environments/environment';
+import { saveAs } from 'file-saver';
 
 export interface DialogData {
   image: string;
@@ -18,29 +20,42 @@ export interface DialogData {
 })
 export class VideoDisplayComponent implements OnInit {
 
-  private url = "http://raspberrypi.local:3000";
-  private socket;
+  private piSocket;
+  private usbSocket;
   private birdsNearby = undefined;
-  private birdsNearbyFull = [];
+  public birdsNearbyFull = [];
   private image;
   private camera_id = 0;
 
   constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
-    this.socket = io(this.url);
+    this.piSocket = io(picamServer);
+    this.usbSocket = io(usbcamServer);
     console.log("Test");
-    this.socket.on('image', (image) => {
-      const imageElm = document.getElementById('image');
-      imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
-      document.getElementById("loading").style.display = 'none';
-      document.getElementById("switch").style.display = 'inline';
-      document.getElementById("capture").style.display = 'inline';
+    this.piSocket.on('image', (image) => {
+      if (this.camera_id == 0) {
+        const imageElm = document.getElementById('image');
+        imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
+        document.getElementById("loading").style.display = 'none';
+        document.getElementById("switch").style.display = 'inline';
+        document.getElementById("capture").style.display = 'inline';
+      }
     });
 
-    this.socket.on("connect_error", function (exeception) {
+    this.piSocket.on("connect_error", function (exeception) {
       document.getElementById('image').setAttribute("src", "https://image.freepik.com/vecteurs-libre/modele-erreur-404-oiseau-dans-style-dessine-main_23-2147734776.jpg");
       document.getElementById("loading").style.display = 'none';
       document.getElementById("switch").style.display = 'none';
       document.getElementById("capture").style.display = 'none';
+    });
+
+    this.usbSocket.on('image', (image) => {
+      if (this.camera_id == 1) {
+        const imageElm = document.getElementById('image');
+        imageElm.setAttribute("src", `data:image/jpeg;base64,${image}`);
+        document.getElementById("loading").style.display = 'none';
+        document.getElementById("switch").style.display = 'inline';
+        document.getElementById("capture").style.display = 'inline';
+      }
     });
   }
 
@@ -60,7 +75,8 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.socket.disconnect();
+    this.piSocket.disconnect();
+    this.usbSocket.disconnect();
   }
 
   fullScreen() {
@@ -77,21 +93,25 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   public capture() {
-    this.socket.emit('picture', 100, (data) => {
+    var socket;
+    if (this.camera_id == 0) {
+      socket = this.piSocket;
+    } else if (this.camera_id == 1) {
+      socket = this.usbSocket;
+    }
+    socket.emit('picture', 100, (data) => {
       this.chooseAlbum(data)
     });
   }
 
   public switch() {
     this.camera_id = (this.camera_id + 1) % 2;
-    this.socket.emit("switch", this.camera_id);
-
-    console.log("Switch");
+    console.log("Switchii");
   }
 
   chooseAlbum(image): void {
     const dialogRef = this.dialog.open(DialogAlbum, {
-      width: '300px',
+      //width: '300px',
       data: { image: image }
     });
 
@@ -105,8 +125,8 @@ export class VideoDisplayComponent implements OnInit {
   }
 
 
-  matchCapture(name, ) {
-    this.socket.emit('picture', 100, (data) => {
+  matchCapture(name) {
+    this.piSocket.emit('picture', 100, (data) => {
       var image = { value: data }
       this.firebase.push("picture/" + name, image);
       this._snackBar.open("capture effectuée", undefined, {
@@ -123,13 +143,15 @@ export class VideoDisplayComponent implements OnInit {
 })
 export class DialogAlbum {
 
-  albumName = "picture";
-  albums = undefined;
+  public albumName = "picture";
+  public albums = undefined;
+  public image;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAlbum>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private firebase: firebaseService) {
+    this.image = `data:image/jpeg;base64,${data.image}`
     this.loadAlbums();
   }
 
@@ -141,6 +163,21 @@ export class DialogAlbum {
     this.firebase.getAlbums().then((albums) => {
       this.albums = albums;
     });
+  }
+
+  download() {
+    saveAs(this.b64toBlob(this.image), "capture.jpg");
+  }
+
+  b64toBlob(dataURI) {
+    var byteString = atob(dataURI.split(',')[1]);
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: 'image/jpeg' });
   }
 
   uploadImage() {

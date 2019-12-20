@@ -82,24 +82,32 @@ def main():
     while True:
         value = sensor.value
         if sensor.value > 800:
-            empty += 1
-            print("{}, Dry.".format(value))
-            if wet == True and empty == 50:
-                r = requests.post(
-                    'http://localhost:1337/water', json={"Empty": "1"})
-                wet = False
-                empty = 0
-                water = 0
+            if wet == True:
+                empty += 1
+                if empty == 50:
+                    print("{}, Dry.".format(value))
+                    try:
+                        requests.post('http://localhost:1337/water',
+                                      json={"Water": False})
+                    except Exception:
+                        pass
+                    wet = False
+                    empty = 0
+                    water = 0
 
         else:
-            water += 1
-            print("{}, Detected Water.".format(value))
-            if wet == False and water == 100:
-                r = requests.post(
-                    'http://localhost:1337/water', json={"Empty": "0"})
-                wet = True
-                water = 0
-                empty = 0
+            if wet == False:
+                water += 1
+                if water == 50:
+                    print("{}, Detected Water.".format(value))
+                    try:
+                        requests.post('http://localhost:1337/water',
+                                      json={"Water": True})
+                    except Exception:
+                        pass
+                    wet = True
+                    water = 0
+                    empty = 0
         time.sleep(.1)
 
 

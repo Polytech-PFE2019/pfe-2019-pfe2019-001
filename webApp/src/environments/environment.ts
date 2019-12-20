@@ -15,6 +15,10 @@ export const environment = {
   }
 };
 
+export const picamServer = "http://192.168.43.175:3000";
+export const usbcamServer = "http://192.168.43.175:3001";
+export const localServer = "http://localhost:1337";
+
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

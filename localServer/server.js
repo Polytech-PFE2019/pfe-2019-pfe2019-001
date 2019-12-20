@@ -6,6 +6,16 @@ var cors = require('cors');
 var functions = require('./functions')
 var firebase = require("./firebase.js");
 const fs = require('fs');
+var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+var ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
+var CronJob = require('cron').CronJob;
+var foodControl = require('./controllers/foodControl')
+
+
+const { spawn } = require('child_process');
+var rimraf = require("rimraf");
+var app2 = require('./webServer')
 
 
 const waterRoutes = require("./routes/waterControl");
@@ -14,15 +24,20 @@ const foodRoutes = require("./routes/foodControl");
 global.mail = "";
 global.name = "";
 
+var videoCpt = 5;
+
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
-var port = 1337;
-var server = app.listen(port, function () {
-  console.log("Connected on port 1337");
+var server = app.listen(process.env.PORT, function () {
+  console.log("Connected on port " + process.env.PORT);
+})
+
+app2.listen(process.env.WEBPORT, function () {
+  console.log("Connected on port " + process.env.WEBPORT);
 })
 
 var io = require('socket.io').listen(server);
@@ -30,7 +45,6 @@ exports.io = io;
 
 
 var ref = firebase.database().ref();
-var birdsCountRef = ref.child('users');
 ref.once('value')
   .then(function (snap) {
     console.log("num : " + snap.numChildren())
@@ -40,50 +54,20 @@ ref.once('value')
       console.log(global.name + global.mail);
     }
   });
-/*
-var ref = firebase.database().ref('stats/birds_count');
-ref.once('value', function (snap) {
-    snap.forEach(function (childSnap) {
-        var temp = new Date(childSnap.child("/time").val());
-        var now = new Date(Date.now());
-        if(temp.getDay() == now.getDay() 
-            && temp.getMonth() == now.getMonth() 
-            && temp.getFullYear() ==now.getFullYear()){
-            var ref = firebase.database().ref();
-            var countsRef = ref.child('stats/birds_count/'+childSnap.key);
-            var countRef = countsRef.update({
-              time: childSnap.child("/time").val(), value: (childSnap.child("/value").val()+10)
-            });
-
-        }else{
-            var ref = firebase.database().ref();
-            var birdsCountRef = ref.child('stats/birds_count');
-            var birdsCountObj = {
-                time: Date.now(),
-                value: 10
-            };
-            birdsCountRef.push(birdsCountObj);
-        }
-    });
-
-});
-*/
-
-var ref = firebase.database().ref();
-var birdsCountRef = ref.child('stats/birds_count');
-var birdsCountObj = {
-    time: Date.now(),
-    value: Math.floor(Math.random() * 10)
-};
-birdsCountRef.push(birdsCountObj);
-
 
 io.on('connection', function (socket) {
   console.log('User connected, starting to record...');
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
-  var file = require('./ressources/ressources.json');
-  io.emit("water", file.water)
+  var water;
+  var temp;
+  var waterStatsRef = ref.child('/stats/water');
+  waterStatsRef.orderByKey().limitToLast(1).once('value', function (snap) {
+    temp = snap.val()
+    water = temp[Object.keys(temp)[0]].value;
+  })
+
+  io.emit("water", water)
 
   socket.on('live', function (msg) {
     console.log("Message: " + msg);
@@ -130,13 +114,20 @@ io.on('connection', function (socket) {
             }
           });
       });
-
   });
 });
 
 //lancement automatique de la détection de mouvement
 functions.motionDetection();
 
+const job = new CronJob('00 00 11 * * *', function () {
+  videoCpt = 5;
+  foodControl.setValue();
+});
+console.log('After job instantiation');
+job.start();
+
+var intervalId;
 app.post('/bird', function (req, res) {
   console.log(req.body.presence)
   var file = require('./ressources/ressources.json');
@@ -145,7 +136,8 @@ app.post('/bird', function (req, res) {
   if (req.body.presence == true) {
     io.emit('presence', true);
     functions.count();
-    var intervalId = setInterval(functions.count, 300000);
+    video();
+    intervalId = setInterval(functions.count, 300000);
   }
   else {
     io.emit('presence', false);
@@ -155,3 +147,48 @@ app.post('/bird', function (req, res) {
     ok: "ok",
   });
 });
+
+
+// ==================================================================
+var recording = false;
+function video() {
+  if (recording || videoCpt == 0) {
+    return;
+  }
+  var command = ffmpeg();
+  recording = true;
+  console.log("requetes lancée");
+  var subprocess = spawn(`cd scripts && python3 video_receiver.py ../ressources/tmp-images image 50`,
+    { shell: true }
+  );
+  subprocess.stderr.on('close', () => {
+    console.log('Data gathered, creating video ...');
+    var today = new Date();
+    var timestamp = today.toString();
+    command
+      .input('ressources/tmp-images/image%05d.jpg')
+      .inputFPS(10)
+      .output(`ressources/videos/${timestamp}.mp4`)
+      .outputFPS(30)
+      .noAudio()
+      .on('progress', function (progress) {
+        console.log('Processing: ' + progress.percent + '% done');
+      })
+      .on('error', function (err) {
+        console.log('Cannot process video: ' + err.message);
+        recording = false;
+      })
+      .on('end', () => {
+        console.log('Video generated.');
+        videoCpt--;
+        const directory = './ressources/tmp-images/*';
+        console.log('Deleting pictures...');
+        rimraf(directory, function () {
+          console.log('Pictures deleted.');
+          subprocess.kill();
+          recording = false;
+        });
+      })
+      .run();
+  });
+};

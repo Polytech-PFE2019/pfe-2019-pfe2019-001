@@ -1,0 +1,3 @@
+[submodule "camServer"]
+	path = camServer
+	url = https://github.com/Sebastien-Posca/camServer.git
