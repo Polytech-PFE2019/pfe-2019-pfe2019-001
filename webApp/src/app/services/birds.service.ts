@@ -16,11 +16,9 @@ export class BirdsService {
 
   getBirdsNearby() {
     return new Promise((resolve, reject) => {
-      this.getPosition().then((data) => {
-        var url = "https://api.ebird.org/v2/data/obs/geo/recent?lat=" + 43.62 + "&lng=" + 7.09 + "&sort=species&dist=50"
-        this.http.get(url, this.httpOptions).subscribe((data) => {
-          resolve(data);
-        })
+      var url = "https://api.ebird.org/v2/data/obs/geo/recent?lat=" + 43.62 + "&lng=" + 7.09 + "&sort=species&dist=50"
+      this.http.get(url, this.httpOptions).subscribe((data) => {
+        resolve(data);
       });
     });
   }
