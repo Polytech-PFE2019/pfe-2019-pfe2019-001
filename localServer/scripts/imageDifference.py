@@ -53,7 +53,7 @@ iterations = 50
 i = 0
 score = 0
 
-
+cap = cv2.VideoCapture('http://192.168.20.100:8081/')
 # load the etalon frame
 etalon_path = "./../ressources/etalon00000.jpg"
 dirname = os.path.dirname(__file__)
@@ -62,18 +62,15 @@ firstFrame = cv2.imread(filename)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
-#take a frame and add the score of the comparison with the etalon to the global score. 
+#take a frame and add the score of the comparison with the etalon to the global score.
 #if it's the last frame to compare, then write the result of the food presence in the database
-def on_img_response(image):
-    global i
-    global score
+while True:
     if (i < iterations):
         #sum for the score computation
-        image = stringToImage(image)
+        ret, image = cap.read()
         image = toRGB(image)
         score += getDifferenceWithEtalon(image)
         i += 1
-        socketIO.emit('picture', 100, on_img_response)
     else :
         print(str(score/iterations))
         food = True
@@ -81,11 +78,5 @@ def on_img_response(image):
            food = True
         else:
            food = False
-        x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
+        #x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
         sys.exit()
-
-#socket creation
-socketIO = SocketIO('192.168.43.175', 3001)
-socketIO.emit('picture', 100, on_img_response)
-
-socketIO.wait()
