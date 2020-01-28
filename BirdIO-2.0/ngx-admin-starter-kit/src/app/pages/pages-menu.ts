@@ -1,0 +1,59 @@
+import { NbMenuItem } from '@nebular/theme';
+
+export const MENU_ITEMS: NbMenuItem[] = [
+  {
+    title: 'Home',
+    icon: 'home-outline',
+    link: '/pages/home',
+    home: true,
+  },
+  {
+    title: 'Streaming',
+    icon: 'monitor-outline',
+    link: '/pages/stream',
+    home: false,
+  },
+  {
+    title: 'Album',
+    icon: 'image-outline',
+    link: '/pages/album',
+    home: false,
+  },
+  {
+    title: 'Statistics',
+    icon: 'bar-chart-2-outline',
+    link: '/pages/statistics',
+    home: false,
+  }, {
+    title: 'Monitoring',
+    icon: 'activity-outline',
+    link: '/pages/ressources',
+    home: false,
+  },
+  // {
+  //   title: 'FEATURES',
+  //   group: true,
+  // },
+  // {
+  //   title: 'Auth',
+  //   icon: 'lock-outline',
+  //   children: [
+  //     {
+  //       title: 'Login',
+  //       link: '/auth/login',
+  //     },
+  //     {
+  //       title: 'Register',
+  //       link: '/auth/register',
+  //     },
+  //     {
+  //       title: 'Request Password',
+  //       link: '/auth/request-password',
+  //     },
+  //     {
+  //       title: 'Reset Password',
+  //       link: '/auth/reset-password',
+  //     },
+  //   ],
+  // },
+];

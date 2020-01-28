@@ -9,6 +9,9 @@ const fs = require('fs');
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
+var CronJob = require('cron').CronJob;
+var foodControl = require('./controllers/foodControl')
+
 
 const { spawn } = require('child_process');
 var rimraf = require("rimraf");
@@ -21,10 +24,7 @@ const foodRoutes = require("./routes/foodControl");
 global.mail = "";
 global.name = "";
 
-console.log(process.env.PORT);
-console.log(process.env.CAMSERVER);
-console.log(process.env.SERVER);
-console.log(process.env.CAMPORT);
+var videoCpt = 5;
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -120,6 +120,14 @@ io.on('connection', function (socket) {
 //lancement automatique de la détection de mouvement
 functions.motionDetection();
 
+const job = new CronJob('00 00 11 * * *', function () {
+  videoCpt = 5;
+  foodControl.setValue();
+});
+console.log('After job instantiation');
+job.start();
+
+var intervalId;
 app.post('/bird', function (req, res) {
   console.log(req.body.presence)
   var file = require('./ressources/ressources.json');
@@ -128,7 +136,8 @@ app.post('/bird', function (req, res) {
   if (req.body.presence == true) {
     io.emit('presence', true);
     functions.count();
-    var intervalId = setInterval(functions.count, 300000);
+    video();
+    intervalId = setInterval(functions.count, 300000);
   }
   else {
     io.emit('presence', false);
@@ -142,9 +151,8 @@ app.post('/bird', function (req, res) {
 
 // ==================================================================
 var recording = false;
-app.post('/video', function (req, res) {
-  if (recording) {
-    res.status(200).json({ error: "Already recording." });
+function video() {
+  if (recording || videoCpt == 0) {
     return;
   }
   var command = ffmpeg();
@@ -156,13 +164,7 @@ app.post('/video', function (req, res) {
   subprocess.stderr.on('close', () => {
     console.log('Data gathered, creating video ...');
     var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth();
-    var yyyy = today.getFullYear();
-    var hh = today.getHours();
-    var min = today.getMinutes();
-    var secs = today.getSeconds();
-    var timestamp = `${dd}-${mm}-${yyyy};${hh}:${min}:${secs}`;
+    var timestamp = today.toString();
     command
       .input('ressources/tmp-images/image%05d.jpg')
       .inputFPS(10)
@@ -175,27 +177,18 @@ app.post('/video', function (req, res) {
       .on('error', function (err) {
         console.log('Cannot process video: ' + err.message);
         recording = false;
-        try {
-          res.status(200).json({ error: "Cannot process video" });
-        } catch(e) {
-          console.log("error when sending response");
-        }
       })
       .on('end', () => {
         console.log('Video generated.');
+        videoCpt--;
         const directory = './ressources/tmp-images/*';
         console.log('Deleting pictures...');
         rimraf(directory, function () {
           console.log('Pictures deleted.');
           subprocess.kill();
           recording = false;
-          try {
-            res.status(200).json({ ok: "ok" });
-          } catch(e) {
-            console.log("error when sending response");
-          }
         });
       })
       .run();
   });
-});
+};

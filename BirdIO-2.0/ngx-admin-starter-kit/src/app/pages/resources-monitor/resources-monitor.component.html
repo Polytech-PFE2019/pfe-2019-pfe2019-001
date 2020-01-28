@@ -1,0 +1,11 @@
+<div id="center" style="position:fixed;top:50%;left:50%;">
+  <table>
+    <td>
+      <nb-card class="resources" [ngStyle]="{'background-color': food? 'green' : 'red'}">Food</nb-card>
+      <div class="spacer"></div>
+      <nb-card class="resources" [ngStyle]="{'background-color': water? 'green' : 'red'}">Water</nb-card>
+    </td>
+
+    <td><button id="etalon" mat-raised-button color="primary" (click)="etalon()">Réapprovisionnement</button></td>
+  </table>
+</div>

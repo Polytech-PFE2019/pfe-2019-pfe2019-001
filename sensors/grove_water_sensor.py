@@ -86,8 +86,11 @@ def main():
                 empty += 1
                 if empty == 50:
                     print("{}, Dry.".format(value))
-                    requests.post('http://localhost:1337/water',
-                                  json={"Water": False})
+                    try:
+                        requests.post('http://localhost:1337/water',
+                                      json={"Water": False})
+                    except Exception:
+                        pass
                     wet = False
                     empty = 0
                     water = 0
@@ -95,10 +98,13 @@ def main():
         else:
             if wet == False:
                 water += 1
-                print("{}, Detected Water.".format(value))
-                if water == 100:
-                    requests.post('http://localhost:1337/water',
-                                  json={"Water": True})
+                if water == 50:
+                    print("{}, Detected Water.".format(value))
+                    try:
+                        requests.post('http://localhost:1337/water',
+                                      json={"Water": True})
+                    except Exception:
+                        pass
                     wet = True
                     water = 0
                     empty = 0

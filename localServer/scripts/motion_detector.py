@@ -24,12 +24,23 @@ ap.add_argument("-a", "--min-area", type=int,
                 default=500, help="minimum area size")
 args = vars(ap.parse_args())
 
+<<<<<<< HEAD
+=======
+
+def stringToImage(base64_string):
+    img = imread(io.BytesIO(base64.b64decode(base64_string)))
+    cv2_img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    return cv2_img
+
+
+>>>>>>> 306a8c16124bf1a85660496593d69db18127b3a0
 i = 0
 # initialize the first frame in the video stream
 firstFrame = None
 text = "Unoccupied"
 oldFrame = None
 
+<<<<<<< HEAD
 cap = cv2.VideoCapture('http://192.168.20.100:8081/')
 
 while True:
@@ -37,6 +48,24 @@ while True:
     i = i+1
     #print('message received with ', data)
     ret, frame = cap.read()
+=======
+
+def on_connect():
+    print('connect')
+
+
+def on_disconnect():
+    print('disconnect')
+
+
+def on_img_response(data):
+    global firstFrame
+    global i
+    global text
+    global oldFrame
+    i = i+1
+    frame = stringToImage(data)
+>>>>>>> 306a8c16124bf1a85660496593d69db18127b3a0
 
     if frame is None:
         sys.exit()
@@ -78,20 +107,25 @@ while True:
         # and update the text
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        # text = "Occupied"
 
     if cnts:
         if text == "Unoccupied":
-            #r = requests.post("http://"+os.environ.get('SERVER') +
-            #                  ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
-            # print("LIVE")
+            try:
+                requests.post("http://"+os.environ.get('SERVER') +
+                              ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+            except Exception:
+                pass
+            print("LIVE")
             text = "Occupied"
     else:
         if text == "Occupied":
-            #r = requests.post(
-            #    "http://"+os.environ.get('SERVER') +
-            #    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
-            #print("COUPER LIVE")
+            try:
+                requests.post(
+                    "http://"+os.environ.get('SERVER') +
+                    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+            except Exception:
+                pass
+            print("COUPER LIVE")
             text = "Unoccupied"
 
     # draw the text and timestamp on the frame
@@ -100,10 +134,13 @@ while True:
     cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                 (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
+<<<<<<< HEAD
     # show the frame and record if the user presses a key
     cv2.imshow("Security Feed", frame)
     # cv2.imshow("Thresh", thresh)
     # cv2.imshow("Frame Delta", frameDelta)
+=======
+>>>>>>> 306a8c16124bf1a85660496593d69db18127b3a0
     key = cv2.waitKey(1) & 0xFF
 
     # if the `q` key is pressed, break from the lop
@@ -111,3 +148,16 @@ while True:
         # cleanup the camera and close any open windows
         cv2.destroyAllWindows()
         sys.exit()
+<<<<<<< HEAD
+=======
+
+
+socketIO = SocketIO(os.environ.get('CAMSERVER'), os.environ.get('CAMPORT'))
+socketIO.on('connect', on_connect)
+socketIO.on('disconnect', on_disconnect)
+
+# Listen
+socketIO.on('image', on_img_response)
+
+socketIO.wait()
+>>>>>>> 306a8c16124bf1a85660496593d69db18127b3a0

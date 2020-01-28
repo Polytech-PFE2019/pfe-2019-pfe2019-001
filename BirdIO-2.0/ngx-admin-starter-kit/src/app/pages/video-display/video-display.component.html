@@ -1,0 +1,16 @@
+<div class="body">
+  <div class="video">
+    <img id="image" (click)="fullScreen()" [src]="picamServer" class="rotateimg180" *ngIf="flipped">
+    <img id="image" (click)="fullScreen()" [src]="picamServer" *ngIf="!flipped">
+
+    <div class="buttons">
+      <mat-slide-toggle [(checked)]="flipped">Slide me!</mat-slide-toggle>
+      <button id="capture" mat-raised-button color="accent" (click)="capture()">Capture</button>
+      <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
+    </div>
+  </div>
+  <div class="pictures">
+    <app-bird-comparator *ngFor="let bird of birdsNearbyFull" name="{{bird.name}}" url="{{bird.url}}"
+      (click)="matchCapture(bird.name)" style="cursor:pointer"></app-bird-comparator>
+  </div>
+</div>

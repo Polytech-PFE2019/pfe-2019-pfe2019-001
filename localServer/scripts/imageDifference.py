@@ -17,15 +17,21 @@ from skimage import data, img_as_float
 from skimage.metrics import structural_similarity
 
 # Take in base64 string and return PIL image
+
+
 def stringToImage(base64_string):
     imgdata = base64.b64decode(base64_string)
     return Image.open(io.BytesIO(imgdata))
 
 # convert PIL Image to an GRAY image( technically a numpy array ) that's compatible with opencv
+
+
 def toRGB(image):
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
 # compute the score of the differences between the image from the rasp and the etalon
+
+
 def getDifferenceWithEtalon(image2):
     global firstFrame
     frame = imutils.resize(image2, width=500)
@@ -75,7 +81,7 @@ while True:
         print(str(score/iterations))
         food = True
         if(score > 0.40):
-           food = True
+            food = True
         else:
            food = False
         #x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})

@@ -3,7 +3,7 @@ var firebase = require("firebase");
 const { spawn } = require('child_process');
 
 // La requéte contient le channel image de la socket
-async function setValue(req, res) {
+async function setValue() {
     //ip de la rasp : 192.168.43.175
 
     var subprocess = spawn(`cd scripts && python3 imageDifference.py`,
@@ -13,9 +13,6 @@ async function setValue(req, res) {
     subprocess.stdout.on('data', (data) => {
         score = parseFloat(data);
         console.log("food score computation finished");
-        res.status(200).json({
-            message: "Message received",
-        });
     });
     subprocess.stderr.on('data', (data) => {
         console.log("error :" + data);
@@ -28,10 +25,10 @@ async function setEtalon(req, res) {
         { shell: true }
     );
     subprocess.stderr.on('close', () => {
-      console.log('Etalon updated');
-      res.status(200).json({
-          message: "Message received",
-      });
+        console.log('Etalon updated');
+        res.status(200).json({
+            message: "Message received",
+        });
     });
 }; module.exports.setEtalon = setEtalon;
 
@@ -41,7 +38,7 @@ async function dataBaseUpdate(req, res) {
         var ref = firebase.database().ref();
         var foodRef = ref.child('stats/food');
         foodRef.limitToLast(1).once('child_added', function (snap) {
-            if(req.body.food != snap.child("/value").val()){
+            if (req.body.food != snap.child("/value").val()) {
                 var ref = firebase.database().ref();
                 var foodRef = ref.child('stats/food');
                 var foodObj = {
@@ -50,10 +47,10 @@ async function dataBaseUpdate(req, res) {
                 };
                 foodRef.push(foodObj);
                 console.log("Water value added to database.")
-            }else{
+            } else {
             }
-        }); 
-    } catch(e) {
-      console.log("Couldn't add food value to database.");
+        });
+    } catch (e) {
+        console.log("Couldn't add food value to database.");
     }
 }; module.exports.dataBaseUpdate = dataBaseUpdate;

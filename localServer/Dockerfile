@@ -18,7 +18,7 @@ RUN npm install
 # ---- Copy Files/Build ----
 FROM dependencies AS build  
 WORKDIR /app
-COPY . /app
+COPY src /app
 
 # --- Release with Alpine ----
 FROM node:8.9-alpine AS release  
