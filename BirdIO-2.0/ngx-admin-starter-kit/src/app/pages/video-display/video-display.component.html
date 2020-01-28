@@ -1,7 +1,7 @@
 <div class="body">
   <div class="video">
     <img id="image" (click)="fullScreen()" [src]="picamServer" class="rotateimg180" *ngIf="flipped">
-    <img id="image" (click)="fullScreen()" [src]="picamServer" *ngIf="!flipped">
+    <img id="image" crossorigin="" (click)="fullScreen()" [src]="picamServer" *ngIf="!flipped">
 
     <div class="buttons">
       <mat-slide-toggle [(checked)]="flipped">Slide me!</mat-slide-toggle>

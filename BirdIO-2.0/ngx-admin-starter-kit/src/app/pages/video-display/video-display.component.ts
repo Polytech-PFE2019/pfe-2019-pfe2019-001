@@ -34,6 +34,7 @@ export class VideoDisplayComponent implements OnInit {
 
   ngOnInit() {
     this.image = document.getElementById('image');
+    console.log(this.image);
     this._birdsService.getBirdsNearby().then(data => {
       this.birdsNearby = data;
       this.birdsNearby.forEach((bird) => {
@@ -65,15 +66,29 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   public capture() {
-    // var socket;
-    // if (this.camera_id == 0) {
-    //   socket = this.piSocket;
-    // } else if (this.camera_id == 1) {
-    //   socket = this.usbSocket;
-    // }
-    // socket.emit('picture', 100, (data) => {
-    //   this.chooseAlbum(data)
-    // });
+    var video_ctx = this;
+    var direct = document.createElement('canvas');
+    var stream = document.createElement('canvas');
+    var img = document.getElementById("image");
+    var ctx_direct = direct.getContext('2d');
+    var ctx_stream = stream.getContext('2d');
+    img.onload = function() {
+       stream.width = direct.width = this.naturalWidth;
+       stream.height = direct.height = this.naturalHeight;
+       // onload should fire multiple times
+       // but it seems it's not at every frames
+       // so we'll disable t and use an interval instead
+       this.onload = null;
+       var ctx_off = stream.cloneNode().getContext('2d');
+       ctx_off.drawImage(img, 0,0);
+       // and draw it back to our visible one
+       ctx_stream.drawImage(ctx_off.canvas, 0,0);
+
+       // draw the img directly on 'direct'
+       ctx_direct.drawImage(img, 0,0);
+       console.log(direct.toDataURL("image/jpeg"));
+       video_ctx.chooseAlbum(direct.toDataURL("image/jpeg"));
+    };
   }
 
   public switch() {
