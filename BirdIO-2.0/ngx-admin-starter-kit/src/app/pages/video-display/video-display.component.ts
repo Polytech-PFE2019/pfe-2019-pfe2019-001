@@ -69,25 +69,26 @@ export class VideoDisplayComponent implements OnInit {
     var video_ctx = this;
     var direct = document.createElement('canvas');
     var stream = document.createElement('canvas');
-    var img = document.getElementById("image");
+    let img = document.getElementById("image") as HTMLImageElement;
     var ctx_direct = direct.getContext('2d');
     var ctx_stream = stream.getContext('2d');
-    img.onload = function() {
-       stream.width = direct.width = this.naturalWidth;
-       stream.height = direct.height = this.naturalHeight;
-       // onload should fire multiple times
-       // but it seems it's not at every frames
-       // so we'll disable t and use an interval instead
-       this.onload = null;
-       var ctx_off = stream.cloneNode().getContext('2d');
-       ctx_off.drawImage(img, 0,0);
-       // and draw it back to our visible one
-       ctx_stream.drawImage(ctx_off.canvas, 0,0);
+    img.onload = () => {
+      stream.width = direct.width = img.naturalWidth;
+      stream.height = direct.height = img.naturalHeight;
+      // onload should fire multiple times
+      // but it seems it's not at every frames
+      // so we'll disable t and use an interval instead
+      img.onload = null;
+      var temp = stream.cloneNode() as HTMLCanvasElement;
+      let ctx_off = temp.getContext('2d');
+      ctx_off.drawImage(img, 0, 0);
+      // and draw it back to our visible one
+      ctx_stream.drawImage(ctx_off.canvas, 0, 0);
 
-       // draw the img directly on 'direct'
-       ctx_direct.drawImage(img, 0,0);
-       console.log(direct.toDataURL("image/jpeg"));
-       video_ctx.chooseAlbum(direct.toDataURL("image/jpeg"));
+      // draw the img directly on 'direct'
+      ctx_direct.drawImage(img, 0, 0);
+      console.log(direct.toDataURL("image/jpeg"));
+      video_ctx.chooseAlbum(direct.toDataURL("image/jpeg"));
     };
   }
 
