@@ -1,7 +1,6 @@
-from socketIO_client import SocketIO
-import base64
 import sys
 import os
+import cv2
 
 if len(sys.argv) < 3:
     print("Usage: python3 <path> <filename> <images_count>")
@@ -12,27 +11,6 @@ file_name = sys.argv[2]
 images_count = int(sys.argv[3])
 image_cpt = 0
 
-
-def on_connect():
-    print('connect')
-
-
-def on_disconnect():
-    print('disconnect')
-
-
-def on_img_response(data):
-    global image_cpt
-    print('img')
-    imgdata = base64.b64decode(data)
-    filename = path + '/' + file_name + str(image_cpt).zfill(5) + '.jpg'
-    with open(filename, 'wb') as f:
-        f.write(imgdata)
-    image_cpt = image_cpt + 1
-    if image_cpt >= images_count:
-        sys.exit()
-
-
 try:
     # Create target Directory
     os.mkdir(path)
@@ -40,11 +18,14 @@ try:
 except FileExistsError:
     print("Directory already exists")
 
-socketIO = SocketIO(os.environ.get('CAMSERVER'), os.environ.get('CAMPORT'))
-socketIO.on('connect', on_connect)
-socketIO.on('disconnect', on_disconnect)
+cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
+while image_cpt < images_count:
+    ret, frame = cap.read()
 
-# Listen
-socketIO.on('image', on_img_response)
+    if frame is None:
+        print('Impossible to get image')
+        sys.exit()
 
-socketIO.wait()
+    filename = path + '/' + file_name + str(image_cpt).zfill(5) + '.jpg'
+    cv2.imwrite(filename, frame)
+    image_cpt = image_cpt + 1

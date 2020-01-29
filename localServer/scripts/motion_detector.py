@@ -30,8 +30,7 @@ i = 0
 firstFrame = None
 text = "Unoccupied"
 oldFrame = None
-
-cap = cv2.VideoCapture('http://192.168.20.100:8081/')
+cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
 
 while True:
     #print("img")
@@ -42,7 +41,7 @@ while True:
     if frame is None:
         print('Impossible to get image')
         time.sleep(5)
-        cap = cv2.VideoCapture('http://192.168.20.100:8081/')
+        cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
         continue
         #sys.exit()
     # resize the frame, convert it to grayscale, and blur it

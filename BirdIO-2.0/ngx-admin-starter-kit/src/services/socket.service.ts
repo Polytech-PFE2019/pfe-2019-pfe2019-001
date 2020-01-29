@@ -35,6 +35,7 @@ export class SocketService {
         });
 
         this.socket.on('presence', (pres) => {
+          console.log(pres);
             this.pres = pres;
         });
 

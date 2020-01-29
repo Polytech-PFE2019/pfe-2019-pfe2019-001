@@ -118,7 +118,7 @@ io.on('connection', function (socket) {
 });
 
 //lancement automatique de la détection de mouvement
-functions.motionDetection();
+//functions.motionDetection();
 
 const job = new CronJob('00 00 11 * * *', function () {
   videoCpt = 5;
@@ -136,7 +136,7 @@ app.post('/bird', function (req, res) {
   if (req.body.presence == true) {
     io.emit('presence', true);
     functions.count();
-    video();
+    //video();
     intervalId = setInterval(functions.count, 300000);
   }
   else {
