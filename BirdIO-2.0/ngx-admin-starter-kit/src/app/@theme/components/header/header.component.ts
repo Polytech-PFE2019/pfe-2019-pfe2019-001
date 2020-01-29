@@ -1,9 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, EventEmitter } from '@angular/core';
 import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
 
 import { UserData } from '../../../@core/data/users';
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+
+import { SocketService } from '../../../../services/socket.service';
 
 @Component({
   selector: 'ngx-header',
@@ -15,6 +17,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
   userPictureOnly: boolean = false;
   user: any;
+  private birdPresence = ""
 
   themes = [
     {
@@ -43,7 +46,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private menuService: NbMenuService,
               private themeService: NbThemeService,
               private userService: UserData,
-              private breakpointService: NbMediaBreakpointsService) {
+              private breakpointService: NbMediaBreakpointsService,
+              private socketService: SocketService) {
   }
 
   ngOnInit() {
@@ -67,6 +71,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe(themeName => this.currentTheme = themeName);
+
+    this.socketService.pres.subscribe((pres) => {
+      if (pres) {
+        this.birdPresence = "Bird !";
+      } else {
+        this.birdPresence = "";
+      }
+
+    })
   }
 
   ngOnDestroy() {

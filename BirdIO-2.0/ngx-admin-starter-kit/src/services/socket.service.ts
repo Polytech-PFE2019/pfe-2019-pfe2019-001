@@ -1,5 +1,5 @@
 import * as io from "socket.io-client";
-import { Injectable } from "@angular/core";
+import { Injectable, EventEmitter } from "@angular/core";
 import { Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { localServer } from '../environments/environment';
@@ -11,7 +11,7 @@ export class SocketService {
     public water = new Subject<boolean>();
     public food = new Subject<boolean>();
     public errorCred = new Subject<boolean>();
-    public pres = new Subject<boolean>();
+    public pres : EventEmitter<any> = new EventEmitter();
     public error = new Subject<boolean>();
 
 
@@ -35,8 +35,8 @@ export class SocketService {
         });
 
         this.socket.on('presence', (pres) => {
-          console.log(pres);
-            this.pres = pres;
+            console.log(pres);
+            this.pres.emit(pres);
         });
 
         this.socket.on("connect_error", (exeception) => {
