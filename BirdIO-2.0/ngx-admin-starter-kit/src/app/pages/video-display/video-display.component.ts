@@ -54,6 +54,7 @@ export class VideoDisplayComponent implements OnInit {
 
   fullScreen() {
     console.log("full screen");
+    this.image = document.getElementById('image');
     if (this.image.requestFullscreen) {
       this.image.requestFullscreen();
     } else if (this.image.mozRequestFullScreen) { /* Firefox */
