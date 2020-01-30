@@ -30,7 +30,10 @@ export class AlbumComponent implements OnInit {
   }
 
   displayImage(base64) {
-    return 'data:image/jpg;base64,' + ((this.sanitizer.bypassSecurityTrustResourceUrl(base64)) as any).changingThisBreaksApplicationSecurity;
+    if (base64.startsWith('data:image/jpeg;base64,')) {
+      return ((this.sanitizer.bypassSecurityTrustResourceUrl(base64)) as any).changingThisBreaksApplicationSecurity;
+    }
+    return 'data:image/jpeg;base64,' + ((this.sanitizer.bypassSecurityTrustResourceUrl(base64)) as any).changingThisBreaksApplicationSecurity;
   }
 
   openAlbum(albumImages, albumName) {
