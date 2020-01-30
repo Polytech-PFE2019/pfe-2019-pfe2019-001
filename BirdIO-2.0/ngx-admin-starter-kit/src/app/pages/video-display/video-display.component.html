@@ -9,8 +9,13 @@
       <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
     </div>
   </div>
-  <div class="pictures">
-    <app-bird-comparator *ngFor="let bird of birdsNearbyFull" name="{{bird.name}}" url="{{bird.url}}"
-      (click)="matchCapture(bird.name)" style="cursor:pointer"></app-bird-comparator>
+  <div class="birdcontent">
+    <div class="birdcontent">
+      <input #searchValue type="text" nbInput class="searchbar" (input)="filter(searchValue.value)" status="info" placeholder="Search...">
+    </div>
+    <div class="pictures">
+      <app-bird-comparator *ngFor="let bird of display" name="{{bird.name}}" url="{{bird.url}}"
+        (click)="matchCapture(bird.name)" style="cursor:pointer"></app-bird-comparator>
+    </div>
   </div>
 </div>

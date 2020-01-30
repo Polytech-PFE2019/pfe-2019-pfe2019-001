@@ -3,6 +3,11 @@
   flex-direction: row;
 }
 
+.searchbar {
+  width: 100%;
+  margin: 5px;
+}
+
 .pictures {
   max-height: 80vh;
   overflow: auto;
@@ -11,6 +16,13 @@
   flex-wrap: wrap;
   justify-content: space-around;
   align-items: center;
+}
+
+.birdcontent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px;
 }
 
 .singlebird {
