@@ -13,3 +13,13 @@
   justify-content: space-around;
   align-items: center;
 }
+
+.title {
+   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.control-status-example {
+  color: nb-theme(color-basic-100);
+}

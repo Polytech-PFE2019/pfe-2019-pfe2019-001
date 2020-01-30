@@ -9,7 +9,9 @@ import { firebaseService } from '../../../services/firebase.service';
 })
 export class AlbumComponent implements OnInit {
   private albumdetail = false;
+  private loading = true;
   private pictures = null;
+  private albumName = null;
   private placeholder;
   public thumbnails;
   constructor(private sanitizer: DomSanitizer, private firebase: firebaseService) {
@@ -19,6 +21,7 @@ export class AlbumComponent implements OnInit {
   ngOnInit() {
     this.firebase.getAlbums().then((data) => {
       this.thumbnails = data;
+      this.loading = false;
       console.log(this.thumbnails.length)
     })
   }
@@ -31,15 +34,17 @@ export class AlbumComponent implements OnInit {
   }
 
   openAlbum(album) {
-    console.log(album)
     this.pictures = album.photos;
-    console.log(this.pictures)
+    this.albumName = album.name;
+    console.log(this.albumName);
+
     this.albumdetail = true;
   }
 
   goBack() {
     this.pictures = null;
     this.albumdetail = false;
+    this.albumName = null;
   }
 
 }

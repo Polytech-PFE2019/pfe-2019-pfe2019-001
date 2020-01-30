@@ -1,5 +1,15 @@
-<div class="pictures" *ngIf="!albumdetail">
+<nb-card [nbSpinner]="loading" nbSpinnerSize="giant" nbSpinnerStatus="primary" *ngIf="loading">
+  <nb-card-header class="control-status-example">
+    Loading Albums
+  </nb-card-header>
+</nb-card>
 
+
+
+
+
+
+<div class="pictures" *ngIf="!albumdetail">
   <nb-card *ngFor="let album of thumbnails">
     <img [src]="displayImage(album.photos[0].value)" width="200px" height="150px" (click)="openAlbum(album)"
       class="thumbnail">
@@ -9,14 +19,21 @@
   </nb-card>
 </div>
 
-<nb-actions size="large">
+<div *ngIf="albumdetail">
 
-  <nb-action class="control-item" icon="arrow-back-outline" *ngIf="albumdetail" (click)="goBack()"></nb-action>
-</nb-actions>
+  <div class='title'>
+    <nb-actions size="large">
+      <nb-action class="control-item" icon="arrow-back-outline" *ngIf="albumdetail" (click)="goBack()"></nb-action>
+    </nb-actions>
+    <h1>{{albumName}}</h1>
+
+  </div>
 
 
-<div class="pictures" *ngIf="albumdetail">
-  <nb-card *ngFor="let picture of pictures">
-    <img [src]="displayImage(picture.value)" width="200px" height="150px" class="thumbnail">
-  </nb-card>
+  <div class="pictures">
+    <nb-card *ngFor="let picture of pictures">
+      <img [src]="displayImage(picture.value)" width="200px" height="150px" class="thumbnail">
+    </nb-card>
+  </div>
+
 </div>
