@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule } from '@nebular/theme';
+import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
@@ -29,7 +29,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatSnackBarModule,
     MatSlideToggleModule,
     NbActionsModule,
-    NbInputModule
+    NbInputModule,
+    NbLayoutModule,
+    NbSpinnerModule
 
   ],
   declarations: [
