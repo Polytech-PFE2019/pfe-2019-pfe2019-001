@@ -1,11 +1,11 @@
 <div class="body">
   <div class="video">
-    <img id="image" (click)="fullScreen()" [src]="picamServer" class="rotateimg180" *ngIf="flipped">
-    <img id="image" crossorigin="" (click)="fullScreen()" [src]="picamServer" *ngIf="!flipped">
+    <img id="image" (click)="fullScreen()" [src]="videoSource" class="rotateimg180" *ngIf="flipped">
+    <img id="image" crossorigin="" (click)="fullScreen()" [src]="videoSource" *ngIf="!flipped" (error)="imgError()">
 
     <div class="buttons">
       <mat-slide-toggle [(checked)]="flipped">Slide me!</mat-slide-toggle>
-      <button id="capture" mat-raised-button color="accent" (click)="capture()">Capture</button>
+      <button id="capture" mat-raised-button color="accent" (click)="matchCapture()">Capture</button>
       <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
     </div>
   </div>

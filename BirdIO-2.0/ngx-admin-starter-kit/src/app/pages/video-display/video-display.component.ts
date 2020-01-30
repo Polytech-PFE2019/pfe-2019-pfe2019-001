@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { firebaseService } from '../../../services/firebase.service'
 import { BirdsService } from '../../../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { picamServer, usbcamServer } from '../../../environments/environment';
 import { saveAs } from 'file-saver';
 
@@ -24,11 +23,11 @@ export class VideoDisplayComponent implements OnInit {
   public birdsNearbyFull = [];
   private image;
   private camera_id = 0;
-  private picamServer = picamServer;
-  private usbcamServer = usbcamServer;
+  private videoSource = picamServer;
   private flipped = false;
+  private error = false;
 
-  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, public dialog: MatDialog, private _birdsService: BirdsService) {
+  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, private _birdsService: BirdsService) {
 
   }
 
@@ -52,6 +51,18 @@ export class VideoDisplayComponent implements OnInit {
 
   }
 
+  imgError() {
+    console.log("Can't find video source.");
+    if (this.error) {
+      return;
+    }
+    if (this.videoSource == picamServer) {
+      this.videoSource = usbcamServer;
+    } else {
+      this.videoSource = picamServer;
+    }
+  }
+
   fullScreen() {
     console.log("full screen");
     this.image = document.getElementById('image');
@@ -66,7 +77,15 @@ export class VideoDisplayComponent implements OnInit {
     }
   }
 
-  public capture() {
+  public switch() {
+    this.videoSource = this.videoSource == picamServer ? usbcamServer : picamServer;
+    console.log("Switchii");
+  }
+
+  matchCapture(name) {
+    if (name == undefined)  {
+      name = "new";
+    }
     var video_ctx = this;
     var direct = document.createElement('canvas');
     var stream = document.createElement('canvas');
@@ -89,89 +108,8 @@ export class VideoDisplayComponent implements OnInit {
       // draw the img directly on 'direct'
       ctx_direct.drawImage(img, 0, 0);
       console.log(direct.toDataURL("image/jpeg"));
-      video_ctx.chooseAlbum(direct.toDataURL("image/jpeg"));
+      var image = { value: direct.toDataURL("image/jpeg") }
+      video_ctx.firebase.push("picture/" + name, image);
     };
   }
-
-  public switch() {
-    this.camera_id = (this.camera_id + 1) % 2;
-    console.log("Switchii");
-  }
-
-  chooseAlbum(image): void {
-    const dialogRef = this.dialog.open(DialogAlbum, {
-      //width: '300px',
-      data: { image: image }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result == true) {
-        this._snackBar.open("capture effectuée", undefined, {
-          duration: 2000,
-        });
-      }
-    });
-  }
-
-
-  // matchCapture(name) {
-  //   this.piSocket.emit('picture', 100, (data) => {
-  //     var image = { value: data }
-  //     this.firebase.push("picture/" + name, image);
-  //     this._snackBar.open("capture effectuée", undefined, {
-  //       duration: 2000,
-  //     });
-  //   });
-  // }
-}
-
-@Component({
-  selector: 'dialog-album',
-  templateUrl: 'dialog-album.html',
-})
-export class DialogAlbum {
-
-  public albumName = "picture";
-  public albums = undefined;
-  public image;
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogAlbum>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private firebase: firebaseService) {
-    this.image = `data:image/jpeg;base64,${data.image}`
-    this.loadAlbums();
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close(false);
-  }
-
-  loadAlbums() {
-    this.firebase.getAlbums().then((albums) => {
-      this.albums = albums;
-    });
-  }
-
-  download() {
-    saveAs(this.b64toBlob(this.image), "capture.jpg");
-  }
-
-  b64toBlob(dataURI) {
-    var byteString = atob(dataURI.split(',')[1]);
-    var ab = new ArrayBuffer(byteString.length);
-    var ia = new Uint8Array(ab);
-
-    for (var i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: 'image/jpeg' });
-  }
-
-  uploadImage() {
-    var image = { value: this.data.image }
-    this.firebase.push("picture/" + this.albumName, image);
-    this.dialogRef.close(true);
-  }
-
 }
