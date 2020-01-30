@@ -8,7 +8,7 @@ import { localServer } from '../environments/environment';
 @Injectable({ providedIn: "root" })
 export class SocketService {
     private socket;
-    public water = new Subject<boolean>();
+    public water : EventEmitter<any> = new EventEmitter();
     public food = new Subject<boolean>();
     public errorCred = new Subject<boolean>();
     public pres : EventEmitter<any> = new EventEmitter();
@@ -20,8 +20,7 @@ export class SocketService {
         this.init();
 
         this.socket.on("water", (data) => {
-            console.log("ok")
-            this.water.next(data)
+            this.water.emit(data);
         });
 
         this.socket.on("food", (data) => {

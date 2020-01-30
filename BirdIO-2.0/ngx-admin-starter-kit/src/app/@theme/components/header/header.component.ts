@@ -17,7 +17,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
   userPictureOnly: boolean = false;
   user: any;
-  private birdPresence = ""
+  private birdPresence = "";
+  private waterPresence = "";
 
   themes = [
     {
@@ -73,12 +74,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(themeName => this.currentTheme = themeName);
 
     this.socketService.pres.subscribe((pres) => {
-      if (pres) {
-        this.birdPresence = "Bird !";
-      } else {
-        this.birdPresence = "";
-      }
+      this.birdPresence = pres ? "Bird !" : "";
+    });
 
+    this.socketService.water.subscribe((water) => {
+      this.waterPresence = water ? "" : "Empty !";
     })
   }
 
