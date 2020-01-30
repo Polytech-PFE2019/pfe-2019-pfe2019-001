@@ -129,15 +129,15 @@ job.start();
 
 var intervalId;
 app.post('/bird', function (req, res) {
-  console.log(req.body.presence)
+  console.log('Presence: ' + req.body.presence)
   var file = require('./ressources/ressources.json');
   file.presence = req.body.presence;
   fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
   if (req.body.presence == true) {
     io.emit('presence', true);
-    functions.count();
+    //functions.count();
     //video();
-    intervalId = setInterval(functions.count, 300000);
+    //intervalId = setInterval(functions.count, 300000);
   }
   else {
     io.emit('presence', false);
