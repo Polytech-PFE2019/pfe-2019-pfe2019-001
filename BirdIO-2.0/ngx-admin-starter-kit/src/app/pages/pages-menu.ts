@@ -11,24 +11,20 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Streaming',
     icon: 'monitor-outline',
     link: '/pages/stream',
-    home: false,
   },
   {
     title: 'Album',
     icon: 'image-outline',
     link: '/pages/album',
-    home: false,
   },
   {
     title: 'Statistics',
     icon: 'bar-chart-2-outline',
     link: '/pages/statistics',
-    home: false,
   }, {
     title: 'Monitoring',
     icon: 'activity-outline',
     link: '/pages/ressources',
-    home: false,
   },
   // {
   //   title: 'FEATURES',
