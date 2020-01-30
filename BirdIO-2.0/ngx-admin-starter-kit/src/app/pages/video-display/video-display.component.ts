@@ -21,6 +21,7 @@ export class VideoDisplayComponent implements OnInit {
 
   private birdsNearby = undefined;
   public birdsNearbyFull = [];
+  public display = [];
   private image;
   private camera_id = 0;
   private videoSource = picamServer;
@@ -41,6 +42,7 @@ export class VideoDisplayComponent implements OnInit {
           var hits = Object.keys(result)[1]
           if (result[hits].length > 0) {
             this.birdsNearbyFull.push({ name: bird.comName, url: result[hits][0].largeImageURL });
+            this.display.push({ name: bird.comName, url: result[hits][0].largeImageURL });
           }
         });
       });
@@ -49,6 +51,20 @@ export class VideoDisplayComponent implements OnInit {
 
   ngOnDestroy() {
 
+  }
+
+  filter(value) {
+    this.display = [];
+    if (value == undefined || value == "") {
+      this.display = this.birdsNearbyFull;
+      return;
+    }
+    for (var bird in this.birdsNearbyFull) {
+      console.log(bird);
+      if (this.birdsNearbyFull[bird].name.includes(value)) {
+        this.display.push(this.birdsNearbyFull[bird]);
+      }
+    }
   }
 
   imgError() {
