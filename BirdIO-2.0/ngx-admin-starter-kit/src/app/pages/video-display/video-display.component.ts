@@ -61,7 +61,7 @@ export class VideoDisplayComponent implements OnInit {
     }
     for (var bird in this.birdsNearbyFull) {
       console.log(bird);
-      if (this.birdsNearbyFull[bird].name.includes(value)) {
+      if (this.birdsNearbyFull[bird].name.toLowerCase().includes(value.toLowerCase())) {
         this.display.push(this.birdsNearbyFull[bird]);
       }
     }

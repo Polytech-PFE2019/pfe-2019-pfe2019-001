@@ -1,10 +1,22 @@
-<h1>Albums :</h1>
-<div class="pictures">
+<div class="pictures" *ngIf="!albumdetail">
 
-    <nb-card *ngFor="let album of thumbnails">
-        <img [src]="displayImage(album.photos[0].value)" width="200px" height="150px" (click)="openAlbum(album.photos, album.name)" class="thumbnail">
-        <nb-card-body class="example-card">
-          <p>{{album.name}}</p>
-        </nb-card-body>
-    </nb-card>
+  <nb-card *ngFor="let album of thumbnails">
+    <img [src]="displayImage(album.photos[0].value)" width="200px" height="150px" (click)="openAlbum(album)"
+      class="thumbnail">
+    <nb-card-body class="example-card">
+      <p>{{album.name}}</p>
+    </nb-card-body>
+  </nb-card>
+</div>
+
+<nb-actions size="large">
+
+  <nb-action class="control-item" icon="arrow-back-outline" *ngIf="albumdetail" (click)="goBack()"></nb-action>
+</nb-actions>
+
+
+<div class="pictures" *ngIf="albumdetail">
+  <nb-card *ngFor="let picture of pictures">
+    <img [src]="displayImage(picture.value)" width="200px" height="150px" class="thumbnail">
+  </nb-card>
 </div>
