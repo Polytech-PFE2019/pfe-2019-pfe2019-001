@@ -21,11 +21,7 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Statistics',
     icon: 'bar-chart-2-outline',
     link: '/pages/statistics',
-  }, {
-    title: 'Monitoring',
-    icon: 'activity-outline',
-    link: '/pages/ressources',
-  },
+  }, 
   // {
   //   title: 'FEATURES',
   //   group: true,
