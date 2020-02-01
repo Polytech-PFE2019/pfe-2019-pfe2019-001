@@ -4,14 +4,15 @@
     <img id="image" crossorigin="" (click)="fullScreen()" [src]="videoSource" *ngIf="!flipped" (error)="imgError()">
 
     <div class="buttons">
-      <mat-slide-toggle [(checked)]="flipped">Slide me!</mat-slide-toggle>
+      <nb-checkbox (checkedChange)="flipped">Flip</nb-checkbox>
       <button id="capture" mat-raised-button color="accent" (click)="matchCapture()">Capture</button>
       <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
     </div>
   </div>
   <div class="birdcontent">
     <div class="birdcontent">
-      <input #searchValue type="text" nbInput class="searchbar" (input)="filter(searchValue.value)" status="info" placeholder="Search...">
+      <input #searchValue type="text" nbInput class="searchbar" (input)="filter(searchValue.value)" status="info"
+        placeholder="Search...">
     </div>
     <div class="pictures">
       <app-bird-comparator *ngFor="let bird of display" name="{{bird.name}}" url="{{bird.url}}"
