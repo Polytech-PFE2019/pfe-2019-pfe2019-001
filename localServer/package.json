@@ -17,6 +17,7 @@
     "express": "^4.17.1",
     "firebase": "^7.5.0",
     "fluent-ffmpeg": "^2.1.2",
+    "mongoose": "^5.8.11",
     "mqtt": "^3.0.0",
     "nodemailer": "^6.3.1",
     "rimraf": "^3.0.0",

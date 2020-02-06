@@ -11,11 +11,33 @@ var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 var CronJob = require('cron').CronJob;
 var foodControl = require('./controllers/foodControl');
+const database = require('./utils/database')
+
 
 var mqtt = require('mqtt');
 
 var client = mqtt.connect('mqtt://' + process.env.CAMSERVER);
 const waterController = require("./controllers/waterControl");
+
+function initDatabaseMiddleWare() {
+  if (process.platform === "win32") {
+    require("readline").createInterface({
+      input: process.stdin,
+      output: process.stdout
+    }).on("SIGINT", () => {
+      console.log('SIGINT: Closing MongoDB connection');
+      database.close();
+    });
+  }
+  process.on('SIGINT', () => {
+    console.log('SIGINT: Closing MongoDB connection');
+    database.close();
+  });
+
+  database.open(() => { });
+}
+
+initDatabaseMiddleWare();
 
 
 client.on('connect', () => {
@@ -40,6 +62,8 @@ var rimraf = require("rimraf");
 var app2 = require('./webServer')
 
 const foodRoutes = require("./routes/foodControl");
+const imageRoutes = require("./routes/image");
+
 
 global.mail = "";
 global.name = "";
@@ -50,6 +74,8 @@ app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/food", foodRoutes);
+app.use("/img", imageRoutes);
+
 
 var server = app.listen(process.env.PORT, function () {
   console.log("Connected on port " + process.env.PORT);
