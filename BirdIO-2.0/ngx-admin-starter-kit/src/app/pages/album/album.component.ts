@@ -1,6 +1,9 @@
 import { Component, OnInit, Inject, Sanitizer } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { firebaseService } from '../../../services/firebase.service';
+import * as JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+
 
 @Component({
   selector: 'app-album',
@@ -33,18 +36,68 @@ export class AlbumComponent implements OnInit {
     return 'data:image/jpeg;base64,' + ((this.sanitizer.bypassSecurityTrustResourceUrl(base64)) as any).changingThisBreaksApplicationSecurity;
   }
 
-  openAlbum(album) {
-    this.pictures = album.photos;
-    this.albumName = album.name;
-    console.log(this.albumName);
-
-    this.albumdetail = true;
-  }
-
   goBack() {
+    for (let e of this.pictures) {
+      e.checked = false;
+    }
     this.pictures = null;
     this.albumdetail = false;
     this.albumName = null;
   }
+
+  openAlbum(album) {
+    this.pictures = album.photos;
+    this.albumName = album.name;
+    this.albumdetail = true;
+    for (let e of this.pictures) {
+      e.checked = false;
+    }
+  }
+
+  check(picture) {
+    console.log("checked =" + picture.checked);
+
+    if (picture.checked == true) {
+      picture.checked = false;
+      console.log("uncheck");
+
+    } else {
+      picture.checked = true;
+      console.log("check");
+
+    }
+    console.log(this.pictures)
+  }
+
+  download() {
+    console.log("ok");
+
+    let zip = new JSZip();
+    let cpt = 0;
+    console.log(this.pictures)
+    for (let e of this.pictures) {
+      if (e.checked == true) {
+        zip.file(cpt + '.jpeg', e.value, { base64: true })
+        cpt++
+      };
+    }
+    zip.generateAsync({ type: "blob" })
+      .then(function (content) {
+        saveAs(content, "example.zip");
+      });
+  }
+
+  selectAll() {
+    for (let e of this.pictures) {
+      e.checked = true;
+    }
+  }
+
+  unSelectAll() {
+    for (let e of this.pictures) {
+      e.checked = false;
+    }
+  }
+
 
 }
