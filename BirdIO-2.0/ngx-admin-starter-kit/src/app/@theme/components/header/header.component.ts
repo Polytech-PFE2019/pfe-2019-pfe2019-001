@@ -74,11 +74,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(themeName => this.currentTheme = themeName);
 
     this.socketService.pres.subscribe((pres) => {
-      this.birdPresence = pres ? "Bird !" : "";
+      this.birdPresence = pres ? "!" : "";
     });
 
     this.socketService.water.subscribe((water) => {
-      this.waterPresence = water ? "" : "Empty !";
+      this.waterPresence = water ? "" : "!";
     })
   }
 
