@@ -1,9 +1,12 @@
 const mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
-const ImageSchema = new Schema({
+const albumSchema = new Schema({
     name: { type: String },
-    path: { type: String }
+    images: [{
+        name: { type: String },
+        path: { type: String }
+    }],
 });
 
-module.exports = mongoose.model('Image', ImageSchema);
+module.exports = mongoose.model('Album', albumSchema);
