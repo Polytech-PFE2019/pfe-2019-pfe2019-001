@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostBinding } from '@angular/core';
 import * as io from "socket.io-client";
 import { HttpClient } from '@angular/common/http';
 import { firebaseService } from '../../../services/firebase.service'
@@ -6,6 +6,7 @@ import { BirdsService } from '../../../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { picamServer, usbcamServer } from '../../../environments/environment';
 import { saveAs } from 'file-saver';
+import { NbToastrService } from '@nebular/theme';
 
 export interface DialogData {
   image: string;
@@ -28,7 +29,10 @@ export class VideoDisplayComponent implements OnInit {
   private flipped = false;
   private error = false;
 
-  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, private _birdsService: BirdsService) {
+  @HostBinding('class')
+  classes = 'example-iteems-row';
+
+  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, private _birdsService: BirdsService, private toastrService: NbToastrService) {
 
   }
 
@@ -126,6 +130,9 @@ export class VideoDisplayComponent implements OnInit {
       console.log(direct.toDataURL("image/jpeg"));
       var image = { value: direct.toDataURL("image/jpeg") }
       video_ctx.firebase.push("picture/" + name, image);
+      var position = 'top-right' as any;
+      var status = 'success' as any;
+      this.toastrService.show(status || 'Success', `Photo ajoutée à l'album ${name}`, {position, status});
     };
   }
 }
