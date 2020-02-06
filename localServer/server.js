@@ -10,15 +10,35 @@ var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 var CronJob = require('cron').CronJob;
-var foodControl = require('./controllers/foodControl')
+var foodControl = require('./controllers/foodControl');
 
+var mqtt = require('mqtt');
+
+var client = mqtt.connect('mqtt://' + process.env.CAMSERVER);
+const waterController = require("./controllers/waterControl");
+
+
+client.on('connect', () => {
+  client.subscribe('sensor/water', (err) => {
+    if (err) {
+      console.log("Couldn't connect to the broker.");
+    } else {
+      console.log("Broker connection successful");
+    }
+  })
+});
+
+client.on('message', (topic, message) => {
+  if (topic == "sensor/water") {
+    console.log(message.toString());
+    waterController.setValue(JSON.parse(message.toString()));
+  }
+});
 
 const { spawn } = require('child_process');
 var rimraf = require("rimraf");
 var app2 = require('./webServer')
 
-
-const waterRoutes = require("./routes/waterControl");
 const foodRoutes = require("./routes/foodControl");
 
 global.mail = "";
@@ -29,7 +49,6 @@ var videoCpt = 5;
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use("/water", waterRoutes);
 app.use("/food", foodRoutes);
 
 var server = app.listen(process.env.PORT, function () {
