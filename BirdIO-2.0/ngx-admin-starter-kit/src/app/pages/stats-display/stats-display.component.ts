@@ -11,7 +11,6 @@ import { DbService } from '../../../services/db.service';
 export class StatsDisplayComponent implements OnInit {
 
   database;
-  return = false;
 
   constructor(private firebaseService: firebaseService, private dbService: DbService) {
     this.database = firebaseService.getDatabase();
@@ -20,7 +19,7 @@ export class StatsDisplayComponent implements OnInit {
   ngOnInit() {
     this.getWaterStats();
     this.getFoodStats();
-    this.getCountStats();
+    this.displayDailyBirdsStats(undefined);
   }
 
   getWaterStats() {
@@ -58,12 +57,56 @@ export class StatsDisplayComponent implements OnInit {
     });
   }
 
-  getCountStats() {
-    this.return = false;
+  displayYearlyBirdsStats() {
     var dataPoints = [];
     var rawData = this.dbService.getBirdStats();
     var newThis = this;
-    const newClickGraphCount = this.clickGraphCount.bind(this);
+    const newClickGraphCount = this.displayMonthlyBirdsStats.bind(this);
+    rawData.forEach(function (childSnap) {
+      if (dataPoints.length == 0) {
+        var date = convertToMonthFormat(new Date(childSnap.date));
+        var obj = { y: childSnap.state ? 1 : 0, label: date};
+        dataPoints.push(obj);
+        console.log(Object.keys(dataPoints));
+      } else {
+        for (var i = 0; i < dataPoints.length; i++) {
+          console.log(dataPoints.length)
+          var check = false;
+          if (dataPoints[i].label == convertToMonthFormat(new Date(childSnap.date))) {
+            dataPoints[i].y += childSnap.state ? 1 : 0;
+            check = true;
+            break;
+          }
+        }
+        if (!check) {
+          var obj = { y: childSnap.state ? 1 : 0, label: convertToMonthFormat(new Date(childSnap.date)) };
+          dataPoints.push(obj);
+          check = false;
+        }
+      }
+    });
+    let chart = new CanvasJS.Chart("chartContainer", {
+      animationEnabled: true,
+      exportEnabled: true,
+      title: {
+        text: "Nombre de passages d'oiseaux par mois"
+      },
+      data: [{
+        type: "column",
+        indexLabel: "{y} passage(s)",
+        click: newClickGraphCount,
+        dataPoints: dataPoints
+      }]
+
+    });
+    chart.render();
+  }
+
+  displayMonthlyBirdsStats(e) {
+    var dataPoints = [];
+    var rawData = this.dbService.getBirdStats();
+    var newThis = this;
+    const newClickGraphCount = this.displayDailyBirdsStats.bind(this);
     rawData.forEach(function (childSnap) {
       if (dataPoints.length == 0) {
         var obj = { y: childSnap.state ? 1 : 0, label: convertToDateFormat(new Date(childSnap.date)) };
@@ -103,8 +146,8 @@ export class StatsDisplayComponent implements OnInit {
     chart.render();
   }
 
-  clickGraphCount(e) {
-    this.return = true;
+  displayDailyBirdsStats(e) {
+    if (e == undefined) e = {dataPoint: {label: convertToDateFormat(new Date(Date.now()))}};
     var dataPoints = [];
     var rawData = this.dbService.getBirdStats();
     rawData.forEach(function (childSnap) {
@@ -182,4 +225,14 @@ function convertToDateFormat(date) {
     mm = '0' + mm;
   }
   return date = dd + '/' + mm + '/' + yyyy;
+}
+
+function convertToMonthFormat(date) {
+  var mm = date.getMonth() + 1;
+
+  var yyyy = date.getFullYear();
+  if (mm < 10) {
+    mm = '0' + mm;
+  }
+  return date = mm + '/' + yyyy;
 }
