@@ -1,17 +1,18 @@
 import { Injectable } from "@angular/core";
-import * as firebase from 'firebase';
 import { ChildActivationEnd } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { localServer } from '../environments/environment';
 
 
 
 @Injectable({ providedIn: "root" })
-export class dbService {
-    constructor() {
+export class DbService {
+    constructor(private http: HttpClient) {
 
     }
 
     getAlbums() {
-
+        return this.http.get(localServer + "/image/").toPromise();
     }
 
     getBirdStats() {
@@ -35,4 +36,11 @@ export class dbService {
 
     }
 
+    getImgInAlbums(name) {
+        return this.http.get(localServer + "/image/" + name).toPromise();
+    }
+
+    addImage(name, image) {
+        return this.http.post(localServer + "/image/add", { name: name, b64: image }).toPromise();
+    }
 }

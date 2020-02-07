@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as CanvasJS from './canvasjs.min';
 import { firebaseService } from '../../../services/firebase.service';
-import { dbService } from '../../../services/db.service';
+import { DbService } from '../../../services/db.service';
 
 @Component({
   selector: 'app-stats-display',
@@ -13,7 +13,7 @@ export class StatsDisplayComponent implements OnInit {
   database;
   return = false;
 
-  constructor(private firebaseService: firebaseService, private dbService: dbService) {
+  constructor(private firebaseService: firebaseService, private dbService: DbService) {
     this.database = firebaseService.getDatabase();
   }
 
