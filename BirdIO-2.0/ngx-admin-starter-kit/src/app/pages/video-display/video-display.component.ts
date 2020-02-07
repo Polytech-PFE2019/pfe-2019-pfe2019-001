@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, HostBinding } from '@angular/core';
 import * as io from "socket.io-client";
 import { HttpClient } from '@angular/common/http';
-import { firebaseService } from '../../../services/firebase.service'
+import { DbService } from '../../../services/db.service'
 import { BirdsService } from '../../../services/birds.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { picamServer, usbcamServer } from '../../../environments/environment';
@@ -32,7 +32,7 @@ export class VideoDisplayComponent implements OnInit {
   @HostBinding('class')
   classes = 'example-iteems-row';
 
-  constructor(private http: HttpClient, private firebase: firebaseService, private _snackBar: MatSnackBar, private _birdsService: BirdsService, private toastrService: NbToastrService) {
+  constructor(private http: HttpClient, private db: DbService, private _snackBar: MatSnackBar, private _birdsService: BirdsService, private toastrService: NbToastrService) {
 
   }
 
@@ -103,7 +103,7 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   matchCapture(name) {
-    if (name == undefined)  {
+    if (name == undefined) {
       name = "new";
     }
     var video_ctx = this;
@@ -129,10 +129,10 @@ export class VideoDisplayComponent implements OnInit {
       ctx_direct.drawImage(img, 0, 0);
       console.log(direct.toDataURL("image/jpeg"));
       var image = { value: direct.toDataURL("image/jpeg") }
-      video_ctx.firebase.push("picture/" + name, image);
+      video_ctx.db.addImage(name, image);
       var position = 'top-right' as any;
       var status = 'success' as any;
-      this.toastrService.show(status || 'Success', `Photo ajoutée à l'album ${name}`, {position, status});
+      this.toastrService.show(status || 'Success', `Photo ajoutée à l'album ${name}`, { position, status });
     };
   }
 }

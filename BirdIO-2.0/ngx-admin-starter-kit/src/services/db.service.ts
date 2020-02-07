@@ -19,7 +19,7 @@ export class DbService {
         return this.http.get(localServer + "/image/" + name).toPromise();
     }
 
-    addImage() {
-        return this.http.get(localServer + "/image/add").toPromise();
+    addImage(name, image) {
+        return this.http.post(localServer + "/image/add", { name: name, b64: image }).toPromise();
     }
 }
