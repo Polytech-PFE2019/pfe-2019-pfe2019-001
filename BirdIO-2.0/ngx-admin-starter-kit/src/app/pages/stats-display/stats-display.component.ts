@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as CanvasJS from './canvasjs.min';
 import { firebaseService } from '../../../services/firebase.service';
+import { dbService } from '../../../services/db.service';
 
 @Component({
   selector: 'app-stats-display',
@@ -12,7 +13,7 @@ export class StatsDisplayComponent implements OnInit {
   database;
   return = false;
 
-  constructor(private firebaseService: firebaseService) {
+  constructor(private firebaseService: firebaseService, private dbService: dbService) {
     this.database = firebaseService.getDatabase();
   }
 
@@ -60,78 +61,74 @@ export class StatsDisplayComponent implements OnInit {
   getCountStats() {
     this.return = false;
     var dataPoints = [];
-    var countRef = this.database.ref('/stats/birds_count');
+    var rawData = this.dbService.getBirdStats();
     var newThis = this;
     const newClickGraphCount = this.clickGraphCount.bind(this);
-    countRef.once('value', function (snap) {
-      snap.forEach(function (childSnap) {
-        if (dataPoints.length == 0) {
-          var obj = { y: childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val())) };
-          dataPoints.push(obj);
-          console.log(Object.keys(dataPoints));
-        } else {
-          for (var i = 0; i < dataPoints.length; i++) {
-            console.log(dataPoints.length)
-            var check = false;
-            if (dataPoints[i].label == convertToDateFormat(new Date(childSnap.child("/time").val()))) {
-              dataPoints[i].y += childSnap.child("/value").val();
-              check = true;
-              break;
-            }
-          }
-          if (!check) {
-            var obj = { y: childSnap.child("/value").val(), label: convertToDateFormat(new Date(childSnap.child("/time").val())) };
-            dataPoints.push(obj);
-            check = false;
+    rawData.forEach(function (childSnap) {
+      if (dataPoints.length == 0) {
+        var obj = { y: childSnap.state ? 1 : 0, label: convertToDateFormat(new Date(childSnap.date)) };
+        dataPoints.push(obj);
+        console.log(Object.keys(dataPoints));
+      } else {
+        for (var i = 0; i < dataPoints.length; i++) {
+          console.log(dataPoints.length)
+          var check = false;
+          if (dataPoints[i].label == convertToDateFormat(new Date(childSnap.date))) {
+            dataPoints[i].y += childSnap.state ? 1 : 0;
+            check = true;
+            break;
           }
         }
-      });
-      let chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        exportEnabled: true,
-        title: {
-          text: "Nombre approximatif d'oiseaux par jour"
-        },
-        data: [{
-          type: "column",
-          indexLabel: "{y} oiseaux",
-          click: newClickGraphCount,
-          dataPoints: dataPoints
-        }]
-
-      });
-      chart.render();
+        if (!check) {
+          var obj = { y: childSnap.state ? 1 : 0, label: convertToDateFormat(new Date(childSnap.date)) };
+          dataPoints.push(obj);
+          check = false;
+        }
+      }
     });
+    let chart = new CanvasJS.Chart("chartContainer", {
+      animationEnabled: true,
+      exportEnabled: true,
+      title: {
+        text: "Nombre approximatif d'oiseaux par jour"
+      },
+      data: [{
+        type: "column",
+        indexLabel: "{y} passage(s)",
+        click: newClickGraphCount,
+        dataPoints: dataPoints
+      }]
+
+    });
+    chart.render();
   }
 
   clickGraphCount(e) {
     this.return = true;
     var dataPoints = [];
-    var countRef = this.database.ref('/stats/birds_count');
-    countRef.once('value', function (snap) {
-      snap.forEach(function (childSnap) {
-        if (e.dataPoint.label == convertToDateFormat(new Date(childSnap.child("/time").val()))) {
-          var tmp = new Date(childSnap.child("/time").val());
-          var time = "" + tmp.getHours() + ":" + tmp.getMinutes() + ":" + tmp.getSeconds();
-          var obj = { y: childSnap.child("/value").val(), label: time };
-          dataPoints.push(obj);
-        }
-      });
-      let chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        exportEnabled: true,
-        title: {
-          text: "Nombre approximatif d'oiseaux le " + e.dataPoint.label
-        },
-        data: [{
-          type: "spline",
-          indexLabel: "{y} oiseaux",
-          dataPoints: dataPoints
-        }]
-
-      });
-      chart.render();
+    var rawData = this.dbService.getBirdStats();
+    rawData.forEach(function (childSnap) {
+      if (e.dataPoint.label == convertToDateFormat(new Date(childSnap.date))) {
+        var tmp = new Date(childSnap.date);
+        var time = "" + tmp.getHours() + ":" + tmp.getMinutes() + ":" + tmp.getSeconds();
+        var obj = { y: childSnap.state ? 1 : 0, label: time };
+        dataPoints.push(obj);
+      }
     });
+    let chart = new CanvasJS.Chart("chartContainer", {
+      animationEnabled: true,
+      exportEnabled: true,
+      title: {
+        text: "Passages d'oiseaux le " + e.dataPoint.label
+      },
+      data: [{
+        type: "stepArea",
+        indexLabel: "{y} passage(s)",
+        dataPoints: dataPoints
+      }]
+
+    });
+    chart.render();
   }
 
   getFoodStats() {
