@@ -31,15 +31,11 @@ exports.getAlbums = (req, res) => {
 
 exports.getImgInAlbums = (req, res) => {
     Album.findOne({ name: req.params.name }, function (err, album) {
-        let b64;
         var imageMap = [];
-        let temp = {};
         for (let e of album.images) {
-            temp.checked = false;
-            b64 = fs.readFileSync(e.path, "utf8")
-            temp.img = b64;
-            imageMap.push(temp);
+            let b64 = fs.readFileSync(e.path, "utf8");
+            imageMap.push({ checked: false, img: b64 });
         }
         res.send(imageMap);
     });
-}
+} 
