@@ -63,6 +63,7 @@ var app2 = require('./webServer')
 
 const foodRoutes = require("./routes/foodControl");
 const imageRoutes = require("./routes/image");
+const statsRoutes = require("./routes/stats");
 
 
 global.mail = "";
@@ -75,6 +76,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/food", foodRoutes);
 app.use("/image", imageRoutes);
+app.use("/stats", statsRoutes);
 
 
 var server = app.listen(process.env.PORT, function () {
