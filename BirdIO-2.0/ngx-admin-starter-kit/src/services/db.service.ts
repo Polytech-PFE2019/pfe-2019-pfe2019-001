@@ -15,13 +15,8 @@ export class DbService {
         return this.http.get(localServer + "/image/").toPromise();
     }
 
-    getBirdStats() {
-      var mock = []
-      mock.push({date: 1581073922546, state: true})
-      mock.push({date: 1581074115285, state: false})
-      mock.push({date: 1581074151077, state: true})
-      mock.push({date: 1581074160742, state: false})
-      return mock;
+    getWaterAverage() {
+      return this.http.get<any[]>(localServer + "/stats/water").toPromise();
     }
 
     getBirdsDaily(day, month, year) {

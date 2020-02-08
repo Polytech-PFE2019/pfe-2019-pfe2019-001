@@ -24,36 +24,22 @@ export class StatsDisplayComponent implements OnInit {
 
   getWaterStats() {
     var statsWater = [];
-    var average = 0;
-    var temp = undefined;
-    var valueTemp = undefined;
-    var waterStatsRef = this.database.ref('/stats/water');
-    waterStatsRef.once('value', function (snap) {
-      snap.forEach(function (childSnap) {
-        if (temp == undefined) {
-          temp = new Date(childSnap.child("/time").val()).valueOf()
-          valueTemp = childSnap.child("/value").val();
-        } else {
-          if (childSnap.child("/value").val() != valueTemp) {
-            var time = new Date(childSnap.child("/time").val()).valueOf();
-            const diffDays = (time - temp) / 1000;
-            statsWater.push(diffDays);
-            temp = undefined;
-          }
-        }
-      });
-      var total = 0;
-      for (var i = 0; i < statsWater.length; i++) {
-        total += statsWater[i];
-      }
-      var seconds = total / statsWater.length;
-      var days = Math.floor(seconds / (3600 * 24));
-      seconds -= days * 3600 * 24;
-      var hrs = Math.floor(seconds / 3600);
-      seconds -= hrs * 3600;
-      var mnts = Math.floor(seconds / 60);
-      seconds -= mnts * 60;
-      document.getElementById("waterStat").innerHTML = days + " jour(s), " + hrs + " heure(s) et " + mnts + " minute(s)";
+    this.dbService.getWaterAverage().then((object) => {
+      let avg = Math.abs(parseInt(object.avg));
+      console.log(avg);
+      let display = "";
+      let days = Math.trunc(avg / (1000 * 60 * 60 * 24));
+      if (days > 0) display += days + " jour(s) ";
+      avg = avg - (days * 1000 * 60 * 60 * 24);
+      let hours = Math.trunc(avg / (1000 * 60 * 60));
+      if (hours > 0 || days > 0) display += hours + " heure(s) ";
+      avg = avg - (hours * 1000 * 60 * 60);
+      let minutes = Math.trunc(avg / (1000 * 60));
+      if (minutes > 0 || hours > 0 || days > 0) display += minutes + " minute(s)";
+      avg = avg - (minutes * 1000 * 60);
+      let seconds = Math.trunc(avg / 1000);
+      if (display == "") display = "Pas assez de données pour être calculé ...";
+      document.getElementById("waterStat").innerHTML = display;
     });
   }
 
@@ -153,9 +139,7 @@ export class StatsDisplayComponent implements OnInit {
     if (e == undefined) e = {dataPoint: {label: convertToDateFormat(new Date(Date.now()))}};
     var dataPoints = [];
     var split = e.dataPoint.label.split('/');
-    console.log(split);
     this.dbService.getBirdsDaily(split[0], split[1], split[2]).then((rawData) => {
-      console.log(rawData);
       rawData.forEach(function (childSnap) {
         if (e.dataPoint.label == convertToDateFormat(new Date(childSnap.date))) {
           var tmp = new Date(childSnap.date);
@@ -172,7 +156,6 @@ export class StatsDisplayComponent implements OnInit {
         },
         data: [{
           type: "stepArea",
-          indexLabel: "{y} passage(s)",
           dataPoints: dataPoints
         }]
 
