@@ -11,6 +11,17 @@ exports.addStat = (req, res) => {
     });
 }
 
+exports.addStatMqtt = (type, date, state) => {
+    let stat = new Stat()
+    stat.type = type;
+    stat.date = date;
+    stat.state = state;
+    stat.save((err, stat) => {
+        if (err) res.send(err);
+        return stat;
+    });
+}
+
 exports.getStats = (req, res) => {
     let d = new Date(req.body.year, req.body.month, req.body.day);
     let temp = d.getTime();
