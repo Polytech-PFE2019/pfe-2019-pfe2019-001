@@ -17,7 +17,7 @@ const database = require('./utils/database')
 var mqtt = require('mqtt');
 
 var client = mqtt.connect('mqtt://' + process.env.CAMSERVER);
-const waterController = require("./controllers/waterControl");
+const statsController = require("./controllers/stats");
 
 function initDatabaseMiddleWare() {
   if (process.platform === "win32") {
@@ -53,7 +53,8 @@ client.on('connect', () => {
 client.on('message', (topic, message) => {
   if (topic == "sensor/water") {
     console.log(message.toString());
-    waterController.setValue(JSON.parse(message.toString()));
+    let tmp = JSON.parse(message.toString());
+    statsController.addStatMqtt('water', Date.now(), tmp.water);
   }
 });
 

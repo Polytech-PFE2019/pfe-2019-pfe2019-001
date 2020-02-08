@@ -340,5 +340,5 @@ SERVER/ressources/etalon.jpg
 .vscode/
 .vscode/settings.json
 .vscode/settings.json
-localServer/ressources/ressources.json
+localServer/ressources/*
 localServer/out.png

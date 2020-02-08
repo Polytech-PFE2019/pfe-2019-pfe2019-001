@@ -25,15 +25,24 @@ export class DbService {
     }
 
     getBirdsDaily(day, month, year) {
-
+      day = parseInt(day, 10) - 1;
+      month = parseInt(month, 10) - 1;
+      year = parseInt(year, 10);
+      return this.http.get<any[]>(localServer + "/stats/", {params: {day: day, month: month, year: year}}).toPromise();
     }
 
     getBirdsMonthly(month, year) {
-
+      let day: any = 0;
+      month = parseInt(month, 10) - 1;
+      year = parseInt(year, 10);
+      return this.http.get<any[]>(localServer + "/stats/", {params: {day: day, month: month, year: year}}).toPromise();
     }
 
     getBirdsYearly(year) {
-
+      let day: any = 0;
+      let month: any = 0;
+      year = parseInt(year, 10);
+      return this.http.get<any[]>(localServer + "/stats/", {params: {day: day, month: month, year: year}}).toPromise();
     }
 
     getImgInAlbums(name) {

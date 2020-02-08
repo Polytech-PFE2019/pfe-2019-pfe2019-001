@@ -87,7 +87,7 @@ while True:
         if text == "Unoccupied":
             try:
                 requests.post("http://"+os.environ.get('SERVER') +
-                              ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+                              ":"+os.environ.get('PORT')+'/stats/add', json={"type": "bird", "date": int(round(time.time() * 1000)),"state": True})
             except Exception:
                 pass
             print("LIVE")
@@ -97,7 +97,7 @@ while True:
             try:
                 requests.post(
                     "http://"+os.environ.get('SERVER') +
-                    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+                    ":"+os.environ.get('PORT')+'/stats/add', json={"type": "bird", "date": int(round(time.time() * 1000)),"state": False})
             except Exception:
                 pass
             print("COUPER LIVE")
