@@ -54,9 +54,7 @@ export class SocketService {
     }
 
     init() {
-        this.water.next(false);
         this.food.next(false);
-        this.pres.next(false);
         this.error.next(false);
         this.errorCred.next(false);
     }
