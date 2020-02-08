@@ -16,7 +16,7 @@ export class DbService {
     }
 
     getWaterAverage() {
-      return this.http.get<any[]>(localServer + "/stats/water").toPromise();
+      return this.http.get<any>(localServer + "/stats/water").toPromise();
     }
 
     getBirdsDaily(day, month, year) {
