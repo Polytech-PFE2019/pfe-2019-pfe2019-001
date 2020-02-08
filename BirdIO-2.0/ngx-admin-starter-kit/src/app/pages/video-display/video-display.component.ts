@@ -128,7 +128,7 @@ export class VideoDisplayComponent implements OnInit {
       // draw the img directly on 'direct'
       ctx_direct.drawImage(img, 0, 0);
       console.log(direct.toDataURL("image/jpeg"));
-      var image = { value: direct.toDataURL("image/jpeg") }
+      var image = direct.toDataURL("image/jpeg");
       video_ctx.db.addImage(name, image);
       var position = 'top-right' as any;
       var status = 'success' as any;

@@ -49,6 +49,8 @@ export class AlbumComponent implements OnInit {
     console.log("ok")
     this.db.getImgInAlbums(album.album.name).then((res) => {
       this.pictures = res;
+      console.log(res);
+
       this.albumName = album.name;
       this.albumdetail = true;
       for (let e of this.pictures) {
