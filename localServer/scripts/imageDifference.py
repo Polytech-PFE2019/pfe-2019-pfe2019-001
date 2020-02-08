@@ -12,6 +12,7 @@ from socketIO_client import SocketIO
 import json
 import sys
 import requests
+import time
 
 from skimage import data, img_as_float
 from skimage.metrics import structural_similarity
@@ -59,7 +60,7 @@ iterations = 50
 i = 0
 score = 0
 
-cap = cv2.VideoCapture('http://192.168.20.100:8081/')
+cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
 # load the etalon frame
 etalon_path = "./../ressources/etalon00000.jpg"
 dirname = os.path.dirname(__file__)
@@ -83,6 +84,10 @@ while True:
         if(score > 0.40):
             food = True
         else:
-           food = False
-        #x = requests.post("http://localhost:1337/food/dataBaseUpdate", json={"Food": True})
+            food = False
+        try:
+            requests.post("http://"+os.environ.get('SERVER') +
+                          ":"+os.environ.get('PORT')+'/stats/add', json={"type": "food", "date": int(round(time.time() * 1000)),"state": food})
+        except Exception:
+            pass
         sys.exit()

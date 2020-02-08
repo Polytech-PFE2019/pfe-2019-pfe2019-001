@@ -17,7 +17,7 @@ const database = require('./utils/database')
 var mqtt = require('mqtt');
 
 var client = mqtt.connect('mqtt://' + process.env.CAMSERVER);
-const waterController = require("./controllers/waterControl");
+const statsController = require("./controllers/stats");
 
 function initDatabaseMiddleWare() {
   if (process.platform === "win32") {
@@ -53,7 +53,8 @@ client.on('connect', () => {
 client.on('message', (topic, message) => {
   if (topic == "sensor/water") {
     console.log(message.toString());
-    waterController.setValue(JSON.parse(message.toString()));
+    let tmp = JSON.parse(message.toString());
+    statsController.addStatMqtt('water', Date.now(), tmp.water);
   }
 });
 
@@ -68,8 +69,6 @@ const statsRoutes = require("./routes/stats");
 
 global.mail = "";
 global.name = "";
-
-var videoCpt = 5;
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -168,8 +167,12 @@ io.on('connection', function (socket) {
 functions.motionDetection();
 
 const job = new CronJob('00 00 11 * * *', function () {
-  videoCpt = 5;
-  foodControl.setValue();
+  if (fs.existsSync('./ressources/etalon00000.jpg')) {
+    console.log('Checking the food.');
+    foodControl.setValue();
+  } else {
+    console.log('No etalon set, can\'t check the food');
+  }
 });
 console.log('After job instantiation');
 job.start();
@@ -199,7 +202,7 @@ app.post('/bird', function (req, res) {
 // ==================================================================
 var recording = false;
 function video() {
-  if (recording || videoCpt == 0) {
+  if (recording) {
     return;
   }
   var command = ffmpeg();
@@ -227,7 +230,6 @@ function video() {
       })
       .on('end', () => {
         console.log('Video generated.');
-        videoCpt--;
         const directory = './ressources/tmp-images/*';
         console.log('Deleting pictures...');
         rimraf(directory, function () {

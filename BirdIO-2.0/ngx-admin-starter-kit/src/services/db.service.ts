@@ -15,25 +15,29 @@ export class DbService {
         return this.http.get(localServer + "/image/").toPromise();
     }
 
-    getBirdStats() {
-      var mock = []
-      mock.push({date: 1581073922546, state: true})
-      mock.push({date: 1581074115285, state: false})
-      mock.push({date: 1581074151077, state: true})
-      mock.push({date: 1581074160742, state: false})
-      return mock;
+    getWaterAverage() {
+      return this.http.get<any>(localServer + "/stats/water").toPromise();
     }
 
     getBirdsDaily(day, month, year) {
-
+      day = parseInt(day, 10) - 1;
+      month = parseInt(month, 10) - 1;
+      year = parseInt(year, 10);
+      return this.http.get<any[]>(localServer + "/stats/", {params: {day: day, month: month, year: year}}).toPromise();
     }
 
     getBirdsMonthly(month, year) {
-
+      let day: any = 0;
+      month = parseInt(month, 10) - 1;
+      year = parseInt(year, 10);
+      return this.http.get<any[]>(localServer + "/stats/", {params: {day: day, month: month, year: year}}).toPromise();
     }
 
     getBirdsYearly(year) {
-
+      let day: any = 0;
+      let month: any = 0;
+      year = parseInt(year, 10);
+      return this.http.get<any[]>(localServer + "/stats/", {params: {day: day, month: month, year: year}}).toPromise();
     }
 
     getImgInAlbums(name) {

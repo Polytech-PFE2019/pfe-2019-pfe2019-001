@@ -87,7 +87,7 @@ while True:
         if text == "Unoccupied":
             try:
                 requests.post("http://"+os.environ.get('SERVER') +
-                              ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+                              ":"+os.environ.get('PORT')+'/stats/add', json={"type": "bird", "date": int(round(time.time() * 1000)),"state": True})
             except Exception:
                 pass
             print("LIVE")
@@ -97,17 +97,17 @@ while True:
             try:
                 requests.post(
                     "http://"+os.environ.get('SERVER') +
-                    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+                    ":"+os.environ.get('PORT')+'/stats/add', json={"type": "bird", "date": int(round(time.time() * 1000)),"state": False})
             except Exception:
                 pass
             print("COUPER LIVE")
             text = "Unoccupied"
 
     # draw the text and timestamp on the frame
-    cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+    # cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
+    #            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    # cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+    #            (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
     # show the frame and record if the user presses a key
     # cv2.imshow("Security Feed", frame)
