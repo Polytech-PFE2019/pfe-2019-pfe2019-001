@@ -6,8 +6,11 @@
 
 <div class="pictures" *ngIf="!albumdetail">
   <nb-card *ngFor="let album of thumbnails">
-    <img [src]="displayImage(album.thumbnail)" width="200px" height="150px" (click)="openAlbum(album)"
+    <img *ngIf="!videoCheck(album.thumbnail)" [src]="displayImage(album.thumbnail)" width="200px" height="150px" (click)="openAlbum(album)"
       class="thumbnail">
+    <video *ngIf="videoCheck(album.thumbnail)" controls muted="muted" autoplay width="200px" height="150px">
+          <source [src]="getVideoPathInServer(album.thumbnail)" type="video/mp4">
+    </video>
     <nb-card-body class="example-card">
       <p>{{album.album.name}}</p>
     </nb-card-body>
@@ -36,7 +39,10 @@
 
   <div class="pictures">
     <nb-card *ngFor="let picture of pictures">
-      <img [src]="displayImage(picture.img)" width="200px" height="150px" class="thumbnail">
+      <img *ngIf="!videoCheck(picture.img)" [src]="displayImage(picture.img)" width="200px" height="150px" class="thumbnail">
+      <video *ngIf="videoCheck(picture.img)" controls muted="muted" autoplay width="200px" height="150px">
+            <source [src]="getVideoPathInServer(picture.img)" type="video/mp4">
+      </video>
       <nb-checkbox [(checked)]="picture.checked"></nb-checkbox>
     </nb-card>
   </div>

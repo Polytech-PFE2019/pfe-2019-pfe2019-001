@@ -2,6 +2,10 @@ const Stat = require('../models/stats')
 const fs = require('fs');
 const server = require('../server')
 var nodemailer = require('nodemailer');
+const imageController = require("../controllers/image");
+const { spawn } = require('child_process');
+
+let recording = false;
 
 exports.addStat = (req, res) => {
     let stat = new Stat()
@@ -10,6 +14,23 @@ exports.addStat = (req, res) => {
     stat.state = req.body.state;
     if (stat.type == "bird") {
       server.io.emit('presence', stat.state);
+      // ==================================================================
+      if (!recording) {
+        recording = true;
+        let video_name = undefined;
+        console.log("Starting to record ...");
+        var subprocess = spawn(`cd scripts && python3 video_maker.py ../ressources/videos 60`,
+          { shell: true }
+        );
+        subprocess.stdout.on('data', (data) => {
+          video_name = data.toString();
+        });
+        subprocess.stderr.on('close', () => {
+          console.log('Video created ...');
+          recording = false;
+          if (video_name) imageController.addVideo(video_name);
+        });
+      }
     }
     stat.save((err, stat) => {
         if (err) res.send(err);

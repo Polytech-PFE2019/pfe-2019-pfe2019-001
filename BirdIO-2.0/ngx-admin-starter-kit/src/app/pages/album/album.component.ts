@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { DbService } from '../../../services/db.service';
 import * as JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-
+import { localServer } from '../../../environments/environment';
 
 @Component({
   selector: 'app-album',
@@ -43,6 +43,17 @@ export class AlbumComponent implements OnInit {
     this.pictures = null;
     this.albumdetail = false;
     this.albumName = null;
+  }
+
+  videoCheck(thumbnail) {
+    return thumbnail.endsWith(".mp4");
+  }
+
+  getVideoPathInServer(name) {
+    if (!name.endsWith(".mp4")) {
+      return name;
+    }
+    return localServer + "/image/video/" + name.replace(/(\r\n|\n|\r)/gm, "");
   }
 
   openAlbum(album) {

@@ -4,7 +4,7 @@
     <img id="image" crossorigin="" (click)="fullScreen()" [src]="videoSource" *ngIf="!flipped" (error)="imgError()">
 
     <div class="buttons">
-      <nb-checkbox (checkedChange)="flipped">Flip</nb-checkbox>
+      <p>{{printVideoSource()}}</p>
       <button id="capture" mat-raised-button color="accent" (click)="matchCapture()">Capture</button>
       <button id="switch" mat-raised-button color="primary" (click)="switch()">Switch</button>
     </div>
