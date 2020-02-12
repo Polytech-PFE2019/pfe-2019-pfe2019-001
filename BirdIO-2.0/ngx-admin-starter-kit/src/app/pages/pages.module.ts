@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule, NbCheckboxModule } from '@nebular/theme';
+import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule, NbCheckboxModule, NbSelectComponent, NbSelectModule } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BirdComparatorComponent } from './bird-comparator/bird-comparator.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     NbInputModule,
     NbLayoutModule,
     NbSpinnerModule,
-    NbCheckboxModule
+    NbCheckboxModule,
+    NbSelectModule, FormsModule
 
   ],
   declarations: [
