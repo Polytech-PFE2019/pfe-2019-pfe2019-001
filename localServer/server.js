@@ -6,9 +6,6 @@ var cors = require('cors');
 var functions = require('./functions')
 var firebase = require("./firebase.js");
 const fs = require('fs');
-var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-var ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegPath);
 var CronJob = require('cron').CronJob;
 var foodControl = require('./controllers/foodControl');
 const database = require('./utils/database')
@@ -197,47 +194,3 @@ app.post('/bird', function (req, res) {
     ok: "ok",
   });
 });
-
-
-// ==================================================================
-var recording = false;
-function video() {
-  if (recording) {
-    return;
-  }
-  var command = ffmpeg();
-  recording = true;
-  console.log("requetes lancée");
-  var subprocess = spawn(`cd scripts && python3 video_receiver.py ../ressources/tmp-images image 50`,
-    { shell: true }
-  );
-  subprocess.stderr.on('close', () => {
-    console.log('Data gathered, creating video ...');
-    var today = new Date();
-    var timestamp = today.toString();
-    command
-      .input('ressources/tmp-images/image%05d.jpg')
-      .inputFPS(10)
-      .output(`ressources/videos/${timestamp}.mp4`)
-      .outputFPS(30)
-      .noAudio()
-      .on('progress', function (progress) {
-        console.log('Processing: ' + progress.percent + '% done');
-      })
-      .on('error', function (err) {
-        console.log('Cannot process video: ' + err.message);
-        recording = false;
-      })
-      .on('end', () => {
-        console.log('Video generated.');
-        const directory = './ressources/tmp-images/*';
-        console.log('Deleting pictures...');
-        rimraf(directory, function () {
-          console.log('Pictures deleted.');
-          subprocess.kill();
-          recording = false;
-        });
-      })
-      .run();
-  });
-};

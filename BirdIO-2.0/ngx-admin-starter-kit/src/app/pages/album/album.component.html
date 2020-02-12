@@ -4,6 +4,10 @@
   </nb-card-header>
 </nb-card>
 
+<video id="videoPlayer" controls muted="muted" autoplay>
+      <source src="http://localhost:1337/image/video/sample.mp4" type="video/mp4">
+</video>
+
 <div class="pictures" *ngIf="!albumdetail">
   <nb-card *ngFor="let album of thumbnails">
     <img [src]="displayImage(album.thumbnail)" width="200px" height="150px" (click)="openAlbum(album)"

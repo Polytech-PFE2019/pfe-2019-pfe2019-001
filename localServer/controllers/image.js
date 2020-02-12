@@ -15,6 +15,16 @@ exports.addImage = (req, res) => {
     fs.writeFileSync('./ressources/' + image.name + '.jpg', req.body.b64);
 }
 
+exports.addVideo = (name) => {
+  let albumName = "new";
+  let video = { path: "./ressources/videos/" + name + ".mp4", name: name + ".mp4" }
+  Album.findOneAndUpdate({ name: albumName }, { $push: { images: [video] } }, { upsert: true, new: true }, (err, doc) => {
+    if (err) return err;
+    console.log("Video added to database.");
+    return 0;
+  });
+}
+
 exports.getAlbums = (req, res) => {
     Album.find({}, function (err, albums) {
         var albumMap = [];
@@ -22,7 +32,7 @@ exports.getAlbums = (req, res) => {
         albums.forEach((album) => {
             temp.thumbnail = fs.readFileSync(album.images[0].path, "utf8")
             temp.album = album;
-            console.log(temp);
+            //console.log(temp);
             albumMap.push(temp);
         });
         res.send(albumMap);
@@ -38,4 +48,43 @@ exports.getImgInAlbums = (req, res) => {
         }
         res.send(imageMap);
     });
-} 
+}
+
+exports.getVideo = (req, res) => {
+  const path = './ressources/videos/' + req.params.name
+  const stat = fs.statSync(path)
+  const fileSize = stat.size
+  const range = req.headers.range
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-")
+    const start = parseInt(parts[0], 10)
+    const end = parts[1]
+      ? parseInt(parts[1], 10)
+      : fileSize-1
+
+    if(start >= fileSize) {
+      res.status(416).send('Requested range not satisfiable\n'+start+' >= '+fileSize);
+      return
+    }
+
+    const chunksize = (end-start)+1
+    const file = fs.createReadStream(path, {start, end})
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    }
+
+    res.writeHead(206, head)
+    file.pipe(res)
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    }
+    res.writeHead(200, head)
+    fs.createReadStream(path).pipe(res)
+  }
+}
