@@ -30,10 +30,16 @@ exports.getAlbums = (req, res) => {
 }
 
 exports.moveImage = (req, res) => {
-    Album.update({ "name": req.body.oldAlbum }, { $pull: { "images": { "path": req.body.image.path } } }).then(
-        Album.update({ "name": req.body.newAlbum }, { $push: { "images": req.body.image } }).then(
-            res.send(200)
-        ))
+    console.log(req.body);
+
+    Album.findOneAndUpdate({ name: req.body.oldAlbum }, { $pull: { images: { "path": req.body.image.path } } }, function (err, albums) {
+        if (err) return res.send(500, { error: err });
+        Album.findOneAndUpdate({ name: req.body.newAlbum }, { $push: { images: req.body.image } }, { upsert: true, new: true }, (err, doc) => {
+            if (err) return res.send(500, { error: err });
+            return res.send('Succesfully saved.');
+        });
+    })
+
 }
 
 exports.getImgInAlbums = (req, res) => {
