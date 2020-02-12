@@ -40,17 +40,23 @@ exports.getAlbums = (req, res) => {
     });
 }
 
+exports.moveImage = (req, res) => {
+    Album.update({ "name": req.body.oldAlbum }, { $pull: { "images": { "path": req.body.image.path } } }).then(
+        Album.update({ "name": req.body.newAlbum }, { $push: { "images": req.body.image } }).then(
+            res.send(200)
+        ))
+}
+
 exports.getImgInAlbums = (req, res) => {
     Album.findOne({ name: req.params.name }, function (err, album) {
         var imageMap = [];
         for (let e of album.images) {
           if (e.path.endsWith('.mp4')) {
             console.log(e.name);
-            imageMap.push({ checked: false, img: e.name })
+            imageMap.push({ checked: false, img: e.name, path: e.path })
           } else {
             let b64 = fs.readFileSync(e.path, "utf8");
-            imageMap.push({ checked: false, img: b64 });
-          }
+            imageMap.push({ checked: false, img: b64, path: e.path });
         }
         res.send(imageMap);
     });
