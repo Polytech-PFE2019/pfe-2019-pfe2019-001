@@ -72,6 +72,7 @@ export class VideoDisplayComponent implements OnInit {
   }
 
   printVideoSource() {
+    if (this.error) return "No video source available ..."
     return this.videoSource == picamServer ? "Source : Picam" : "Source : Caméra USB";
   }
 
