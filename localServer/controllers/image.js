@@ -59,6 +59,7 @@ exports.getImgInAlbums = (req, res) => {
             imageMap.push({ checked: false, img: b64, path: e.path });
         }
         res.send(imageMap);
+      }
     });
 }
 
