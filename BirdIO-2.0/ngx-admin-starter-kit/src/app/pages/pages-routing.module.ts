@@ -5,7 +5,7 @@ import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AlbumComponent } from './album/album.component';
 import { StatsDisplayComponent } from './stats-display/stats-display.component';
-import { ResourcesMonitorComponent } from './resources-monitor/resources-monitor.component';
+import { SettingsComponent } from './settings/settings.component';
 import { VideoDisplayComponent } from './video-display/video-display.component';
 
 const routes: Routes = [{
@@ -22,8 +22,8 @@ const routes: Routes = [{
       path: 'statistics',
       component: StatsDisplayComponent,
     }, {
-      path: 'ressources',
-      component: ResourcesMonitorComponent,
+      path: 'settings',
+      component: SettingsComponent,
     }, {
       path: 'stream',
       component: VideoDisplayComponent,

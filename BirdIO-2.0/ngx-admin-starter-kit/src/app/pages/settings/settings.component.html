@@ -1,0 +1,7 @@
+<nb-card class="example-card">
+  <img *ngIf="etalonOk" [src]="refresh" (error)="etalonNotOk()" width="200px" height="150px">
+  <p *ngIf="!etalonOk" class="p-center">Food needs to be reset.</p>
+  <nb-card-body class="example-card">
+    <button id="foodEtalon" nbButton color="accent" (click)="setFoodEtalon()">Calibrate food</button>
+  </nb-card-body>
+</nb-card>

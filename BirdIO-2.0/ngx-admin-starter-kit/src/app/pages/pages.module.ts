@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule, NbCheckboxModule, NbSelectComponent, NbSelectModule } from '@nebular/theme';
+import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule, NbCheckboxModule, NbSelectComponent, NbSelectModule, NbButtonModule } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
@@ -15,6 +15,7 @@ import { BirdComparatorComponent } from './bird-comparator/bird-comparator.compo
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
+import { SettingsComponent } from './settings/settings.component';
 
 
 @NgModule({
@@ -33,7 +34,9 @@ import { FormsModule } from '@angular/forms';
     NbLayoutModule,
     NbSpinnerModule,
     NbCheckboxModule,
-    NbSelectModule, FormsModule
+    NbSelectModule,
+    FormsModule,
+    NbButtonModule,
 
   ],
   declarations: [
@@ -42,7 +45,8 @@ import { FormsModule } from '@angular/forms';
     StatsDisplayComponent,
     ResourcesMonitorComponent,
     VideoDisplayComponent,
-    BirdComparatorComponent
+    BirdComparatorComponent,
+    SettingsComponent
   ],
 })
 export class PagesModule {

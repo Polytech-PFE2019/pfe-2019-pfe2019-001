@@ -21,6 +21,11 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Statistics',
     icon: 'bar-chart-2-outline',
     link: '/pages/statistics',
+  },
+  {
+    title: 'Settings',
+    icon: 'settings-2-outline',
+    link: '/pages/settings',
   }, 
   // {
   //   title: 'FEATURES',

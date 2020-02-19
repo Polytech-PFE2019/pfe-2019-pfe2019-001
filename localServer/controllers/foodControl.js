@@ -27,10 +27,14 @@ async function setEtalon(req, res) {
     subprocess.stderr.on('close', () => {
         console.log('Etalon updated');
         res.status(200).json({
-            message: "Message received",
+            message: "Etalon updated",
         });
     });
 }; module.exports.setEtalon = setEtalon;
+
+exports.getEtalon = (req, res) => {
+  res.sendFile('/ressources/etalon00000.jpg', {'root': __dirname + '/..'});
+}
 
 
 async function dataBaseUpdate(req, res) {
