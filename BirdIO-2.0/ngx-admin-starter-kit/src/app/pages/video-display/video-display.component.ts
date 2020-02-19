@@ -44,9 +44,9 @@ export class VideoDisplayComponent implements OnInit {
       this.birdsNearby.forEach((bird) => {
         this._birdsService.getBirdImage(bird.comName).then((result) => {
           var hits = Object.keys(result)[1]
-          if (result[hits].length > 0) {
-            this.birdsNearbyFull.push({ name: bird.comName, url: result[hits][0].largeImageURL });
-            this.display.push({ name: bird.comName, url: result[hits][0].largeImageURL });
+          if (result[hits] > 0) {
+            this.birdsNearbyFull.push({ name: bird.comName, url: result['hits'][0].largeImageURL });
+            this.display.push({ name: bird.comName, url: result['hits'][0].largeImageURL });
           }
         });
       });
