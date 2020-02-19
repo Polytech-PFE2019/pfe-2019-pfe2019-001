@@ -12,8 +12,15 @@ export class SettingsComponent implements OnInit {
   public foodEtalonUrl: string;
   public refresh: string;
   public etalonOk: boolean;
+  public currentMail: String;
+  public oldMail: String;
+  public newMail: String;
 
-  constructor(private dbService: DbService) { }
+  constructor(private dbService: DbService) {
+    this.dbService.getEmail().then((res: any) => {
+      this.oldMail = res.email;
+    })
+  }
 
   ngOnInit() {
     this.etalonOk = true;
@@ -32,6 +39,10 @@ export class SettingsComponent implements OnInit {
   etalonNotOk() {
     console.log('No etalon found');
     this.etalonOk = false;
+  }
+
+  setEmail() {
+    this.dbService.setEmail(this.newMail);
   }
 
 }

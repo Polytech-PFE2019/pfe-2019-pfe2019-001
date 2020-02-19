@@ -5,3 +5,10 @@
     <button id="foodEtalon" nbButton color="accent" (click)="setFoodEtalon()">Calibrate food</button>
   </nb-card-body>
 </nb-card>
+
+<nb-card class="email-card">
+  <nb-card-body>
+    <input [(ngModel)]="newMail" type="text" nbInput status="info" placeholder="{{oldMail}}" style="margin-left: 30px;">
+  </nb-card-body>
+  <button nbButton color="accent" (click)="setEmail()">Change Email</button>
+</nb-card>

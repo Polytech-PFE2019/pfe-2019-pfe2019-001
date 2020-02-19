@@ -1,29 +1,15 @@
 const User = require('../models/user')
 
-exports.addEmail = (req, res) => {
-    let user = new User();
-    user.email = req.body.email;
-    user.save((err, user) => {
-        if (err) res.send(err);
-        res.send(user);
-    });
-}
-
 exports.setEmail = (req, res) => {
-    User.findOne(null, (err, user) => {
-        console.log(user);
-        user.email = req.body.email;
-        user.save((err, user) => {
-            if (err) res.send(err);
-            res.send(user);
-        });
-
-    })
+    User.findOneAndUpdate(null, { email: req.body.email }, { upsert: true, new: true }, (err, doc) => {
+        if (err) return res.status(500).send(err);
+        return res.send('Succesfully saved.');
+    });
 }
 
 exports.getEmail = (req, res) => {
     User.findOne(null, (err, user) => {
-        if (err) return res.send(500, { error: err });
+        if (err) return res.status(500).send(err);
         res.send(user)
     })
 }

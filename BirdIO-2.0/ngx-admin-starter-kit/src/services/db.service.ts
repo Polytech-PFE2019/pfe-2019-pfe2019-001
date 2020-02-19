@@ -59,4 +59,12 @@ export class DbService {
   setFoodEtalon() {
     return this.http.post(localServer + "/food/setEtalon", {}).toPromise();
   }
+
+  setEmail(email) {
+    return this.http.post(localServer + '/user', { email: email }).toPromise();
+  }
+
+  getEmail() {
+    return this.http.get(localServer + '/user/').toPromise();
+  }
 }
