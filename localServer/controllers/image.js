@@ -41,14 +41,14 @@ exports.getAlbums = (req, res) => {
 
 exports.moveImage = (req, res) => {
     console.log(req.body);
-    Album.findOneAndUpdate({ name: req.body.oldAlbum }, { $pull: { images: { "path": req.body.image.path } } }, function (err, albums) {
+    Album.findOneAndUpdate({ name: req.body.oldAlbum }, { $pull: { images: { "path": req.body.image.path } } }, function (err, doc) {
         if (err) return res.status(500).send(err);
-        if (albums.images.length == 1) {
-            albums.remove();
+        if (doc.images.length == 1) {
+            doc.remove();
         }
         Album.findOneAndUpdate({ name: req.body.newAlbum }, { $push: { images: req.body.image } }, { upsert: true, new: true }, (err, doc) => {
             if (err) return res.status(500).send(err);
-            return res.send('Succesfully saved.');
+            return res.status(200).send(doc);
         });
     })
 }
@@ -56,9 +56,12 @@ exports.moveImage = (req, res) => {
 exports.deleteImage = (req, res) => {
     console.log(req.body);
 
-    Album.findOneAndUpdate({ name: req.body.name }, { $pull: { images: { "path": req.body.image } } }, function (err, albums) {
+    Album.findOneAndUpdate({ name: req.body.name }, { $pull: { images: { "path": req.body.image } } }, function (err, doc) {
         if (err) return res.status(500).send(err);
-        return res.send('Succesfully removed.');
+        if (doc.images.length == 1) {
+            doc.remove();
+        }
+        return res.status(200).send(doc);
     })
 }
 

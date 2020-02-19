@@ -46,7 +46,8 @@
       <nb-select-label>
         {{ selectedItem }}
       </nb-select-label>
-      <nb-option *ngFor="let album of thumbnails" [value]="album.album.name">{{album.album.name}}</nb-option>
+      <nb-option *ngFor="let album of thumbnails" [value]="album.album.name">{{album.album.name}}
+      </nb-option>
       <nb-option value="Custom">Custom</nb-option>
     </nb-select>
 
