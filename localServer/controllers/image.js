@@ -41,7 +41,6 @@ exports.getAlbums = (req, res) => {
 
 exports.moveImage = (req, res) => {
     console.log(req.body);
-
     Album.findOneAndUpdate({ name: req.body.oldAlbum }, { $pull: { images: { "path": req.body.image.path } } }, function (err, albums) {
         if (err) return res.status(500).send(err);
         if (albums.images.length == 1) {
@@ -52,7 +51,15 @@ exports.moveImage = (req, res) => {
             return res.send('Succesfully saved.');
         });
     })
+}
 
+exports.deleteImage = (req, res) => {
+    console.log(req.body);
+
+    Album.findOneAndUpdate({ name: req.body.name }, { $pull: { images: { "path": req.body.image } } }, function (err, albums) {
+        if (err) return res.status(500).send(err);
+        return res.send('Succesfully removed.');
+    })
 }
 
 exports.getImgInAlbums = (req, res) => {

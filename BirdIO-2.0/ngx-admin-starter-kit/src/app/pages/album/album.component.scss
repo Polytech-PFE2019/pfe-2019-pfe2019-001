@@ -20,6 +20,13 @@
   flex-wrap: wrap;
 }
 
+.album {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
 .control-status-example {
   color: nb-theme(color-basic-100);
 }

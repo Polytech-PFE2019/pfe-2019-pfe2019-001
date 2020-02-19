@@ -52,6 +52,10 @@ export class DbService {
     return this.http.post(localServer + "/image/add", { name: name, b64: image }).toPromise();
   }
 
+  removeImage(name, image) {
+    return this.http.post(localServer + "/image/remove", { name: name, image: image }).toPromise();
+  }
+
   setFoodEtalon() {
     return this.http.post(localServer + "/food/setEtalon", {}).toPromise();
   }

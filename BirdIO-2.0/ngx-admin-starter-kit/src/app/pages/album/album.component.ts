@@ -129,4 +129,14 @@ export class AlbumComponent implements OnInit {
     }
   }
 
+  remove() {
+    for (let e of this.pictures) {
+      if (e.checked == true) {
+        this.db.removeImage(this.albumName, e.path).then((res) => {
+          console.log(res)
+        })
+      };
+    }
+  }
+
 }
