@@ -2,7 +2,7 @@ const Album = require('../models/image')
 const fs = require('fs');
 
 exports.addImage = (req, res) => {
-    let now = new Date();
+    let now = Date.now();
     let image = { path: "./ressources/" + now.toString() + '.jpg', name: now.toString() };
     let name = "new";
     if (req.body.name != undefined) {
@@ -30,8 +30,10 @@ exports.getAlbums = (req, res) => {
     Album.find({}, function (err, albums) {
         var albumMap = [];
         albums.forEach((album) => {
-            let thumbnail = fs.readFileSync(album.images[0].path, "utf8")
-            albumMap.push({ thumbnail: thumbnail, album: album });
+            if (album.images[0] != undefined) {
+                let thumbnail = fs.readFileSync(album.images[0].path, "utf8")
+                albumMap.push({ thumbnail: thumbnail, album: album });
+            }
         });
         res.send(albumMap);
     });
@@ -41,9 +43,12 @@ exports.moveImage = (req, res) => {
     console.log(req.body);
 
     Album.findOneAndUpdate({ name: req.body.oldAlbum }, { $pull: { images: { "path": req.body.image.path } } }, function (err, albums) {
-        if (err) return res.send(500, { error: err });
+        if (err) return res.status(500).send(err);
+        if (albums.images.length == 1) {
+            albums.remove();
+        }
         Album.findOneAndUpdate({ name: req.body.newAlbum }, { $push: { images: req.body.image } }, { upsert: true, new: true }, (err, doc) => {
-            if (err) return res.send(500, { error: err });
+            if (err) return res.status(500).send(err);
             return res.send('Succesfully saved.');
         });
     })
@@ -52,7 +57,7 @@ exports.moveImage = (req, res) => {
 
 exports.getImgInAlbums = (req, res) => {
     Album.findOne({ name: req.params.name }, function (err, album) {
-        if (err) return res.send(500, { error: err });
+        if (err) return res.status(500).send(err);
         var imageMap = [];
         for (let e of album.images) {
             if (e.path.endsWith('.mp4')) {

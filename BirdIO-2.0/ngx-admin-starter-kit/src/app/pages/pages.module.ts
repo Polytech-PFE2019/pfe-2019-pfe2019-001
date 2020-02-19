@@ -16,6 +16,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 import { SettingsComponent } from './settings/settings.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+
 
 
 @NgModule({
@@ -37,6 +39,9 @@ import { SettingsComponent } from './settings/settings.component';
     NbSelectModule,
     FormsModule,
     NbButtonModule,
+    NbSelectModule, FormsModule,
+    MatAutocompleteModule,
+    NbInputModule
 
   ],
   declarations: [
