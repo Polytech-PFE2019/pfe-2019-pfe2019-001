@@ -11,8 +11,8 @@ import { localServer } from '../../../environments/environment';
   styleUrls: ['./album.component.scss']
 })
 export class AlbumComponent implements OnInit {
-  private albumdetail = false;
-  private loading = true;
+  public albumdetail = false;
+  public loading = true;
   private pictures = null;
   private albumName = null;
   private placeholder;
@@ -121,8 +121,8 @@ export class AlbumComponent implements OnInit {
       if (e.checked == true) {
         console.log(e);
         let newName;
-        if(this.selectedItem == "Custom"){
-            newName = this.customName;
+        if (this.selectedItem == "Custom") {
+          newName = this.customName;
         }
         else {
           newName = this.selectedItem;

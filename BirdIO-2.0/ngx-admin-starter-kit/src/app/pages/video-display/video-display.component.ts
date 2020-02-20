@@ -26,7 +26,7 @@ export class VideoDisplayComponent implements OnInit {
   private image;
   private camera_id = 0;
   private videoSource = picamServer;
-  private flipped = false;
+  public flipped = false;
   private error = false;
 
   @HostBinding('class')
