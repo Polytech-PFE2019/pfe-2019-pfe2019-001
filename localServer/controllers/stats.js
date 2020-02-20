@@ -128,3 +128,13 @@ exports.getAverage = (req, res) => {
         res.send({ avg: cpt / temp1.length })
     });
 }
+
+exports.getLast = (type) => {
+  return new Promise((resolve, reject) => {
+    Stat.findOne({ type: type }).sort({ _id: -1}).exec((err, stats) => {
+      if (err) reject(err);
+      resolve(stats);
+    });
+  })
+
+}

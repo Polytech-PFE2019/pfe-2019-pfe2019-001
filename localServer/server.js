@@ -4,12 +4,11 @@ const bodyParser = require("body-parser");
 var waitUntil = require('wait-until');
 var cors = require('cors');
 var functions = require('./functions')
-var firebase = require("./firebase.js");
 const fs = require('fs');
 var CronJob = require('cron').CronJob;
 var foodControl = require('./controllers/foodControl');
 const database = require('./utils/database')
-
+const stats = require('./controllers/stats');
 
 var mqtt = require('mqtt');
 
@@ -76,8 +75,6 @@ app.use("/image", imageRoutes);
 app.use("/stats", statsRoutes);
 app.use("/user", userRoutes);
 
-
-
 var server = app.listen(process.env.PORT, function () {
   console.log("Connected on port " + process.env.PORT);
 })
@@ -89,77 +86,28 @@ app2.listen(process.env.WEBPORT, function () {
 var io = require('socket.io').listen(server);
 exports.io = io;
 
-
-var ref = firebase.database().ref();
-ref.once('value')
-  .then(function (snap) {
-    console.log("num : " + snap.numChildren())
-    if (snap.numChildren() >= 2) {
-      global.name = snap.child("users/nom").val();
-      global.mail = snap.child("users/email").val();
-      console.log(global.name + global.mail);
-    }
-  });
-
 io.on('connection', function (socket) {
-  console.log('User connected, starting to record...');
+  console.log('New user connected');
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
-  var water;
-  var temp;
-  var waterStatsRef = ref.child('/stats/water');
-  waterStatsRef.orderByKey().limitToLast(1).once('value', function (snap) {
-    temp = snap.val()
-    water = temp[Object.keys(temp)[0]].value;
+  console.log('Fetching latest water value...');
+  stats.getLast('water').then(stats => {
+    console.log('Sending latest water value to client');
+    io.emit("water", stats.state);
+  }).catch(err => {
+    console.log("Error while fetching water value");
   })
 
-  io.emit("water", water)
+  console.log('Fetching latest food value...');
+  stats.getLast('food').then(stats => {
+    console.log('Sending latest food value to client');
+    io.emit("food", stats.state);
+  }).catch(err => {
+    console.log("Error while fetching food value");
+  })
 
-  socket.on('live', function (msg) {
-    console.log("Message: " + msg);
-  });
   socket.on('disconnect', function () {
     console.log("clients: " + Object.keys(io.sockets.sockets).length);
-  });
-
-  socket.on('mail', function (msg) {
-    console.log("Mail: " + msg);
-    mail = msg;
-  });
-
-  socket.on('name', function (msg) {
-    console.log("Name: " + msg);
-    name = msg;
-
-    waitUntil().interval(500)
-      .times(10).condition(function () {
-        return (name != "" && mail != "");
-      })
-      .done(function (result) {
-        var ref = firebase.database().ref();
-        console.log(name + " " + mail);
-        ref.once('value')
-          .then(function (snap) {
-            console.log(snap.numChildren());
-            if (snap.numChildren() >= 1) {
-              console.log("update");
-              var usersRef = ref.child('users');
-              var userRef = usersRef.push();
-              console.log('user key', userRef.key);
-              var userRef = usersRef.update({
-                nom: name, email: mail
-              });
-            } else {
-              console.log("pas update");
-              var usersRef = ref.child('users');
-              var userRef = usersRef.push();
-              console.log('user key', userRef.key);
-              var userRef = usersRef.push({
-                nom: name, email: mail
-              });
-            }
-          });
-      });
   });
 });
 
@@ -176,24 +124,3 @@ const job = new CronJob('00 00 11 * * *', function () {
 });
 console.log('After job instantiation');
 job.start();
-
-var intervalId;
-app.post('/bird', function (req, res) {
-  console.log('Presence: ' + req.body.presence)
-  var file = require('./ressources/ressources.json');
-  file.presence = req.body.presence;
-  fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
-  if (req.body.presence == true) {
-    io.emit('presence', true);
-    //functions.count();
-    //video();
-    //intervalId = setInterval(functions.count, 300000);
-  }
-  else {
-    io.emit('presence', false);
-    clearInterval(intervalId);
-  }
-  res.status(200).json({
-    ok: "ok",
-  });
-});

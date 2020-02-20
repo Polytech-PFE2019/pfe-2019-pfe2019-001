@@ -3,7 +3,7 @@ const User = require('../models/user')
 exports.setEmail = (req, res) => {
     User.findOneAndUpdate(null, { email: req.body.email }, { upsert: true, new: true }, (err, doc) => {
         if (err) return res.status(500).send(err);
-        return res.send('Succesfully saved.');
+        return res.send(doc);
     });
 }
 
@@ -13,4 +13,3 @@ exports.getEmail = (req, res) => {
         res.send(user)
     })
 }
-

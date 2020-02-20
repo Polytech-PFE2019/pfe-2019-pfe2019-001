@@ -17,6 +17,9 @@ async function setValue() {
     subprocess.stderr.on('data', (data) => {
         console.log("error :" + data);
     });
+    subprocess.stderr.on('close', () =>  {
+      console.log('Food control finished')
+    })
 }; module.exports.setValue = setValue;
 
 async function setEtalon(req, res) {

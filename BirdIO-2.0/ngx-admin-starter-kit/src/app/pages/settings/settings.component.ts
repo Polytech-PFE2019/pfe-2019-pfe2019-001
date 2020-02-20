@@ -19,6 +19,8 @@ export class SettingsComponent implements OnInit {
   constructor(private dbService: DbService) {
     this.dbService.getEmail().then((res: any) => {
       this.oldMail = res.email;
+    }).catch((err) => {
+      this.oldMail = "Email not defined";
     })
   }
 
@@ -42,7 +44,10 @@ export class SettingsComponent implements OnInit {
   }
 
   setEmail() {
-    this.dbService.setEmail(this.newMail);
+    this.dbService.setEmail(this.newMail).then(newMail => {
+      this.newMail = '';
+      this.oldMail = newMail.email
+    });
   }
 
 }
