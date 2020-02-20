@@ -9,7 +9,7 @@ import { localServer } from '../environments/environment';
 export class SocketService {
     private socket;
     public water : EventEmitter<any> = new EventEmitter();
-    public food = new Subject<boolean>();
+    public food : EventEmitter<any> = new EventEmitter();
     public errorCred = new Subject<boolean>();
     public pres : EventEmitter<any> = new EventEmitter();
     public error = new Subject<boolean>();
@@ -24,17 +24,10 @@ export class SocketService {
         });
 
         this.socket.on("food", (data) => {
-            console.log("ok")
-            this.food.next(data)
-        });
-
-        this.socket.on("errorCred", (data) => {
-            console.log("ok")
-            this.errorCred.next(data)
+            this.food.emit(data);
         });
 
         this.socket.on('presence', (pres) => {
-            console.log(pres);
             this.pres.emit(pres);
         });
 
@@ -54,7 +47,6 @@ export class SocketService {
     }
 
     init() {
-        this.food.next(false);
         this.error.next(false);
         this.errorCred.next(false);
     }

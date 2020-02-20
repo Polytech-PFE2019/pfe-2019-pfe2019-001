@@ -19,6 +19,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: any;
   private birdPresence = "";
   private waterPresence = "";
+  private foodPresence = "";
 
   themes = [
     {
@@ -79,7 +80,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.socketService.water.subscribe((water) => {
       this.waterPresence = water ? "" : "!";
+    });
+    this.socketService.food.subscribe((food) => {
+      this.foodPresence = food ? "" : "!";
     })
+
   }
 
   ngOnDestroy() {

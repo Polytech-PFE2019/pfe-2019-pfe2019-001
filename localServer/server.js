@@ -8,12 +8,11 @@ const fs = require('fs');
 var CronJob = require('cron').CronJob;
 var foodControl = require('./controllers/foodControl');
 const database = require('./utils/database')
-const stats = require('./controllers/stats');
+const statsController = require('./controllers/stats');
 
 var mqtt = require('mqtt');
 
 var client = mqtt.connect('mqtt://' + process.env.CAMSERVER);
-const statsController = require("./controllers/stats");
 
 function initDatabaseMiddleWare() {
   if (process.platform === "win32") {
@@ -91,19 +90,19 @@ io.on('connection', function (socket) {
   console.log("clients: " + Object.keys(io.sockets.sockets).length);
 
   console.log('Fetching latest water value...');
-  stats.getLast('water').then(stats => {
+  statsController.getLast('water').then(stats => {
     console.log('Sending latest water value to client');
     io.emit("water", stats.state);
   }).catch(err => {
-    console.log("Error while fetching water value");
+    console.log("Error while fetching/sending water value");
   })
 
   console.log('Fetching latest food value...');
-  stats.getLast('food').then(stats => {
+  statsController.getLast('food').then(stats => {
     console.log('Sending latest food value to client');
     io.emit("food", stats.state);
   }).catch(err => {
-    console.log("Error while fetching food value");
+    console.log("Error while fetching/sending food value");
   })
 
   socket.on('disconnect', function () {

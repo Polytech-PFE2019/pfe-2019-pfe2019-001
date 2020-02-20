@@ -13,3 +13,12 @@ exports.getEmail = (req, res) => {
         res.send(user)
     })
 }
+
+exports.getEmailLocal = () => {
+  return new Promise((resolve, reject) => {
+    User.findOne(null, (err, user) => {
+        if (err) reject(err);
+        resolve(user);
+    })
+  })
+}

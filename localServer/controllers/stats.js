@@ -4,6 +4,7 @@ const server = require('../server')
 var nodemailer = require('nodemailer');
 const imageController = require("../controllers/image");
 const { spawn } = require('child_process');
+const userController = require('./user');
 
 let recording = false;
 
@@ -15,7 +16,7 @@ exports.addStat = (req, res) => {
     if (stat.type == "bird") {
         server.io.emit('presence', stat.state);
         // ==================================================================
-        if (!recording) {
+        if (!recording && stat.state) {
             recording = true;
             let video_name = undefined;
             console.log("Starting to record ...");
@@ -31,6 +32,11 @@ exports.addStat = (req, res) => {
                 if (video_name) imageController.addVideo(video_name);
             });
         }
+    } else if (stat.type == "food") {
+      server.io.emit('food', stat.state);
+      if (!stat.state) {
+        sendMail('Cabin out of food', 'The cabin is out of food and needs to be refilled.');
+      }
     }
     stat.save((err, stat) => {
         if (err) res.send(err);
@@ -44,41 +50,9 @@ exports.addStatMqtt = (type, date, state) => {
     stat.date = date;
     stat.state = state;
     if (type == "water") {
-        var credentialsError = false;
-
-        if (global.mail == undefined || global.name == undefined) {
-            console.log("not ok")
-            credentialsError = true;
-        }
-
-        var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'birdcontrol06@gmail.com',
-                pass: 'Birdcontrol06!'
-            }
-        });
-
-        var mailOptions = {
-            from: 'birdcontrol06@gmail.com',
-            to: global.mail,
-            subject: 'Sending Email using Node.js',
-            text: 'That was easy!' + global.name
-        };
-
         server.io.emit('water', state);
-        if (!credentialsError) {
-            server.io.emit("errorCred", false);
-            transporter.sendMail(mailOptions, function (error, info) {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
-        } else {
-            server.io.emit("errorCred", true);
-            console.log("pb de credentials !");
+        if (!state) {
+          sendMail('Cabin out of water', 'The cabin is out of water and needs to be refilled.');
         }
     }
     stat.save((err, stat) => {
@@ -137,4 +111,31 @@ exports.getLast = (type) => {
     });
   })
 
+}
+
+function sendMail(object, content) {
+  userController.getEmailLocal().then(user => {
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'birdcontrol06@gmail.com',
+            pass: 'Birdcontrol06!'
+        }
+    });
+
+    var mailOptions = {
+        from: 'birdcontrol06@gmail.com',
+        to: user.email,
+        subject: object,
+        text: content
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+  });
 }

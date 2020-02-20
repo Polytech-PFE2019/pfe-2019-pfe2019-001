@@ -46,7 +46,7 @@ export class SettingsComponent implements OnInit {
   setEmail() {
     this.dbService.setEmail(this.newMail).then(newMail => {
       this.newMail = '';
-      this.oldMail = newMail.email
+      this.oldMail = newMail['email']
     });
   }
 
