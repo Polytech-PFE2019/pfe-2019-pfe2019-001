@@ -127,6 +127,11 @@ export class AlbumComponent implements OnInit {
         else {
           newName = this.selectedItem;
         }
+        if (this.albumName == newName) {
+          this.ngOnInit();
+          this.albumdetail = false;
+          return;
+        }
         this.db.moveImage(this.albumName, newName, { name: e.img.endsWith('.mp4') ? e.img : "some name", path: e.path }).then((res: any) => {
           console.log(res);
           this.ngOnInit();
