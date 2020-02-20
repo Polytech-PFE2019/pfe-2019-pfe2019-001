@@ -31,12 +31,12 @@ exports.getAlbums = (req, res) => {
         var albumMap = [];
         albums.forEach((album) => {
             if (album.images[0] != undefined) {
-              let thumbnail;
-              if (album.images[0].path.endsWith('.mp4')) {
-                thumbnail = album.images[0].name;
-              } else {
-                thumbnail = fs.readFileSync(album.images[0].path, "utf8")
-              }
+                let thumbnail;
+                if (album.images[0].path.endsWith('.mp4')) {
+                    thumbnail = album.images[0].name;
+                } else {
+                    thumbnail = fs.readFileSync(album.images[0].path, "utf8")
+                }
 
                 albumMap.push({ thumbnail: thumbnail, album: album });
             }
@@ -64,10 +64,15 @@ exports.deleteImage = (req, res) => {
 
     Album.findOneAndUpdate({ name: req.body.name }, { $pull: { images: { "path": req.body.image } } }, function (err, doc) {
         if (err) return res.status(500).send(err);
-        if (doc.images.length == 1) {
-            doc.remove();
-        }
-        return res.status(200).send(doc);
+        fs.unlink(req.body.image, function (err) {
+            if (err) return res.status(500).send(err);
+            if (doc.images.length == 1) {
+                doc.remove();
+            }
+            return res.status(200).send(doc);
+
+        });
+
     })
 }
 
