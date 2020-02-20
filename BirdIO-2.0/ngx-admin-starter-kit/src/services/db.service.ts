@@ -23,6 +23,10 @@ export class DbService {
     return this.http.get<any>(localServer + "/stats/water").toPromise();
   }
 
+  getFoodAverage() {
+    return this.http.get<any>(localServer + "/stats/food").toPromise();
+  }
+
   getBirdsDaily(day, month, year) {
     day = parseInt(day, 10) - 1;
     month = parseInt(month, 10) - 1;

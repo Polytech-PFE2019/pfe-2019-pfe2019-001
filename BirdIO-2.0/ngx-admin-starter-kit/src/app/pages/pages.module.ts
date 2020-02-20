@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule, NbCheckboxModule, NbSelectComponent, NbSelectModule, NbButtonModule } from '@nebular/theme';
+import { NbTooltipModule, NbMenuModule, NbCardModule, NbActionsModule, NbInputModule, NbLayoutModule, NbSpinnerModule, NbCheckboxModule, NbSelectComponent, NbSelectModule, NbButtonModule } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
@@ -41,7 +41,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     NbButtonModule,
     NbSelectModule, FormsModule,
     MatAutocompleteModule,
-    NbInputModule
+    NbInputModule,
+    NbTooltipModule,
 
   ],
   declarations: [

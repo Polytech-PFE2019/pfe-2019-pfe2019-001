@@ -5,14 +5,14 @@
 
     <div class="buttons">
       <p>{{printVideoSource()}}</p>
-      <button id="capture" nbButton color="accent" (click)="matchCapture()">Capture</button>
-      <button id="switch" nbButton color="primary" (click)="switch()">Switch</button>
+      <button id="capture" nbButton color="accent" (click)="matchCapture()">Prendre une photo</button>
+      <button id="switch" nbButton color="primary" (click)="switch()">Changer de caméra</button>
     </div>
   </div>
   <div class="birdcontent">
     <div class="birdcontent">
       <input #searchValue type="text" nbInput class="searchbar" (input)="filter(searchValue.value)" status="info"
-        placeholder="Search...">
+        placeholder="Rechercher...">
     </div>
     <div class="pictures">
       <app-bird-comparator *ngFor="let bird of display" name="{{bird.name}}" url="{{bird.url}}"

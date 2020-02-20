@@ -1,13 +1,57 @@
 <nb-card [nbSpinner]="loading" nbSpinnerSize="giant" nbSpinnerStatus="primary" *ngIf="loading">
   <nb-card-header class="control-status-example">
-    Loading Albums
+    Chargement des albums
+  </nb-card-header>
+</nb-card>
+
+<nb-card *ngIf="!loading">
+  <nb-card-header class="control-status-example">
+    <div class="controls">
+      <div *ngIf="!albumdetail">
+        <h1 class="albumtitle">Mes albums</h1>
+      </div>
+      <nb-actions size="small">
+        <nb-action nbTooltip="Revenir en arrière" class="control-item" icon="arrow-back-outline" *ngIf="albumdetail" (click)="goBack()"></nb-action>
+      </nb-actions>
+      <h1 class="albumtitle" *ngIf="albumdetail">{{albumName}}</h1>
+      <nb-actions size="small">
+        <nb-action nbTooltip="Télécharger la sélection" class="control-item" icon="download-outline" *ngIf="albumdetail" (click)="download()"></nb-action>
+      </nb-actions>
+      <nb-actions size="small">
+        <nb-action nbTooltip="Tout sélectionner" class="control-item" icon="checkmark-square-outline" *ngIf="albumdetail" (click)="selectAll()">
+        </nb-action>
+      </nb-actions>
+      <nb-actions size="small">
+        <nb-action nbTooltip="Tout désélectionner" class="control-item" icon="square-outline" *ngIf="albumdetail" (click)="unSelectAll()"></nb-action>
+      </nb-actions>
+
+      <nb-actions size="small">
+        <nb-action nbTooltip="Supprimer la sélection" class="control-item" icon="trash-outline" *ngIf="albumdetail" (click)="remove()">
+        </nb-action>
+      </nb-actions>
+      <nb-select nbTooltip="Album vers lequel déplacer la sélection" *ngIf="albumdetail" [(selected)]="selectedItem" [(ngModel)]="selectedItem">
+        <nb-select-label>
+          {{ selectedItem }}
+        </nb-select-label>
+        <nb-option *ngFor="let album of thumbnails" [value]="album.album.name">{{album.album.name}}
+        </nb-option>
+        <nb-option value="Custom">Nouvel album</nb-option>
+      </nb-select>
+
+      <input *ngIf="selectedItem == 'Custom' && albumdetail" [(ngModel)]="customName" type="text" nbInput class="searchbar" status="info"
+        placeholder="Album..." style="margin-left: 30px;">
+      <nb-actions nbTooltip="Déplacer la sélection" size="small" *ngIf="albumdetail">
+        <nb-action class="control-item" icon="paper-plane-outline" *ngIf="albumdetail" (click)="move()">
+        </nb-action>
+      </nb-actions>
+    </div>
   </nb-card-header>
 </nb-card>
 
 <div class="pictures" *ngIf="!albumdetail">
-  <nb-card *ngFor="let album of thumbnails">
+  <nb-card *ngFor="let album of thumbnails" (click)="openAlbum(album)">
     <img *ngIf="!videoCheck(album.thumbnail)" [src]="displayImage(album.thumbnail)" width="200px" height="150px"
-      (click)="openAlbum(album)" class="thumbnail">
+      class="thumbnail">
     <video *ngIf="videoCheck(album.thumbnail)" controls muted="muted" autoplay width="200px" height="150px">
       <source [src]="getVideoPathInServer(album.thumbnail)" type="video/mp4">
     </video>
@@ -18,48 +62,6 @@
 </div>
 
 <div *ngIf="albumdetail">
-
-  <div class='title'>
-    <nb-actions size="medium">
-      <nb-action class="control-item" icon="arrow-back-outline" *ngIf="albumdetail" (click)="goBack()"></nb-action>
-    </nb-actions>
-    <h1>{{albumName}}</h1>
-    <nb-actions size="medium">
-      <nb-action class="control-item" icon="download-outline" *ngIf="albumdetail" (click)="download()"></nb-action>
-    </nb-actions>
-    <nb-actions size="medium">
-      <nb-action class="control-item" icon="checkmark-square-outline" *ngIf="albumdetail" (click)="selectAll()">
-      </nb-action>
-    </nb-actions>
-    <nb-actions size="medium">
-      <nb-action class="control-item" icon="square-outline" *ngIf="albumdetail" (click)="unSelectAll()"></nb-action>
-    </nb-actions>
-
-    <nb-actions size="medium">
-      <nb-action class="control-item" icon="trash-outline" *ngIf="albumdetail" (click)="remove()">
-      </nb-action>
-    </nb-actions>
-  </div>
-
-  <div class='album'>
-    <nb-select [(selected)]="selectedItem" [(ngModel)]="selectedItem">
-      <nb-select-label>
-        {{ selectedItem }}
-      </nb-select-label>
-      <nb-option *ngFor="let album of thumbnails" [value]="album.album.name">{{album.album.name}}
-      </nb-option>
-      <nb-option value="Custom">Custom</nb-option>
-    </nb-select>
-
-    <input *ngIf="selectedItem == 'Custom'" [(ngModel)]="customName" type="text" nbInput class="searchbar" status="info"
-      placeholder="Album..." style="margin-left: 30px;">
-    <nb-actions size="medium">
-      <nb-action class="control-item" icon="paper-plane-outline" *ngIf="albumdetail" (click)="move()">
-      </nb-action>
-    </nb-actions>
-
-  </div>
-
 
   <div class="pictures">
     <nb-card *ngFor="let picture of pictures">

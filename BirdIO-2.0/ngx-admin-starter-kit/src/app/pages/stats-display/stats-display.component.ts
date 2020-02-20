@@ -43,6 +43,27 @@ export class StatsDisplayComponent implements OnInit {
     });
   }
 
+  getFoodStats() {
+    var statsWater = [];
+    this.dbService.getFoodAverage().then((object) => {
+      let avg = Math.abs(parseInt(object.avg));
+      console.log(avg);
+      let display = "";
+      let days = Math.trunc(avg / (1000 * 60 * 60 * 24));
+      if (days > 0) display += days + " jour(s) ";
+      avg = avg - (days * 1000 * 60 * 60 * 24);
+      let hours = Math.trunc(avg / (1000 * 60 * 60));
+      if (hours > 0 || days > 0) display += hours + " heure(s) ";
+      avg = avg - (hours * 1000 * 60 * 60);
+      let minutes = Math.trunc(avg / (1000 * 60));
+      if (minutes > 0 || hours > 0 || days > 0) display += minutes + " minute(s)";
+      avg = avg - (minutes * 1000 * 60);
+      let seconds = Math.trunc(avg / 1000);
+      if (display == "") display = "Pas assez de données pour être calculé ...";
+      document.getElementById("foodStat").innerHTML = display;
+    });
+  }
+
   displayYearlyBirdsStats() {
     var dataPoints = [];
     var newThis = this;
@@ -161,42 +182,6 @@ export class StatsDisplayComponent implements OnInit {
 
       });
       chart.render();
-    });
-  }
-
-  getFoodStats() {
-    var statsFood = [];
-    var average = 0;
-    var temp = undefined;
-    var valueTemp = undefined;
-    var foodStatsRef = this.database.ref('/stats/food');
-    foodStatsRef.once('value', function (snap) {
-      snap.forEach(function (childSnap) {
-        if (temp == undefined) {
-          temp = new Date(childSnap.child("/time").val()).valueOf()
-          valueTemp = childSnap.child("/value").val();
-        } else {
-          if (childSnap.child("/value").val() != valueTemp) {
-            var time = new Date(childSnap.child("/time").val()).valueOf();
-            const diffDays = (time - temp) / 1000;
-            statsFood.push(diffDays);
-            console.log("Diffdays :" + diffDays);
-            temp = undefined;
-          }
-        }
-      });
-      var total = 0;
-      for (var i = 0; i < statsFood.length; i++) {
-        total += statsFood[i];
-      }
-      var seconds = total / statsFood.length;
-      var days = Math.floor(seconds / (3600 * 24));
-      seconds -= days * 3600 * 24;
-      var hrs = Math.floor(seconds / 3600);
-      seconds -= hrs * 3600;
-      var mnts = Math.floor(seconds / 60);
-      seconds -= mnts * 60;
-      document.getElementById("foodStat").innerHTML = days + " jour(s), " + hrs + " heure(s) et " + mnts + " minute(s)";
     });
   }
 

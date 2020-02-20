@@ -31,7 +31,13 @@ exports.getAlbums = (req, res) => {
         var albumMap = [];
         albums.forEach((album) => {
             if (album.images[0] != undefined) {
-                let thumbnail = fs.readFileSync(album.images[0].path, "utf8")
+              let thumbnail;
+              if (album.images[0].path.endsWith('.mp4')) {
+                thumbnail = album.images[0].name;
+              } else {
+                thumbnail = fs.readFileSync(album.images[0].path, "utf8")
+              }
+
                 albumMap.push({ thumbnail: thumbnail, album: album });
             }
         });
