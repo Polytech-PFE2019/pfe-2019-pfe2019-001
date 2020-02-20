@@ -3,7 +3,7 @@
   margin-bottom: 5px;
   margin-left: 3px;
   margin-right: 3px;
-  width: 200px;
+  width: 350px;
 }
 
 .email-card {
@@ -11,11 +11,16 @@
   margin-bottom: 5px;
   margin-left: 3px;
   margin-right: 3px;
-  width: 300px;
+  width: 350px;
 }
 
 .p-center {
   display:flex;
   justify-content: center;
   align-items: center;
+}
+
+.settings {
+  display: flex;
+  justify-content: center;
 }

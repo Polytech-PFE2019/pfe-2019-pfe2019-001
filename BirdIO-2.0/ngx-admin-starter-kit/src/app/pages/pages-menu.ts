@@ -2,31 +2,31 @@ import { NbMenuItem } from '@nebular/theme';
 
 export const MENU_ITEMS: NbMenuItem[] = [
   {
-    title: 'Home',
+    title: 'Accueil',
     icon: 'home-outline',
     link: '/pages/home',
     home: true,
   },
   {
-    title: 'Streaming',
+    title: 'Visualisation',
     icon: 'monitor-outline',
     link: '/pages/stream',
   },
   {
-    title: 'Album',
+    title: 'Albums',
     icon: 'image-outline',
     link: '/pages/album',
   },
   {
-    title: 'Statistics',
+    title: 'Statistiques',
     icon: 'bar-chart-2-outline',
     link: '/pages/statistics',
   },
   {
-    title: 'Settings',
+    title: 'Paramètres',
     icon: 'settings-2-outline',
     link: '/pages/settings',
-  }, 
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,

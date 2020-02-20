@@ -20,7 +20,7 @@ export class SettingsComponent implements OnInit {
     this.dbService.getEmail().then((res: any) => {
       this.oldMail = res.email;
     }).catch((err) => {
-      this.oldMail = "Email not defined";
+      this.oldMail = "Email non défini";
     })
   }
 

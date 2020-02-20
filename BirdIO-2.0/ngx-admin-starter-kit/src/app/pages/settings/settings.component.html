@@ -1,15 +1,19 @@
-<nb-card class="example-card">
-  <img *ngIf="etalonOk" [src]="refresh" (error)="etalonNotOk()" width="200px" height="150px">
-  <p *ngIf="!etalonOk" class="p-center">Food needs to be reset.</p>
-  <nb-card-body class="example-card">
-    <button id="foodEtalon" nbButton color="accent" (click)="setFoodEtalon()">Calibrate food</button>
-  </nb-card-body>
-</nb-card>
+<div class="settings">
+  <nb-card class="example-card">
+    <nb-card-body class="example-card">
+      <img *ngIf="etalonOk" [src]="refresh" (error)="etalonNotOk()" width="300px" height="200px">
+      <p *ngIf="!etalonOk" class="p-center">La nourriture doit être actulisée.</p>
+    </nb-card-body>
+    <button id="foodEtalon" nbButton color="accent" (click)="setFoodEtalon()">Actualiser la nourriture</button>
 
-<nb-card class="email-card">
-  <nb-card-body>
-    <p class="p-center">{{oldMail}}</p>
-    <input [(ngModel)]="newMail" type="text" nbInput status="info" placeholder="New mail address" style="margin-left: 30px;">
-  </nb-card-body>
-  <button nbButton color="accent" (click)="setEmail()">Change Email</button>
-</nb-card>
+  </nb-card>
+
+  <nb-card class="email-card">
+    <nb-card-body>
+      <p class="p-center">{{oldMail}}</p>
+      <input [(ngModel)]="newMail" type="text" nbInput status="info" placeholder="New mail address" style="margin-left: 30px;">
+    </nb-card-body>
+    <button nbButton color="accent" (click)="setEmail()">Changer de mail</button>
+  </nb-card>
+
+</div>
