@@ -33,13 +33,13 @@ exports.addStat = (req, res) => {
             });
         }
     } else if (stat.type == "food") {
-      server.io.emit('food', stat.state);
-      if (!stat.state) {
-        sendMail('Cabin out of food', 'The cabin is out of food and needs to be refilled.');
-      }
+        server.io.emit('food', stat.state);
+        if (!stat.state) {
+            sendMail('Pénurie de nourriture', "La cabane n'a plus de nourriture et doit être remplie à nouveau.");
+        }
     }
     stat.save((err, stat) => {
-        if (err) res.send(err);
+        if (err) res.status(500).send(err);
         res.send(stat);
     });
 }
@@ -52,7 +52,7 @@ exports.addStatMqtt = (type, date, state) => {
     if (type == "water") {
         server.io.emit('water', state);
         if (!state) {
-          sendMail('Cabin out of water', 'The cabin is out of water and needs to be refilled.');
+            sendMail("Pénurie d'eau", "La cabane n'a plus d'eau et doit être remplie à nouveau.");
         }
     }
     stat.save((err, stat) => {
@@ -88,13 +88,13 @@ exports.getAverage = (req, res) => {
             return a.state == true
         });
         while (temp2.length != temp1.length) {
-          if (temp2.length > temp1.length) {
-              temp2.pop();
-          } else if (temp1.length > temp2.length) {
-              temp1.pop();
-          }
+            if (temp2.length > temp1.length) {
+                temp2.pop();
+            } else if (temp1.length > temp2.length) {
+                temp1.pop();
+            }
         }
-        if (temp2.length == 0) return res.send({avg: 0});
+        if (temp2.length == 0) return res.send({ avg: 0 });
         function myFunction(value, index, array) {
             return temp2[index].date - value.date;
         }
@@ -107,38 +107,38 @@ exports.getAverage = (req, res) => {
 }
 
 exports.getLast = (type) => {
-  return new Promise((resolve, reject) => {
-    Stat.findOne({ type: type }).sort({ _id: -1}).exec((err, stats) => {
-      if (err) reject(err);
-      resolve(stats);
-    });
-  })
+    return new Promise((resolve, reject) => {
+        Stat.findOne({ type: type }).sort({ _id: -1 }).exec((err, stats) => {
+            if (err) reject(err);
+            resolve(stats);
+        });
+    })
 
 }
 
 function sendMail(object, content) {
-  userController.getEmailLocal().then(user => {
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'birdcontrol06@gmail.com',
-            pass: 'Birdcontrol06!'
-        }
-    });
+    userController.getEmailLocal().then(user => {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'birdcontrol06@gmail.com',
+                pass: 'Birdcontrol06!'
+            }
+        });
 
-    var mailOptions = {
-        from: 'birdcontrol06@gmail.com',
-        to: user.email,
-        subject: object,
-        text: content
-    };
+        var mailOptions = {
+            from: 'birdcontrol06@gmail.com',
+            to: user.email,
+            subject: object,
+            text: content
+        };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
     });
-  });
 }

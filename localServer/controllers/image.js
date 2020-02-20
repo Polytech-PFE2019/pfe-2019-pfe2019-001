@@ -9,8 +9,8 @@ exports.addImage = (req, res) => {
         name = req.body.name;
     }
     Album.findOneAndUpdate({ name: name }, { $push: { images: [image] } }, { upsert: true, new: true }, (err, doc) => {
-        if (err) return res.send(500, { error: err });
-        return res.send('Succesfully saved.');
+        if (err) return res.status(500).send(err);
+        return res.status(200).send(doc);
     });
     fs.writeFileSync('./ressources/' + image.name + '.jpg', req.body.b64);
 }

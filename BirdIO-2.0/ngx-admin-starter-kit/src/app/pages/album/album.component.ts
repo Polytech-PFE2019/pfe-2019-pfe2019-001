@@ -143,6 +143,8 @@ export class AlbumComponent implements OnInit {
       if (e.checked == true) {
         this.db.removeImage(this.albumName, e.path).then((res) => {
           console.log(res)
+          this.ngOnInit();
+          this.albumdetail = false;
         })
       };
     }
