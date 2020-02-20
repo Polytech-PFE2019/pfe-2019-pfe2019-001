@@ -13,4 +13,4 @@ export const environment = {
 
 export const picamServer = "http://raspberrypi.local:8080";
 export const usbcamServer = "http://raspberrypi.local:8081";
-export const localServer = "http://bird:1337";
+export const localServer = "http://bird.local:1337";
