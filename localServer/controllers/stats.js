@@ -87,11 +87,14 @@ exports.getAverage = (req, res) => {
         let temp2 = stats.filter((a) => {
             return a.state == true
         });
-        if (temp2.length > temp1.length) {
-            temp2.pop();
-        } else if (temp1.length > temp2.length) {
-            temp1.pop();
+        while (temp2.length != temp1.length) {
+          if (temp2.length > temp1.length) {
+              temp2.pop();
+          } else if (temp1.length > temp2.length) {
+              temp1.pop();
+          }
         }
+        if (temp2.length == 0) return res.send({avg: 0});
         function myFunction(value, index, array) {
             return temp2[index].date - value.date;
         }
