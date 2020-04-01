@@ -1,0 +1,22 @@
+<div class="body">
+  <div class="video">
+    <img id="image" (click)="fullScreen()" [src]="videoSource" class="rotateimg180" *ngIf="flipped">
+    <img id="image" crossorigin="" (click)="fullScreen()" [src]="videoSource" *ngIf="!flipped" (error)="imgError()">
+
+    <div class="buttons">
+      <p>{{printVideoSource()}}</p>
+      <button id="capture" nbButton color="accent" (click)="matchCapture(undefined)">Prendre une photo</button>
+      <button id="switch" nbButton color="primary" (click)="switch()">Changer de caméra</button>
+    </div>
+  </div>
+  <div class="birdcontent">
+    <div class="birdcontent">
+      <input #searchValue type="text" nbInput class="searchbar" (input)="filter(searchValue.value)" status="info"
+        placeholder="Rechercher...">
+    </div>
+    <div class="pictures">
+      <app-bird-comparator *ngFor="let bird of display" name="{{bird.name}}" url="{{bird.url}}"
+        (click)="matchCapture(bird.name)" style="cursor:pointer"></app-bird-comparator>
+    </div>
+  </div>
+</div>

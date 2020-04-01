@@ -12,6 +12,7 @@ from socketIO_client import SocketIO
 import json
 import sys
 import requests
+import time
 
 from skimage import data, img_as_float
 from skimage.metrics import structural_similarity
@@ -59,7 +60,7 @@ iterations = 50
 i = 0
 score = 0
 
-
+cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
 # load the etalon frame
 etalon_path = "./../ressources/etalon00000.jpg"
 dirname = os.path.dirname(__file__)
@@ -68,38 +69,25 @@ firstFrame = cv2.imread(filename)
 resizedFirstFrame = imutils.resize(firstFrame, width=500)
 firstFrame = cv2.GaussianBlur(resizedFirstFrame, (21, 21), 0)
 
-# take a frame and add the score of the comparison with the etalon to the global score.
-# if it's the last frame to compare, then write the result of the food presence in the database
-
-
-
-def on_img_response(image):
-    global i
-    global score
+#take a frame and add the score of the comparison with the etalon to the global score.
+#if it's the last frame to compare, then write the result of the food presence in the database
+while True:
     if (i < iterations):
-        # calcul du score
-        image = stringToImage(image)
+        #sum for the score computation
+        ret, image = cap.read()
         image = toRGB(image)
         score += getDifferenceWithEtalon(image)
         i += 1
-        socketIO.emit('picture', 100, on_img_response)
-    else:
+    else :
         print(str(score/iterations))
         food = True
         if(score > 0.40):
             food = True
         else:
             food = False
-         try:
-            requests.post(
-                "http://localhost:1337/food/dataBaseUpdate", json={"Food": food})
+        try:
+            requests.post("http://"+os.environ.get('SERVER') +
+                          ":"+os.environ.get('PORT')+'/stats/add', json={"type": "food", "date": int(round(time.time() * 1000)),"state": food})
         except Exception:
             pass
         sys.exit()
-
-
-# socket creation
-socketIO = SocketIO(os.environ.get('CAMSERVER'), os.environ.get('CAMPORT'))
-socketIO.emit('picture', 100, on_img_response)
-
-socketIO.wait()

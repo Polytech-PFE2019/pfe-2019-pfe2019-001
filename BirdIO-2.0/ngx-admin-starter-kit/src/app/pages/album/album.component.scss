@@ -1,0 +1,41 @@
+.example-card {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 3px;
+  margin-right: 3px;
+  //width: 200px;
+}
+
+.pictures {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.title {
+   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.album {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.control-status-example {
+  color: nb-theme(color-basic-100);
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+}
+
+.albumtitle {
+  font-size: 25px;
+}

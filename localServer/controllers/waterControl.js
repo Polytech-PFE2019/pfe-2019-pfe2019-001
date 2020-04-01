@@ -3,7 +3,7 @@ const server = require('../server')
 var nodemailer = require('nodemailer');
 var firebase = require("firebase");
 
-async function setValue(req, res) {
+async function setValue(message) {
 
     var credentialsError = false;
 
@@ -27,13 +27,13 @@ async function setValue(req, res) {
         text: 'That was easy!' + global.name
     };
 
-    console.log("Test : " + req.body.water);
+    console.log("Test : " + message.water);
     try {
         var ref = firebase.database().ref();
         var waterRef = ref.child('stats/water');
         var waterObj = {
             time: Date.now(),
-            value: req.body.water
+            value: message.water
         };
         waterRef.push(waterObj);
         console.log("Water value added to database.")
@@ -42,9 +42,9 @@ async function setValue(req, res) {
     }
 
     var file = require('./../ressources/ressources.json');
-    file.water = req.body.water;
+    file.water = message.water;
     await fs.writeFileSync('./ressources/ressources.json', JSON.stringify(file));
-    server.io.emit('water', req.body.water);
+    server.io.emit('water', message.water);
     if (!credentialsError) {
         server.io.emit("errorCred", false);
         transporter.sendMail(mailOptions, function (error, info) {
@@ -58,8 +58,5 @@ async function setValue(req, res) {
         server.io.emit("errorCred", true);
         console.log("pb de credentials !");
     }
-
-    res.status(200).json({
-        message: "Message received",
-    });
+    
 }; module.exports.setValue = setValue;

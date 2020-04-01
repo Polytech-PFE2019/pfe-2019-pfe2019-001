@@ -1,8 +1,0 @@
-<h1>Albums :</h1>
-<div class="pictures">
-
-    <div *ngFor="let album of thumbnails">
-        <img [src]="displayImage(album.photos[0].value)" (click)="openAlbum(album.photos, album.name)" class="thumbnail">
-        <p>{{album.name}}</p>
-    </div>
-</div>

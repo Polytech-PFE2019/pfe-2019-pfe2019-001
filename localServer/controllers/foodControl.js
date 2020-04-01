@@ -17,6 +17,9 @@ async function setValue() {
     subprocess.stderr.on('data', (data) => {
         console.log("error :" + data);
     });
+    subprocess.stderr.on('close', () =>  {
+      console.log('Food control finished')
+    })
 }; module.exports.setValue = setValue;
 
 async function setEtalon(req, res) {
@@ -27,10 +30,14 @@ async function setEtalon(req, res) {
     subprocess.stderr.on('close', () => {
         console.log('Etalon updated');
         res.status(200).json({
-            message: "Message received",
+            message: "Etalon updated",
         });
     });
 }; module.exports.setEtalon = setEtalon;
+
+exports.getEtalon = (req, res) => {
+  res.sendFile('/ressources/etalon00000.jpg', {'root': __dirname + '/..'});
+}
 
 
 async function dataBaseUpdate(req, res) {

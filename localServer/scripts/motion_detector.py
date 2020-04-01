@@ -17,6 +17,7 @@ from imageio import imread
 import os
 import sys
 from socketIO_client import SocketIO
+import time
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
@@ -24,38 +25,25 @@ ap.add_argument("-a", "--min-area", type=int,
                 default=500, help="minimum area size")
 args = vars(ap.parse_args())
 
-
-def stringToImage(base64_string):
-    img = imread(io.BytesIO(base64.b64decode(base64_string)))
-    cv2_img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    return cv2_img
-
-
 i = 0
 # initialize the first frame in the video stream
 firstFrame = None
 text = "Unoccupied"
 oldFrame = None
+cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
 
-
-def on_connect():
-    print('connect')
-
-
-def on_disconnect():
-    print('disconnect')
-
-
-def on_img_response(data):
-    global firstFrame
-    global i
-    global text
-    global oldFrame
+while True:
+    #print("img")
     i = i+1
-    frame = stringToImage(data)
+    #print('message received with ', data)
+    ret, frame = cap.read()
 
     if frame is None:
-        return
+        print('Impossible to get image')
+        time.sleep(5)
+        cap = cv2.VideoCapture('http://'+os.environ.get('CAMSERVER')+ ':'+ os.environ.get('CAMPORT') +'/')
+        continue
+        #sys.exit()
     # resize the frame, convert it to grayscale, and blur it
     frame = imutils.resize(frame, width=500)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -65,12 +53,12 @@ def on_img_response(data):
     if firstFrame is None:
         firstFrame = gray
         oldFrame = gray
-        return
+        continue
     if i == 10:
         firstFrame = oldFrame
         oldFrame = gray
         i = 0
-        return
+        continue
 
     # compute the absolute difference between the current frame and
     # first frame
@@ -99,7 +87,7 @@ def on_img_response(data):
         if text == "Unoccupied":
             try:
                 requests.post("http://"+os.environ.get('SERVER') +
-                              ":"+os.environ.get('PORT')+'/bird', json={"presence": True})
+                              ":"+os.environ.get('PORT')+'/stats/add', json={"type": "bird", "date": int(round(time.time() * 1000)),"state": True})
             except Exception:
                 pass
             print("LIVE")
@@ -109,18 +97,22 @@ def on_img_response(data):
             try:
                 requests.post(
                     "http://"+os.environ.get('SERVER') +
-                    ":"+os.environ.get('PORT')+'/bird', json={"presence": False})
+                    ":"+os.environ.get('PORT')+'/stats/add', json={"type": "bird", "date": int(round(time.time() * 1000)),"state": False})
             except Exception:
                 pass
             print("COUPER LIVE")
             text = "Unoccupied"
 
     # draw the text and timestamp on the frame
-    cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+    # cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
+    #            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    # cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+    #            (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
+    # show the frame and record if the user presses a key
+    # cv2.imshow("Security Feed", frame)
+    # cv2.imshow("Thresh", thresh)
+    # cv2.imshow("Frame Delta", frameDelta)
     key = cv2.waitKey(1) & 0xFF
 
     # if the `q` key is pressed, break from the lop
@@ -128,13 +120,3 @@ def on_img_response(data):
         # cleanup the camera and close any open windows
         cv2.destroyAllWindows()
         sys.exit()
-
-
-socketIO = SocketIO(os.environ.get('CAMSERVER'), os.environ.get('CAMPORT'))
-socketIO.on('connect', on_connect)
-socketIO.on('disconnect', on_disconnect)
-
-# Listen
-socketIO.on('image', on_img_response)
-
-socketIO.wait()
