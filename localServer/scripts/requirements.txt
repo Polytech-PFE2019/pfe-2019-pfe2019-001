@@ -1,5 +1,5 @@
 imutils==0.5.3
-opencv_python==4.1.2.30
+opencv_python==4.2.0.32
 requests==2.22.0
 numpy==1.17.4
 gevent_socketio==0.3.6
